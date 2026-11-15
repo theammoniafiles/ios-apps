@@ -23,7 +23,7 @@ html{scroll-behavior:smooth}
 body{margin:0;font-family:"Barlow",system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
 button,select,input{font:inherit;min-height:44px}
 .mono{font-family:"JetBrains Mono",ui-monospace,monospace}
-h1,h2,h3{font-family:"Barlow Condensed","Barlow",sans-serif;letter-spacing:.02em;line-height:1.05;margin:0}
+h1,h2,h3{font-family:"Barlow Condensed","Barlow",sans-serif;letter-spacing:.02em;line-height:1.15;margin:0}
 h2{font-size:28px;text-transform:uppercase}
 h3{font-size:20px}
 a{color:var(--accent)}
@@ -53,6 +53,10 @@ select:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bord
 body{padding-bottom:86px}
 .panel{display:none}
 .panel.on{display:block}
+/* Animations header: keep the section title fully clear of the top edge —
+   extra breathing room above the heading so the condensed caps never clip */
+#panel-anims .card:first-child{padding-top:22px}
+#panel-anims .card:first-child h2{line-height:1.25;padding-top:3px;padding-bottom:2px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:14px}
 .card p{margin:8px 0;color:var(--muted)}
 .card p strong{color:var(--ink)}
@@ -1093,10 +1097,12 @@ tr.near td{background:var(--amber-bg);font-weight:700}
       <h4>1 · Basic Refrigeration Cycle</h4>
       <svg id="animCycle" viewBox="0 0 360 250" role="img" aria-label="Animated basic refrigeration cycle">
         <path id="cyclePath" d="M70,60 L290,60 L290,190 L70,190 Z" fill="none" stroke="#5b7a86" stroke-width="7"/>
-        <rect x="238" y="36" width="104" height="48" rx="9" fill="#b42318"/><text x="290" y="57" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">CONDENSER</text><text x="290" y="73" text-anchor="middle" font-size="10.5" fill="#ffd9d4">heat out</text>
+        <rect x="232" y="36" width="116" height="48" rx="9" fill="#24343d" stroke="#7fd8e6"/><text x="290" y="57" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">COMPRESSOR</text><text x="290" y="73" text-anchor="middle" font-size="10.5" fill="#cfe3e8">squeezes vapor</text>
         <rect x="18" y="36" width="104" height="48" rx="9" fill="#0e6b7a"/><text x="70" y="57" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">EVAPORATOR</text><text x="70" y="73" text-anchor="middle" font-size="10.5" fill="#cfeef4">heat in</text>
-        <rect x="232" y="166" width="116" height="48" rx="9" fill="#24343d" stroke="#7fd8e6"/><text x="290" y="187" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">COMPRESSOR</text><text x="290" y="203" text-anchor="middle" font-size="10.5" fill="#cfe3e8">squeezes vapor</text>
+        <rect x="238" y="166" width="104" height="48" rx="9" fill="#b42318"/><text x="290" y="187" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">CONDENSER</text><text x="290" y="203" text-anchor="middle" font-size="10.5" fill="#ffd9d4">heat out</text>
         <rect x="12" y="166" width="116" height="48" rx="9" fill="#b7790a"/><text x="70" y="187" text-anchor="middle" font-size="12.5" font-weight="700" fill="#fff">EXPANSION VALVE</text><text x="70" y="203" text-anchor="middle" font-size="10.5" fill="#fff3d6">pressure drops</text>
+        <text x="183" y="158" text-anchor="middle" font-size="12" font-style="italic" fill="#cfeef4">Liquid feed</text>
+        <rect x="151" y="172" width="64" height="36" rx="6" fill="#2e7d8f" stroke="#7fd8e6"/><text x="183" y="195" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fff">RECEIVER</text>
         <circle r="7" fill="#ff8a80"><animateMotion dur="7s" repeatCount="indefinite"><mpath href="#cyclePath"/></animateMotion></circle>
         <circle r="7" fill="#7fd8e6"><animateMotion dur="7s" begin="-3.5s" repeatCount="indefinite"><mpath href="#cyclePath"/></animateMotion></circle>
         <circle r="5" fill="#fff"><animateMotion dur="7s" begin="-1.7s" repeatCount="indefinite"><mpath href="#cyclePath"/></animateMotion></circle>
@@ -1600,7 +1606,10 @@ tabs.forEach(function(tab){
        (the tab tap is the user gesture iOS needs for sensor permission)
        and stop it when the user leaves the tab. */
     if(tab.dataset.panel==="coil"){ startCoil(); } else { stopCoil(); }
-    window.scrollTo({top:0, behavior:"smooth"});
+    /* Jump straight to the top when a tab opens — a smooth scroll left the
+       Animations header caught half off-screen at the top of the tab. */
+    window.scrollTo({top:0, behavior:"instant"});
+    document.documentElement.scrollTop=0; document.body.scrollTop=0;
   });
 });
 syncRefbar("pt");
