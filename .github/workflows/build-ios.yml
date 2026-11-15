@@ -7,7 +7,7 @@
 # Required GitHub secrets (see README.md for how to create each):
 #   APPLE_TEAM_ID
 #   IOS_DIST_P12, IOS_DIST_P12_PASSWORD
-#   IOS_TOOLS_PROFILE_B64, IOS_STORE_PROFILE_B64
+#   IOS_TOOLS_PROFILE_B64, IOS_STORE_PROFILE_B64, IOS_PLANNER_PROFILE_B64
 #   APP_STORE_CONNECT_API_KEY_ID, APP_STORE_CONNECT_ISSUER_ID,
 #   APP_STORE_CONNECT_API_PRIVATE_KEY
 
@@ -19,6 +19,7 @@ on:
     paths:
       - 'tools-app/**'
       - 'store-app/**'
+      - 'planner-app/**'
   workflow_dispatch:
 
 jobs:
@@ -39,6 +40,11 @@ jobs:
             bundle_id: com.theammoniafiles.store
             profile_name: TAF Store App Store
             ipa_name: ammonia-files-store
+          - app_dir: planner-app
+            app_name: Weekly Planner
+            bundle_id: com.theammoniafiles.planner
+            profile_name: TAF Planner App Store
+            ipa_name: weekly-planner
 
     steps:
       - name: Check out
@@ -89,6 +95,16 @@ jobs:
         if: matrix.app_dir == 'store-app'
         env:
           PROFILE_B64: ${{ secrets.IOS_STORE_PROFILE_B64 }}
+        run: |
+          mkdir -p ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "$PROFILE_B64" | base64 -d > ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles/profile.mobileprovision
+          cp ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+
+      - name: Install provisioning profile (Planner)
+        if: matrix.app_dir == 'planner-app'
+        env:
+          PROFILE_B64: ${{ secrets.IOS_PLANNER_PROFILE_B64 }}
         run: |
           mkdir -p ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles

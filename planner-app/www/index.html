@@ -1,0 +1,773 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="data:,">
+<title>Weekly Planner</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --bg:#0c1626; --bg2:#101f36; --panel:#15263f; --panel2:#1a2f4d; --line:#2a4060;
+  --ink:#e8eef6; --muted:#9db0c8; --faint:#6f87a3;
+  --accent:#3b82c4; --accent2:#f2b705; --green:#3db56a; --red:#e05252;
+  --radius:10px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.4;display:flex;flex-direction:column;height:100dvh}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+h1{font-size:22px;margin:0}
+h2{font-size:16px;margin:0;letter-spacing:.02em}
+h3{font-size:14px;margin:0}
+.topbar{flex:none;z-index:20;background:linear-gradient(180deg,#12233d,#0e1c31);border-bottom:1px solid var(--line);padding:12px 14px 10px}
+.topbar .row{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:10px}
+.brand .mark{width:38px;height:38px;border-radius:9px;background:var(--accent2);color:#16233a;display:grid;place-items:center;font-weight:900;font-size:18px;flex:none}
+.brand small{display:block;color:var(--muted);font-size:12px;font-weight:600}
+.weekbar{margin-top:10px;display:flex;gap:8px;align-items:stretch}
+.weekbar label{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:7px 10px;display:block}
+.weekbar label span{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.weekbar input[type=date]{width:100%;background:transparent;border:0;color:var(--ink);font-size:16px;font-weight:700;padding:2px 0;min-height:28px;color-scheme:dark}
+.navbtn{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);min-width:44px;min-height:44px;font-size:18px;color:var(--ink)}
+main{max-width:760px;margin:0 auto;padding:14px 12px 20px;width:100%;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.tabpage{display:none}
+.tabpage.active{display:block}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:14px}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.card-head .sub{color:var(--muted);font-size:12.5px;margin-top:2px}
+.privacy{background:#12291c;border:1px solid #245c3a;border-radius:12px;padding:12px 14px;margin-bottom:14px;display:flex;gap:10px}
+.privacy .lock{font-size:22px;line-height:1}
+.privacy strong{color:#8fe3ae}
+.privacy p{margin:2px 0 0;color:#cfe8d8;font-size:13.5px}
+.field{margin-bottom:10px}
+.field label{display:block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.textin, .datein, textarea.ta{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:10px;min-height:44px}
+textarea.ta{min-height:110px;resize:vertical;line-height:1.5}
+.textin:focus,.datein:focus,textarea.ta:focus{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent)}
+/* spreadsheet rows */
+.srow{display:flex;align-items:flex-start;gap:0;background:var(--bg2);border:1px solid var(--line);border-radius:8px;margin-bottom:6px;overflow:hidden}
+.srow .cbwrap{flex:none;width:48px;align-self:stretch;display:grid;place-items:center;border-right:1px solid var(--line);background:rgba(255,255,255,.03);cursor:pointer;min-height:48px}
+.srow input[type=checkbox]{width:24px;height:24px;accent-color:var(--green);cursor:pointer}
+.srow .body{flex:1;padding:6px 8px;min-width:0}
+.srow .body input[type=text]{width:100%;background:transparent;border:0;padding:6px 2px;font-size:15px;min-height:36px}
+.srow .body input[type=text]:focus{outline:none}
+.srow .body input[type=date]{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:5px 7px;font-size:13px;color:var(--muted);min-height:36px;color-scheme:dark;margin:2px 0 4px}
+.srow.done .body input[type=text]{text-decoration:line-through;color:var(--muted)}
+.delbtn{flex:none;background:transparent;border:0;color:var(--faint);font-size:20px;width:44px;min-height:48px;align-self:stretch}
+.delbtn:active{color:var(--red)}
+.addbtn{width:100%;background:transparent;border:1.5px dashed var(--line);color:var(--accent);border-radius:8px;padding:11px;font-weight:700;min-height:48px;margin-top:2px}
+.addbtn:active{background:var(--panel2)}
+.empty{color:var(--faint);font-size:13.5px;padding:8px 2px}
+.count{font-size:12px;background:var(--panel2);border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:2px 9px;font-weight:700;white-space:nowrap}
+/* two-col rows (assets, key results, recurring) */
+.trow{display:flex;gap:6px;margin-bottom:6px;align-items:stretch}
+.trow .grow{flex:1;min-width:0}
+.trow .side{width:38%;flex:none}
+.trow input{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:10px;min-height:46px;font-size:14.5px}
+.trow input:focus{outline:2px solid var(--accent)}
+.trow .delbtn{border:1px solid var(--line);border-radius:8px;background:var(--bg2);width:42px}
+/* plan grid */
+.plan-head,.plan-row{display:grid;grid-template-columns:1fr repeat(7,38px) 40px;gap:3px;align-items:center}
+.plan-head{font-size:12px;font-weight:800;color:var(--muted);text-align:center;padding:0 0 6px}
+.plan-head .taskh{text-align:left}
+.plan-row{margin-bottom:6px;background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:5px}
+.plan-row input[type=text]{background:transparent;border:0;padding:8px 4px;font-size:14px;min-width:0;width:100%;min-height:38px}
+.plan-row input[type=text]:focus{outline:none}
+.daycb{width:38px;height:42px;display:grid;place-items:center;cursor:pointer;border-radius:6px}
+.daycb input{width:22px;height:22px;accent-color:var(--accent2);cursor:pointer}
+.plan-row .delbtn{min-height:42px;width:40px}
+@media(max-width:420px){.plan-head,.plan-row{grid-template-columns:1fr repeat(7,32px) 36px}.daycb{width:32px}}
+/* groups */
+.group{border:1px solid var(--line);border-radius:10px;margin-bottom:12px;overflow:hidden}
+.group-head{display:flex;align-items:center;gap:8px;padding:9px 10px;color:#101828}
+.group-head input.gname{flex:1;background:rgba(255,255,255,.85);border:0;border-radius:6px;padding:8px 10px;font-weight:800;font-size:15px;color:#101828;min-height:40px;min-width:0}
+.group-head input[type=color]{width:44px;height:40px;border:0;background:transparent;padding:0;cursor:pointer;flex:none}
+.group-head .gdel{background:rgba(0,0,0,.25);color:#fff;border:0;border-radius:6px;width:40px;height:40px;font-size:17px;flex:none}
+.group-body{background:var(--bg2);padding:8px}
+.progress{height:8px;background:var(--panel2);border-radius:99px;overflow:hidden;margin:10px 0 4px}
+.progress i{display:block;height:100%;background:var(--green);width:0%}
+.stats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.stat{flex:1;min-width:100px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center}
+.stat b{display:block;font-size:20px}
+.stat span{font-size:11.5px;color:var(--muted);font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);padding:12px 16px;font-weight:700;min-height:48px;width:100%}
+.btn.primary{background:var(--accent2);border-color:var(--accent2);color:#17233a}
+.btn:active{filter:brightness(1.15)}
+.hint{font-size:12.5px;color:var(--faint);margin-top:8px}
+/* bottom tabs */
+.tabbar{flex:none;z-index:30;background:#0e1c31;border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom)}
+.tabbar button{flex:1;background:transparent;border:0;color:var(--muted);padding:8px 2px 9px;font-size:11.5px;font-weight:700;min-height:58px;display:flex;flex-direction:column;align-items:center;gap:3px}
+.tabbar button .ic{font-size:19px;line-height:1}
+.tabbar button.active{color:var(--accent2)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:76px;background:#1e3a24;border:1px solid #2f6b41;color:#c9f2d6;padding:9px 16px;border-radius:99px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .25s;z-index:40;white-space:nowrap}
+.toast.show{opacity:1}
+.secttl{font-size:12px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--accent2);margin:2px 0 8px}
+/* reminders */
+.rem-card{border-color:#8a6d1f;background:#241f10}
+.rem-card.overdue{border-color:#7c2d2d;background:#2a1214}
+.rem-card h2{color:var(--accent2)}
+.rem-card.overdue h2{color:#ff9a9a}
+.rem-item{display:flex;gap:8px;align-items:baseline;padding:7px 2px;border-top:1px solid rgba(255,255,255,.07);font-size:14.5px}
+.rem-item:first-child{border-top:0}
+.rem-item .src{flex:none;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;background:var(--panel2);border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:2px 8px}
+.rem-card.overdue .rem-item .src{background:#4a1a1a;border-color:#7c2d2d;color:#ffb3b3}
+.rem-item .txt{flex:1;min-width:0;overflow-wrap:anywhere}
+.rem-item .when{flex:none;color:var(--muted);font-size:12.5px;white-space:nowrap}
+.rem-card.overdue .rem-item .when{color:#ff9a9a;font-weight:700}
+.rem-empty{color:var(--faint);font-size:13.5px;padding:4px 2px}
+/* tab badge */
+.tabbar button{position:relative}
+.tabbadge{position:absolute;top:5px;right:calc(50% - 24px);background:var(--red);color:#fff;font-size:11px;font-weight:800;min-width:20px;height:20px;border-radius:999px;display:grid;place-items:center;padding:0 5px;line-height:1}
+.tabbadge[hidden]{display:none}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="row">
+    <div class="brand">
+      <div class="mark">▦</div>
+      <div><h1>Weekly Planner</h1><small id="weekRangeLabel">Your week at a glance</small></div>
+    </div>
+  </div>
+  <div class="weekbar">
+    <button class="navbtn" id="prevWeek" aria-label="Previous week">‹</button>
+    <label><span>Week beginning (Monday)</span><input type="date" id="weekPicker"></label>
+    <button class="navbtn" id="nextWeek" aria-label="Next week">›</button>
+  </div>
+</header>
+
+<main>
+  <!-- WEEK -->
+  <section class="tabpage active" id="page-week">
+    <div class="privacy">
+      <div class="lock" aria-hidden="true">🔒</div>
+      <div><strong>Private — stays on this phone</strong>
+      <p>Everything you type is stored only on this device. No account, no sign-in, no upload, no sharing. Nothing leaves this phone unless you tap “Download Excel report” yourself and send the file.</p></div>
+    </div>
+
+    <div class="card rem-card" id="dueTodayCard">
+      <div class="card-head"><div><h2>Due Today</h2><div class="sub">Everything due today, across every list.</div></div><span class="count" id="dueTodayCount"></span></div>
+      <div id="dueTodayList"></div>
+    </div>
+
+    <div class="card rem-card overdue" id="overdueCard">
+      <div class="card-head"><div><h2>Overdue</h2><div class="sub">Past its due date and not done yet.</div></div><span class="count" id="overdueCount"></span></div>
+      <div id="overdueList"></div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><b id="statOpen">0</b><span>Open to-dos</span></div>
+      <div class="stat"><b id="statDone">0</b><span>Done this week</span></div>
+      <div class="stat"><b id="statProjects">0</b><span>Projects</span></div>
+    </div>
+
+    <div class="card">
+      <div class="field" style="margin-bottom:2px">
+        <label for="nameField">Name</label>
+        <input class="textin" id="nameField" type="text" placeholder="Your name" autocomplete="name">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div><h2>Projects</h2><div class="sub">This week's project list — tick off as they close out.</div></div><span class="count" id="projCount"></span></div>
+      <div id="projectList"></div>
+      <button class="addbtn" data-add="projects">+ Add project row</button>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div><h2>Asset List</h2><div class="sub">Equipment and issues — what's wrong or what needs doing.</div></div></div>
+      <div id="assetList"></div>
+      <button class="addbtn" id="addAsset">+ Add asset</button>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div><h2>Key Results</h2><div class="sub">Plant targets — metric and target / actual.</div></div></div>
+      <div id="keyList"></div>
+      <button class="addbtn" id="addKey">+ Add key result</button>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-bottom:6px">Weekly Report</h2>
+      <p style="color:var(--muted);font-size:13.5px;margin:0 0 10px">Downloads a real Excel workbook (.xlsx) of this whole week — one sheet per section: Projects, To Do, Completed, Reach Out To, Follow Up, Assets, Plan the Day, Supervisors, Monthly, Quarterly, Annual, Key Results and Notes.</p>
+      <button class="btn primary" id="exportBtn">⬇ Download Excel report (.xlsx)</button>
+      <div class="hint">Filename includes the week date. The file is created on this phone — nothing is sent anywhere. If the Excel library can't load (no connection), you'll get a CSV of this week's to-dos instead.</div>
+    </div>
+  </section>
+
+  <!-- TO DO -->
+  <section class="tabpage" id="page-todo">
+    <div class="card">
+      <div class="card-head"><div><h2>RAILS / TO DO</h2><div class="sub">Tick an item off and it moves to Completed below.</div></div><span class="count" id="todoCount"></span></div>
+      <div id="todoList"></div>
+      <button class="addbtn" data-add="todos">+ Add to-do</button>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div><h2>Completed RAILS / TO DO</h2><div class="sub">Done this week. Untick one to move it back to the open list.</div></div><span class="count" id="doneCount"></span></div>
+      <div id="doneList"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div><h2>Reach Out To / To Do</h2><div class="sub">People to contact and follow-ups you owe them.</div></div></div>
+      <div id="reachList"></div>
+      <button class="addbtn" data-add="reach">+ Add reach-out</button>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div><h2>Follow Up</h2><div class="sub">Things you're waiting on or need to chase.</div></div></div>
+      <div id="followList"></div>
+      <button class="addbtn" data-add="follow">+ Add follow-up</button>
+    </div>
+  </section>
+
+  <!-- PLAN -->
+  <section class="tabpage" id="page-plan">
+    <div class="card">
+      <div class="card-head"><div><h2>Plan the Day</h2><div class="sub">Daily routine — tick each day you get it done.</div></div></div>
+      <div class="plan-head"><span class="taskh">Task</span><span>M</span><span>T</span><span>W</span><span>H</span><span>F</span><span>S</span><span>S</span><span></span></div>
+      <div id="planList"></div>
+      <button class="addbtn" id="addPlan">+ Add routine task</button>
+      <div class="progress"><i id="planBar"></i></div>
+      <div class="hint" id="planPct"></div>
+    </div>
+  </section>
+
+  <!-- PEOPLE -->
+  <section class="tabpage" id="page-people">
+    <div class="card">
+      <div class="card-head"><div><h2>Supervisors To Do List</h2><div class="sub">Grouped by person. Rename, recolor, add or delete any group.</div></div></div>
+      <div id="groupList"></div>
+      <button class="addbtn" id="addGroup">+ Add person / group</button>
+    </div>
+  </section>
+
+  <!-- RECURRING -->
+  <section class="tabpage" id="page-recurring">
+    <div class="card">
+      <div class="card-head"><div><h2>Monthly</h2><div class="sub">Recurring every month — these carry across weeks.</div></div></div>
+      <div id="monthlyList"></div>
+      <button class="addbtn" data-rec="monthly">+ Add monthly item</button>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><h2>Quarterly</h2><div class="sub">Recurring every quarter.</div></div></div>
+      <div id="quarterlyList"></div>
+      <button class="addbtn" data-rec="quarterly">+ Add quarterly item</button>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><h2>Annually</h2><div class="sub">Once a year.</div></div></div>
+      <div id="annualList"></div>
+      <button class="addbtn" data-rec="annual">+ Add annual item</button>
+    </div>
+  </section>
+
+  <!-- NOTES -->
+  <section class="tabpage" id="page-notes">
+    <div class="card">
+      <div class="field"><label for="notesField">Notes</label>
+      <textarea class="ta" id="notesField" placeholder="Notes for this week…"></textarea></div>
+    </div>
+    <div class="card">
+      <div class="field" style="margin-bottom:2px"><label for="notes3Field">Level 3 Notes</label>
+      <textarea class="ta" id="notes3Field" placeholder="Level 3 notes…" style="min-height:160px"></textarea></div>
+    </div>
+    <button class="btn primary" id="exportBtn2">⬇ Download Excel report (.xlsx)</button>
+  </section>
+</main>
+
+<nav class="tabbar" aria-label="Planner sections">
+  <button data-tab="week" class="active"><span class="ic">▦</span>Week</button>
+  <button data-tab="todo"><span class="ic">✓</span>To Do<span class="tabbadge" id="todoBadge" hidden>0</span></button>
+  <button data-tab="plan"><span class="ic">◷</span>Plan</button>
+  <button data-tab="people"><span class="ic">👥</span>People</button>
+  <button data-tab="recurring"><span class="ic">↻</span>Recurring</button>
+  <button data-tab="notes"><span class="ic">✎</span>Notes</button>
+</nav>
+<div class="toast" id="toast">Saved on this phone</div>
+
+<script>
+(function(){
+"use strict";
+var KEY="weekly-planner-v1";
+var uid=function(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);};
+
+function mondayOf(d){var x=new Date(d.getFullYear(),d.getMonth(),d.getDate());var day=(x.getDay()+6)%7;x.setDate(x.getDate()-day);return x;}
+function iso(d){var p=function(n){return (n<10?"0":"")+n;};return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate());}
+function parseISO(s){var p=s.split("-");return new Date(+p[0],+p[1]-1,+p[2]);}
+function fmtDate(s){if(!s)return "";var d=parseISO(s);return d.toLocaleDateString(undefined,{month:"numeric",day:"numeric",year:"numeric"});}
+function fmtLong(s){var d=parseISO(s);var e=new Date(d);e.setDate(e.getDate()+6);var o={month:"short",day:"numeric"};return d.toLocaleDateString(undefined,o)+" – "+e.toLocaleDateString(undefined,o)+", "+e.getFullYear();}
+
+function blankWeek(){
+  return {
+    projects:[{id:uid(),text:"",done:false},{id:uid(),text:"",done:false},{id:uid(),text:"",done:false},{id:uid(),text:"",done:false},{id:uid(),text:"",done:false},{id:uid(),text:"",done:false}],
+    todos:[], reach:[], follow:[],
+    assets:[], plan:[],
+    notes:"", notes3:""
+  };
+}
+var DEFAULT_GROUPS=[
+  {name:"Self",color:"#2f7fc4"},{name:"Norman",color:"#7ac74f"},{name:"Ben",color:"#e05252"},
+  {name:"Garrett",color:"#f2991f"},{name:"All",color:"#8e44ad"},{name:"Purchasing Agent",color:"#f2d705"},
+  {name:"JASON",color:"#7ea6d8"},{name:"Food Safety",color:"#f2991f"}
+];
+var DEFAULT_KEYS=["Safety Audit","HACCP","Sanitation Audit","Plant Audit","Schedule Completion"];
+
+function defaultStore(){
+  return {
+    name:"",
+    groups:DEFAULT_GROUPS.map(function(g){return {id:uid(),name:g.name,color:g.color};}),
+    groupItems:{}, /* weekISO -> {groupId:[{id,text,done}]} */
+    monthly:[], quarterly:[], annual:[],
+    keys:DEFAULT_KEYS.map(function(k){return {id:uid(),metric:k,value:""};}),
+    weeks:{}
+  };
+}
+var store;
+try{ store=JSON.parse(localStorage.getItem(KEY))||defaultStore(); }catch(e){ store=defaultStore(); }
+if(!store.weeks) store=defaultStore();
+var currentWeek=iso(mondayOf(new Date()));
+
+function week(){ if(!store.weeks[currentWeek]) store.weeks[currentWeek]=blankWeek(); return store.weeks[currentWeek]; }
+function gItems(gid){ var w=store.groupItems[currentWeek]; if(!w){w={};store.groupItems[currentWeek]=w;} if(!w[gid]) w[gid]=[]; return w[gid]; }
+
+var saveTimer=null;
+function save(showToast){
+  try{ localStorage.setItem(KEY,JSON.stringify(store)); }catch(e){}
+  if(showToast){ var t=document.getElementById("toast"); t.classList.add("show"); clearTimeout(saveTimer); saveTimer=setTimeout(function(){t.classList.remove("show");},1200); }
+}
+function esc(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+
+/* ---------- generic check-row lists (projects / todos / reach / follow) ---------- */
+function renderCheckList(elId, items, opts){
+  var el=document.getElementById(elId); el.innerHTML="";
+  if(!items.length){ el.innerHTML='<div class="empty">'+(opts.empty||'Nothing here yet — tap “+ Add” below.')+'</div>'; return; }
+  items.forEach(function(it){
+    var row=document.createElement("div"); row.className="srow"+(it.done?" done":"");
+    var html='<label class="cbwrap"><input type="checkbox" '+(it.done?"checked":"")+' aria-label="Done"></label><div class="body">'
+      +'<input type="text" value="'+esc(it.text)+'" placeholder="'+esc(opts.ph||"Type here…")+'">'
+      +(opts.date?'<input type="date" value="'+esc(it.due||"")+'" aria-label="Due date">':"")
+      +'</div><button class="delbtn" aria-label="Delete row">×</button>';
+    row.innerHTML=html;
+    row.querySelector('input[type=checkbox]').addEventListener("change",function(ev){ it.done=ev.target.checked; save(); renderAll(); });
+    var txt=row.querySelector('input[type=text]');
+    txt.addEventListener("input",function(){ it.text=txt.value; save(); updateStats(); });
+    if(opts.date){ var dt=row.querySelector('input[type=date]'); dt.addEventListener("change",function(){ it.due=dt.value; save(); }); }
+    row.querySelector(".delbtn").addEventListener("click",function(){ var src=opts.source||items; var i=src.indexOf(it); if(i>=0)src.splice(i,1); save(); renderAll(); });
+    el.appendChild(row);
+  });
+}
+
+/* ---------- two-column lists ---------- */
+function renderTwoCol(elId, items, f1, f2, ph1, ph2){
+  var el=document.getElementById(elId); el.innerHTML="";
+  if(!items.length){ el.innerHTML='<div class="empty">Nothing here yet — tap “+ Add” below.</div>'; return; }
+  items.forEach(function(it){
+    var row=document.createElement("div"); row.className="trow";
+    row.innerHTML='<div class="grow"><input type="text" value="'+esc(it[f1])+'" placeholder="'+esc(ph1)+'"></div>'
+      +'<div class="side"><input type="text" value="'+esc(it[f2])+'" placeholder="'+esc(ph2)+'"></div>'
+      +'<button class="delbtn" aria-label="Delete row">×</button>';
+    var a=row.querySelectorAll("input")[0], b=row.querySelectorAll("input")[1];
+    a.addEventListener("input",function(){ it[f1]=a.value; save(); });
+    b.addEventListener("input",function(){ it[f2]=b.value; save(); });
+    row.querySelector(".delbtn").addEventListener("click",function(){ var i=items.indexOf(it); if(i>=0)items.splice(i,1); save(); renderAll(); });
+    el.appendChild(row);
+  });
+}
+
+/* ---------- plan ---------- */
+function renderPlan(){
+  var w=week(), el=document.getElementById("planList"); el.innerHTML="";
+  if(!w.plan.length){ el.innerHTML='<div class="empty">No routine tasks yet — add your daily rounds, meetings and checks.</div>'; }
+  var total=0, done=0;
+  w.plan.forEach(function(it){
+    var row=document.createElement("div"); row.className="plan-row";
+    var html='<input type="text" value="'+esc(it.task)+'" placeholder="Task — e.g. Daily schedule review 1:30 PM">';
+    for(var d=0;d<7;d++){ html+='<label class="daycb"><input type="checkbox" data-day="'+d+'" '+(it.days[d]?"checked":"")+' aria-label="Day '+(d+1)+'"></label>'; total++; if(it.days[d])done++; }
+    html+='<button class="delbtn" aria-label="Delete row">×</button>';
+    row.innerHTML=html;
+    var txt=row.querySelector('input[type=text]');
+    txt.addEventListener("input",function(){ it.task=txt.value; save(); });
+    row.querySelectorAll('input[type=checkbox]').forEach(function(cb){ cb.addEventListener("change",function(){ it.days[+cb.getAttribute("data-day")]=cb.checked; save(); renderPlan(); }); });
+    row.querySelector(".delbtn").addEventListener("click",function(){ var i=w.plan.indexOf(it); if(i>=0)w.plan.splice(i,1); save(); renderAll(); });
+    el.appendChild(row);
+  });
+  var pct=total?Math.round(done/total*100):0;
+  document.getElementById("planBar").style.width=pct+"%";
+  document.getElementById("planPct").textContent= total? (done+" of "+total+" day-checks ticked this week ("+pct+"%)") : "";
+}
+
+/* ---------- groups ---------- */
+function renderGroups(){
+  var el=document.getElementById("groupList"); el.innerHTML="";
+  store.groups.forEach(function(g){
+    var items=gItems(g.id);
+    var wrap=document.createElement("div"); wrap.className="group";
+    var head=document.createElement("div"); head.className="group-head"; head.style.background=g.color;
+    head.innerHTML='<input class="gname" type="text" value="'+esc(g.name)+'" aria-label="Group name">'
+      +'<input type="color" value="'+esc(g.color)+'" aria-label="Group color">'
+      +'<button class="gdel" aria-label="Delete group">🗑</button>';
+    head.querySelector(".gname").addEventListener("input",function(ev){ g.name=ev.target.value; save(); });
+    head.querySelector('input[type=color]').addEventListener("input",function(ev){ g.color=ev.target.value; head.style.background=g.color; save(); });
+    head.querySelector(".gdel").addEventListener("click",function(){
+      store.groups=store.groups.filter(function(x){return x.id!==g.id;}); save(); renderAll();
+    });
+    wrap.appendChild(head);
+    var body=document.createElement("div"); body.className="group-body";
+    var list=document.createElement("div");
+    body.appendChild(list);
+    var add=document.createElement("button"); add.className="addbtn"; add.textContent="+ Add to-do for "+(g.name||"this person");
+    add.addEventListener("click",function(){ items.push({id:uid(),text:"",done:false}); save(); renderGroups(); focusLast(list); });
+    body.appendChild(add);
+    wrap.appendChild(body);
+    el.appendChild(wrap);
+    /* render items into list */
+    if(!items.length){ list.innerHTML='<div class="empty">No to-dos yet for this week.</div>'; }
+    items.forEach(function(it){
+      var row=document.createElement("div"); row.className="srow"+(it.done?" done":"");
+      row.innerHTML='<label class="cbwrap"><input type="checkbox" '+(it.done?"checked":"")+' aria-label="Done"></label><div class="body"><input type="text" value="'+esc(it.text)+'" placeholder="To-do…"></div><button class="delbtn" aria-label="Delete row">×</button>';
+      row.querySelector('input[type=checkbox]').addEventListener("change",function(ev){ it.done=ev.target.checked; save(); renderGroups(); updateStats(); });
+      var txt=row.querySelector('input[type=text]');
+      txt.addEventListener("input",function(){ it.text=txt.value; save(); });
+      row.querySelector(".delbtn").addEventListener("click",function(){ var i=items.indexOf(it); if(i>=0)items.splice(i,1); save(); renderGroups(); });
+      list.appendChild(row);
+    });
+  });
+}
+function focusLast(container){ setTimeout(function(){ var inputs=container.querySelectorAll('input[type=text]'); if(inputs.length) inputs[inputs.length-1].focus(); },50); }
+
+/* ---------- reminders: due today / overdue ---------- */
+function todayISO(){ return iso(new Date()); }
+function todayDateOnly(){ var n=new Date(); return new Date(n.getFullYear(),n.getMonth(),n.getDate()); }
+/* Interpret a free-text recurring due ("15th", "4th Tuesday", "7/29/2026") against today.
+   Returns "today", "overdue", or null when it can't be pinned to a day. */
+function recStatus(text){
+  if(!text) return null;
+  var t=(" "+text.toLowerCase()+" "), now=new Date(), td=todayDateOnly(), dom=now.getDate();
+  var md=t.match(/(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?/);
+  if(md){
+    var d1=new Date(now.getFullYear(), +md[1]-1, +md[2]);
+    if(d1.getTime()===td.getTime()) return "today";
+    if(d1<td) return "overdue";
+    return null;
+  }
+  var nth=t.match(/(1st|2nd|3rd|4th|5th|last)\s+(monday|tuesday|wednesday|thursday|friday|saturday|sunday)/);
+  if(nth){
+    var wd=["sunday","monday","tuesday","wednesday","thursday","friday","saturday"].indexOf(nth[2]);
+    var first=new Date(now.getFullYear(), now.getMonth(), 1);
+    var offset=(wd-first.getDay()+7)%7, day;
+    if(nth[1]==="last"){ day=1+offset+28; if(new Date(now.getFullYear(),now.getMonth(),day).getMonth()!==now.getMonth()) day-=7; }
+    else day=1+offset+(parseInt(nth[1],10)-1)*7;
+    if(day===dom) return "today";
+    if(day<dom) return "overdue";
+    return null;
+  }
+  var od=t.match(/(\d{1,2})(?:st|nd|rd|th)\b/);
+  if(od){ var dd=+od[1]; if(dd>=1&&dd<=31){ if(dd===dom) return "today"; if(dd<dom) return "overdue"; } return null; }
+  return null;
+}
+function collectReminders(){
+  var today=todayISO(), dueToday=[], overdue=[];
+  function scanDated(items, label){
+    (items||[]).forEach(function(it){
+      if(it.done || !it.due || !(it.text||"").trim()) return;
+      if(it.due===today) dueToday.push({src:label, text:it.text, when:"Due today"});
+      else if(it.due<today) overdue.push({src:label, text:it.text, when:"Due "+fmtDate(it.due)});
+    });
+  }
+  Object.keys(store.weeks).forEach(function(wk){
+    var w=store.weeks[wk];
+    scanDated(w.todos,"To Do"); scanDated(w.reach,"Reach Out"); scanDated(w.follow,"Follow Up");
+  });
+  [["Monthly",store.monthly],["Quarterly",store.quarterly],["Annual",store.annual]].forEach(function(pair){
+    (pair[1]||[]).forEach(function(it){
+      if(!(it.text||"").trim()) return;
+      var st=recStatus(it.due);
+      if(st==="today") dueToday.push({src:pair[0], text:it.text, when:it.due||"Due today"});
+      else if(st==="overdue") overdue.push({src:pair[0], text:it.text, when:it.due||"Overdue"});
+    });
+  });
+  /* Today's Plan the Day tasks not yet ticked (from the week that contains today) */
+  var tw=store.weeks[iso(mondayOf(new Date()))];
+  if(tw && tw.plan){
+    var di=(new Date().getDay()+6)%7;
+    tw.plan.forEach(function(p){
+      if((p.task||"").trim() && !p.days[di]) dueToday.push({src:"Plan the Day", text:p.task, when:"Today"});
+    });
+  }
+  return {dueToday:dueToday, overdue:overdue};
+}
+function remListHtml(items, emptyMsg){
+  if(!items.length) return '<div class="rem-empty">'+emptyMsg+'</div>';
+  return items.map(function(r){
+    return '<div class="rem-item"><span class="src">'+esc(r.src)+'</span><span class="txt">'+esc(r.text)+'</span><span class="when">'+esc(r.when)+'</span></div>';
+  }).join("");
+}
+function renderReminders(){
+  var r=collectReminders();
+  document.getElementById("dueTodayList").innerHTML=remListHtml(r.dueToday,"Nothing due today.");
+  document.getElementById("overdueList").innerHTML=remListHtml(r.overdue,"Nothing overdue — you're clear.");
+  document.getElementById("dueTodayCount").textContent=r.dueToday.length? r.dueToday.length+" due" : "";
+  document.getElementById("overdueCount").textContent=r.overdue.length? r.overdue.length+" overdue" : "";
+  var badge=document.getElementById("todoBadge"), total=r.dueToday.length+r.overdue.length;
+  badge.textContent=total; badge.hidden= total===0;
+}
+
+/* ---------- stats / render all ---------- */
+function updateStats(){
+  var w=week();
+  var open=w.todos.filter(function(t){return !t.done && t.text.trim();}).length + w.todos.filter(function(t){return !t.done;}).length*0; // open count below recomputed
+  open=w.todos.filter(function(t){return !t.done;}).length;
+  var done=w.todos.filter(function(t){return t.done;}).length;
+  document.getElementById("statOpen").textContent=open;
+  document.getElementById("statDone").textContent=done;
+  document.getElementById("statProjects").textContent=w.projects.filter(function(p){return p.text.trim();}).length;
+  document.getElementById("todoCount").textContent=open+" open";
+  document.getElementById("doneCount").textContent=done+" done";
+  document.getElementById("projCount").textContent=w.projects.filter(function(p){return p.done;}).length+" / "+w.projects.length+" ticked";
+}
+function renderAll(){
+  var w=week();
+  document.getElementById("weekPicker").value=currentWeek;
+  document.getElementById("weekRangeLabel").textContent="Week of "+fmtLong(currentWeek);
+  document.getElementById("nameField").value=store.name||"";
+  renderCheckList("projectList", w.projects, {ph:"Project…"});
+  renderCheckList("todoList", w.todos.filter(function(t){return !t.done;}), {date:true, ph:"To-do…", source:w.todos});
+  renderCheckList("doneList", w.todos.filter(function(t){return t.done;}), {date:true, ph:"To-do…", source:w.todos, empty:"Nothing completed yet this week — tick an open item off and it lands here."});
+  renderCheckList("reachList", w.reach, {date:true, ph:"Person / what you owe them…"});
+  renderCheckList("followList", w.follow, {date:true, ph:"Follow-up…"});
+  renderTwoCol("assetList", w.assets, "name","notes","Asset — e.g. Chiller 5","Notes — what's wrong / needs doing");
+  renderTwoCol("keyList", store.keys, "metric","value","Metric","Target / actual");
+  renderTwoCol("monthlyList", store.monthly, "text","due","Monthly item","Due by — e.g. 15th, 4th Tuesday");
+  renderTwoCol("quarterlyList", store.quarterly, "text","due","Quarterly item","Due — e.g. first period of Q");
+  renderTwoCol("annualList", store.annual, "text","due","Annual item","Due — e.g. June, April/October");
+  renderPlan();
+  renderGroups();
+  renderReminders();
+  document.getElementById("notesField").value=w.notes||"";
+  document.getElementById("notes3Field").value=w.notes3||"";
+  updateStats();
+}
+
+/* ---------- add buttons ---------- */
+document.querySelectorAll("[data-add]").forEach(function(btn){
+  btn.addEventListener("click",function(){
+    var k=btn.getAttribute("data-add"), w=week();
+    if(k==="projects") w.projects.push({id:uid(),text:"",done:false});
+    if(k==="todos") w.todos.push({id:uid(),text:"",due:"",done:false});
+    if(k==="reach") w.reach.push({id:uid(),text:"",due:"",done:false});
+    if(k==="follow") w.follow.push({id:uid(),text:"",due:"",done:false});
+    save(); renderAll();
+  });
+});
+document.querySelectorAll("[data-rec]").forEach(function(btn){
+  btn.addEventListener("click",function(){ store[btn.getAttribute("data-rec")].push({id:uid(),text:"",due:""}); save(); renderAll(); });
+});
+document.getElementById("addAsset").addEventListener("click",function(){ week().assets.push({id:uid(),name:"",notes:""}); save(); renderAll(); });
+document.getElementById("addKey").addEventListener("click",function(){ store.keys.push({id:uid(),metric:"",value:""}); save(); renderAll(); });
+document.getElementById("addPlan").addEventListener("click",function(){ week().plan.push({id:uid(),task:"",days:[false,false,false,false,false,false,false]}); save(); renderAll(); });
+document.getElementById("addGroup").addEventListener("click",function(){ store.groups.push({id:uid(),name:"New Person",color:"#5b7a99"}); save(); renderAll(); });
+
+document.getElementById("nameField").addEventListener("input",function(ev){ store.name=ev.target.value; save(); });
+document.getElementById("notesField").addEventListener("input",function(ev){ week().notes=ev.target.value; save(); });
+document.getElementById("notes3Field").addEventListener("input",function(ev){ week().notes3=ev.target.value; save(); });
+
+/* ---------- week nav ---------- */
+function setWeek(s){ save(); currentWeek=iso(mondayOf(parseISO(s))); renderAll(); save(true); }
+document.getElementById("weekPicker").addEventListener("change",function(ev){ if(ev.target.value) setWeek(ev.target.value); });
+document.getElementById("prevWeek").addEventListener("click",function(){ var d=parseISO(currentWeek); d.setDate(d.getDate()-7); setWeek(iso(d)); });
+document.getElementById("nextWeek").addEventListener("click",function(){ var d=parseISO(currentWeek); d.setDate(d.getDate()+7); setWeek(iso(d)); });
+
+/* ---------- tabs ---------- */
+document.querySelectorAll(".tabbar button").forEach(function(btn){
+  btn.addEventListener("click",function(){
+    document.querySelectorAll(".tabbar button").forEach(function(b){b.classList.remove("active");});
+    btn.classList.add("active");
+    document.querySelectorAll(".tabpage").forEach(function(p){p.classList.remove("active");});
+    document.getElementById("page-"+btn.getAttribute("data-tab")).classList.add("active");
+    document.querySelector("main").scrollTop=0;
+  });
+});
+
+/* ---------- export: real Excel workbook (.xlsx), CSV fallback ---------- */
+function downloadBlob(blob, filename){
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },400);
+}
+function aoaSheet(rows, widths){
+  var ws=XLSX.utils.aoa_to_sheet(rows);
+  if(widths) ws["!cols"]=widths.map(function(n){return {wch:n};});
+  return ws;
+}
+function datedRows(items){
+  return items.filter(function(t){return (t.text||"").trim();}).map(function(t){ return [t.text, t.due?fmtDate(t.due):""]; });
+}
+function buildWorkbook(){
+  var w=week();
+  var wb=XLSX.utils.book_new();
+  wb.Props={ Title:"Weekly Planner — Week of "+fmtDate(currentWeek), Author:store.name||"" };
+  var projRows=[["Done","Project"]].concat(w.projects.filter(function(p){return p.text.trim();}).map(function(p){ return [p.done?"X":"", p.text]; }));
+  XLSX.utils.book_append_sheet(wb, aoaSheet(projRows,[6,60]), "Projects");
+  XLSX.utils.book_append_sheet(wb, aoaSheet([["To-Do","Due Date"]].concat(datedRows(w.todos.filter(function(t){return !t.done;}))),[60,14]), "To Do");
+  XLSX.utils.book_append_sheet(wb, aoaSheet([["Completed To-Do","Due Date"]].concat(datedRows(w.todos.filter(function(t){return t.done;}))),[60,14]), "Completed");
+  XLSX.utils.book_append_sheet(wb, aoaSheet([["Reach Out To","Due Date"]].concat(datedRows(w.reach)),[60,14]), "Reach Out To");
+  XLSX.utils.book_append_sheet(wb, aoaSheet([["Follow Up","Due Date"]].concat(datedRows(w.follow)),[60,14]), "Follow Up");
+  var assetRows=[["Asset","Notes"]].concat(w.assets.filter(function(a){return (a.name||"").trim()||(a.notes||"").trim();}).map(function(a){ return [a.name||"", a.notes||""]; }));
+  XLSX.utils.book_append_sheet(wb, aoaSheet(assetRows,[30,60]), "Assets");
+  var planRows=[["Task","M","T","W","H","F","S","S"]].concat(w.plan.filter(function(p){return p.task.trim();}).map(function(p){
+    return [p.task].concat(p.days.map(function(d){return d?"X":"";}));
+  }));
+  XLSX.utils.book_append_sheet(wb, aoaSheet(planRows,[44,5,5,5,5,5,5,5]), "Plan the Day");
+  var supRows=[["Group","Done","To-Do"]];
+  store.groups.forEach(function(g){
+    gItems(g.id).filter(function(t){return t.text.trim();}).forEach(function(t){ supRows.push([g.name||"", t.done?"X":"", t.text]); });
+  });
+  XLSX.utils.book_append_sheet(wb, aoaSheet(supRows,[22,6,60]), "Supervisors");
+  function recSheet(name, items){
+    var rows=[[name+" Item","Due"]].concat(items.filter(function(t){return (t.text||"").trim();}).map(function(t){ return [t.text, t.due||""]; }));
+    XLSX.utils.book_append_sheet(wb, aoaSheet(rows,[50,26]), name);
+  }
+  recSheet("Monthly", store.monthly); recSheet("Quarterly", store.quarterly); recSheet("Annual", store.annual);
+  var keyRows=[["Metric","Target / Actual"]].concat(store.keys.filter(function(k){return (k.metric||"").trim()||(k.value||"").trim();}).map(function(k){ return [k.metric||"", k.value||""]; }));
+  XLSX.utils.book_append_sheet(wb, aoaSheet(keyRows,[34,50]), "Key Results");
+  var noteRows=[["Week beginning", fmtLong(currentWeek)],["Name", store.name||""],["",""],["Notes", w.notes||""],["",""],["Level 3 Notes", w.notes3||""]];
+  XLSX.utils.book_append_sheet(wb, aoaSheet(noteRows,[18,90]), "Notes");
+  return wb;
+}
+function csvCell(s){ s=(s==null?"":String(s)); return /[",\n]/.test(s)? '"'+s.replace(/"/g,'""')+'"' : s; }
+function downloadCSVFallback(){
+  var w=week();
+  var lines=["Item,Status,Due Date"];
+  w.todos.forEach(function(t){
+    if(!(t.text||"").trim()) return;
+    lines.push([csvCell(t.text), t.done?"Completed":"Open", t.due?fmtDate(t.due):""].join(","));
+  });
+  downloadBlob(new Blob([lines.join("\r\n")],{type:"text/csv"}), "weekly-planner-"+currentWeek+"-todos.csv");
+  var t=document.getElementById("toast"); t.textContent="Excel library offline — saved a CSV of your to-dos instead";
+  t.classList.add("show"); setTimeout(function(){ t.classList.remove("show"); t.textContent="Saved on this phone"; },2600);
+}
+function doExport(){
+  if(typeof XLSX==="undefined" || !XLSX.utils || !XLSX.write){ downloadCSVFallback(); return; }
+  try{
+    var wb=buildWorkbook();
+    var out=XLSX.write(wb,{bookType:"xlsx", type:"array"});
+    downloadBlob(new Blob([out],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}), "weekly-planner-"+currentWeek+".xlsx");
+  }catch(e){ downloadCSVFallback(); }
+}
+document.getElementById("exportBtn").addEventListener("click",doExport);
+document.getElementById("exportBtn2").addEventListener("click",doExport);
+
+renderAll();
+})();
+</script>
+<script>
+/* Weekly Planner native notification bridge.
+   Injected at packaging time into the native (Capacitor) builds only.
+   Schedules a daily 7:00 AM on-device local notification summarising
+   due-today + overdue items from the planner data (localStorage key
+   weekly-planner-v1). No server, no push, no data leaves the phone.
+   No-ops completely in a plain browser (no window.Capacitor). */
+(function(){
+"use strict";
+var KEY="weekly-planner-v1";
+var NOTIF_ID=9101;
+function pad(n){return (n<10?"0":"")+n;}
+function iso(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());}
+function todayISO(){return iso(new Date());}
+function mondayOf(d){var x=new Date(d.getFullYear(),d.getMonth(),d.getDate());var day=(x.getDay()+6)%7;x.setDate(x.getDate()-day);return x;}
+function parseISO(s){var p=(s||"").split("-");return new Date(+p[0],(+p[1]||1)-1,+p[2]||1);}
+function recStatus(due){
+  if(!due) return "none";
+  var now=new Date(); now.setHours(0,0,0,0);
+  var m=due.match(/^(\d{1,2})\/(\d{1,2})$/);
+  if(m){ var dt=new Date(now.getFullYear(),+m[0]-1,+m[1]); return dt.getTime()===now.getTime()?"today":(dt<now?"overdue":"future"); }
+  if(/^\d{4}-\d{2}-\d{2}$/.test(due)){ var d2=parseISO(due); return d2.getTime()===now.getTime()?"today":(d2<now?"overdue":"future"); }
+  return "none";
+}
+function collect(){
+  var store; try{ store=JSON.parse(localStorage.getItem(KEY))||{}; }catch(e){ store={}; }
+  var today=todayISO(), dueToday=[], overdue=[];
+  function scanDated(items){
+    (items||[]).forEach(function(it){
+      if(it.done||!it.due||!(it.text||"").trim()) return;
+      if(it.due===today) dueToday.push(it.text);
+      else if(it.due<today) overdue.push(it.text);
+    });
+  }
+  Object.keys(store.weeks||{}).forEach(function(wk){
+    var w=store.weeks[wk]||{};
+    scanDated(w.todos); scanDated(w.reach); scanDated(w.follow);
+  });
+  [["Monthly",store.monthly],["Quarterly",store.quarterly],["Annual",store.annual]].forEach(function(pair){
+    (pair[1]||[]).forEach(function(it){
+      if(!(it.text||"").trim()) return;
+      var st=recStatus(it.due);
+      if(st==="today") dueToday.push(it.text);
+      else if(st==="overdue") overdue.push(it.text);
+    });
+  });
+  var tw=(store.weeks||{})[iso(mondayOf(new Date()))];
+  if(tw&&tw.plan){
+    var di=(new Date().getDay()+6)%7;
+    tw.plan.forEach(function(p){
+      if((p.task||"").trim()&&p.days&&!p.days[di]) dueToday.push(p.task);
+    });
+  }
+  return {dueToday:dueToday, overdue:overdue};
+}
+function getLN(){
+  try{
+    if(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.LocalNotifications)
+      return window.Capacitor.Plugins.LocalNotifications;
+    if(window.Capacitor&&window.Capacitor.registerPlugin)
+      return window.Capacitor.registerPlugin("LocalNotifications");
+  }catch(e){}
+  return null;
+}
+var scheduling=false;
+function schedule(){
+  if(!window.Capacitor||scheduling) return;
+  var LN=getLN();
+  if(!LN||!LN.requestPermissions||!LN.schedule) return;
+  scheduling=true;
+  LN.checkPermissions().then(function(p){
+    if(p&&p.display==="granted") return p;
+    return LN.requestPermissions();
+  }).then(function(p){
+    if(!p||p.display!=="granted") return;
+    var r=collect();
+    var parts=[];
+    if(r.dueToday.length) parts.push(r.dueToday.length+" due today");
+    if(r.overdue.length) parts.push(r.overdue.length+" overdue");
+    var body=parts.length? parts.join(" · ") : "Nothing due today — you're clear.";
+    var first=r.dueToday[0]||r.overdue[0];
+    if(first) body+=" — "+first;
+    var at=new Date(); at.setHours(7,0,0,0);
+    if(at.getTime()<=Date.now()) at.setDate(at.getDate()+1);
+    return LN.cancel({notifications:[{id:NOTIF_ID}]})["catch"](function(){})
+      .then(function(){
+        return LN.schedule({notifications:[{
+          id:NOTIF_ID,
+          title:"Weekly Planner",
+          body:body,
+          schedule:{at:at, repeats:true, every:"day"},
+          actionTypeId:"",
+          extra:{}
+        }]});
+      });
+  })["catch"](function(){/* notifications unavailable; app still works */})
+  .finally(function(){ scheduling=false; });
+}
+window.addEventListener("load", function(){ setTimeout(schedule, 1500); });
+document.addEventListener("visibilitychange", function(){ if(!document.hidden) schedule(); });
+setInterval(schedule, 5*60*1000);
+})();
+
+</script>
+</body>
+</html>

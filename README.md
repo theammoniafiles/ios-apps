@@ -243,3 +243,13 @@ into chat.
 - **If GitHub Actions is ever abandoned**, the same Xcode projects
   build on any Mac with `xcodebuild` (or Xcode Cloud — 25 compute
   hours/month included with the Developer Program).
+
+## Weekly Planner (added 15 Nov 2026, ~02:45 CST)
+
+| App | Bundle ID | Version | Contents |
+|---|---|---|---|
+| Weekly Planner | `com.theammoniafiles.planner` | 1.0.0 (build = GitHub run #) | Blake's personal Hormel weekly planner (projects, RAILS to-dos, reach-outs, follow-ups, assets, Plan the Day, supervisors' lists, monthly/quarterly/annual, key results, notes). Excel (.xlsx) export, in-app Due Today/Overdue reminders, daily 7:00 AM on-device local notification via @capacitor/local-notifications 7.0.7 (bridge script `~/workspace/apps/planner-notify-bridge.js` injected into www at packaging time — the web artifact itself has no Capacitor code). Free, internal TestFlight only, NOT for store submission. |
+
+- Bundle ID `8Y7775D5HV`, profile "TAF Planner App Store" (`signing/planner.mobileprovision`, secret `IOS_PLANNER_PROFILE_B64`).
+- **BLOCKED at 15 Nov ~02:45 CST: the App Store Connect app record does not exist yet.** The ASC API key returns 403 CREATE on `/v1/apps` (key role cannot create apps) — the record must be created in the App Store Connect web UI (Apps → + → iOS, bundle `com.theammoniafiles.planner`, name "Weekly Planner", SKU `ammonia-files-planner`, primary locale en-US), then add Blake (bgcustom@outlook.com) to the "Internal Testers" internal group. After that, re-run the workflow (Actions → Run workflow) and answer export compliance ("None of the algorithms mentioned above") if asked.
+- Android: `~/workspace/apps/android/weekly-planner-1.0.aab` (versionCode 1, signed, bundletool-validated, jarsigner-verified). `build-tools/build-aab.sh` now also compiles Capacitor plugin Java/res (needed for local-notifications).
