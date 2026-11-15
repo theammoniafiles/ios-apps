@@ -1,0 +1,1353 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" href="data:," />
+    <title>Project Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&family=Barlow+Mono:wght@500;600&display=swap" rel="stylesheet" />
+    <style>
+      :root{
+        --bg:#081120;
+        --bg-2:#0b1a2e;
+        --panel:#101f33;
+        --panel-2:#14263d;
+        --frost:rgba(160,200,235,.07);
+        --frost-line:rgba(160,200,235,.16);
+        --ink:#e8f1f8;
+        --ink-dim:#9db4c8;
+        --ink-faint:#68809a;
+        --steel:#6fb1e8;
+        --steel-deep:#2e6ea8;
+        --ice:#cfe8ff;
+        --red:#ff6b5e;
+        --red-bg:rgba(255,107,94,.13);
+        --amber:#ffb648;
+        --amber-bg:rgba(255,182,72,.13);
+        --green:#43d68a;
+        --green-bg:rgba(67,214,138,.12);
+        --radius:14px;
+        --nav-h:64px;
+      }
+      *{ box-sizing:border-box; }
+      html{ -webkit-text-size-adjust:100%; }
+      body{
+        margin:0;
+        background:
+          radial-gradient(120% 60% at 50% -10%, #123152 0%, rgba(18,49,82,0) 60%),
+          linear-gradient(180deg, var(--bg-2), var(--bg) 320px);
+        background-color:var(--bg);
+        color:var(--ink);
+        font-family:"Barlow", system-ui, -apple-system, sans-serif;
+        font-size:16px;
+        line-height:1.45;
+        min-height:100vh;
+      }
+      button, input, select, textarea{ font:inherit; color:inherit; }
+      button{ cursor:pointer; }
+      :focus-visible{ outline:2px solid var(--steel); outline-offset:2px; }
+
+      /* ---------- top bar ---------- */
+      .topbar{
+        position:sticky; top:0; z-index:40;
+        display:flex; align-items:center; gap:12px;
+        padding:10px 16px calc(10px + env(safe-area-inset-top, 0px));
+        padding-top:calc(10px + env(safe-area-inset-top, 0px));
+        background:rgba(8,17,32,.82);
+        backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+        border-bottom:1px solid var(--frost-line);
+      }
+      .emblem{
+        width:42px; height:42px; flex:0 0 auto; border-radius:50%;
+        display:grid; place-items:center;
+        background:radial-gradient(circle at 32% 28%, rgba(220,242,255,.5), rgba(140,190,235,.16) 55%, rgba(70,120,175,.22));
+        border:1px solid rgba(190,225,255,.45);
+        box-shadow:inset 0 0 10px rgba(210,240,255,.35), 0 2px 10px rgba(0,0,0,.35);
+        font-family:"Barlow Semi Condensed", sans-serif; font-weight:700;
+        font-size:15px; letter-spacing:.02em; color:#eaf7ff;
+        text-shadow:0 0 6px rgba(160,220,255,.8);
+      }
+      .emblem sub{ font-size:9px; }
+      .topbar h1{
+        margin:0; font-family:"Barlow Semi Condensed", sans-serif;
+        font-size:22px; font-weight:600; letter-spacing:.04em; text-transform:uppercase;
+      }
+      .topbar .sub{ font-size:12.5px; color:var(--ink-dim); margin-top:-2px; }
+
+      main{ max-width:860px; margin:0 auto; padding:18px 16px calc(var(--nav-h) + 34px + env(safe-area-inset-bottom, 0px)); }
+      .view{ display:none; }
+      .view.active{ display:block; }
+
+      h2.sec{
+        font-family:"Barlow Semi Condensed", sans-serif; font-size:19px; font-weight:600;
+        letter-spacing:.05em; text-transform:uppercase; margin:26px 0 10px;
+        display:flex; align-items:center; gap:10px;
+      }
+      h2.sec:first-child{ margin-top:4px; }
+      h2.sec .count{ font-size:13px; color:var(--ink-faint); letter-spacing:0; text-transform:none; font-family:"Barlow",sans-serif; }
+      .hint{ color:var(--ink-dim); font-size:14px; }
+      .disclaimer{
+        margin-top:30px; padding:12px 14px; border:1px solid var(--frost-line);
+        border-radius:var(--radius); background:var(--frost);
+        color:var(--ink-dim); font-size:13.5px; text-align:center;
+      }
+      .privacy-note{
+        margin-top:10px; padding:12px 14px; border:1px solid rgba(67,214,138,.35);
+        border-radius:var(--radius); background:var(--green-bg);
+        color:var(--ink); font-size:13.5px; text-align:center;
+      }
+
+      /* ---------- cards & bars ---------- */
+      .card{
+        background:linear-gradient(180deg, var(--panel-2), var(--panel));
+        border:1px solid var(--frost-line); border-radius:var(--radius);
+        padding:16px; margin-bottom:12px;
+      }
+      button.card{ width:100%; text-align:left; display:block; }
+      .card-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+      .card-title{ font-weight:600; font-size:17.5px; line-height:1.25; }
+      .type-tag{
+        flex:0 0 auto; font-size:11.5px; font-weight:600; letter-spacing:.06em; text-transform:uppercase;
+        color:var(--ice); background:rgba(111,177,232,.16); border:1px solid rgba(111,177,232,.35);
+        padding:4px 8px; border-radius:999px; white-space:nowrap;
+      }
+      .meta-row{ display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:8px; font-size:14px; color:var(--ink-dim); }
+      .meta-row b{ color:var(--ink); font-weight:600; }
+      .bar{ height:10px; border-radius:999px; background:rgba(160,200,235,.14); overflow:hidden; margin-top:10px; }
+      .bar > i{ display:block; height:100%; border-radius:999px; background:linear-gradient(90deg, var(--steel-deep), var(--steel)); }
+      .bar > i.over{ background:linear-gradient(90deg, #b3372c, var(--red)); }
+      .bar > i.warn{ background:linear-gradient(90deg, #a8741f, var(--amber)); }
+      .bar-label{ display:flex; justify-content:space-between; font-size:13px; color:var(--ink-dim); margin-top:6px; }
+      .bar-label .pct{ font-family:"Barlow Mono", monospace; font-weight:600; color:var(--ink); }
+      .flag-overdue{ color:var(--red); font-weight:600; }
+      .flag-soon{ color:var(--amber); font-weight:600; }
+      .flag-ok{ color:var(--green); font-weight:600; }
+
+      /* ---------- lists / rows ---------- */
+      .row{
+        display:flex; gap:12px; align-items:flex-start;
+        background:var(--panel); border:1px solid var(--frost-line);
+        border-radius:var(--radius); padding:13px 14px; margin-bottom:9px;
+      }
+      .row .grow{ flex:1 1 auto; min-width:0; }
+      .row-title{ font-weight:600; font-size:16px; overflow-wrap:anywhere; }
+      .row-sub{ font-size:13.5px; color:var(--ink-dim); margin-top:2px; overflow-wrap:anywhere; }
+      .row-actions{ display:flex; flex-direction:column; gap:6px; flex:0 0 auto; }
+      .chip{
+        display:inline-block; font-size:11.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase;
+        padding:3px 8px; border-radius:999px; border:1px solid var(--frost-line); color:var(--ink-dim);
+        vertical-align:1px; white-space:nowrap;
+      }
+      .chip.crit{ color:#ffb3ab; background:var(--red-bg); border-color:rgba(255,107,94,.4); }
+      .chip.high{ color:#ffd9a0; background:var(--amber-bg); border-color:rgba(255,182,72,.4); }
+      .chip.med{ color:var(--ice); background:rgba(111,177,232,.14); }
+      .chip.done{ color:#a9ecc9; background:var(--green-bg); border-color:rgba(67,214,138,.4); }
+      .chip.blocked{ color:#ffb3ab; background:var(--red-bg); border-color:rgba(255,107,94,.4); }
+      .chip.prog{ color:var(--ice); background:rgba(111,177,232,.14); }
+      .due-overdue{ color:var(--red); font-weight:700; }
+      .due-soon{ color:var(--amber); font-weight:600; }
+
+      /* ---------- buttons ---------- */
+      .btn{
+        min-height:46px; padding:10px 18px; border-radius:12px; border:1px solid var(--frost-line);
+        background:var(--panel-2); color:var(--ink); font-weight:600; font-size:15.5px;
+        display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      }
+      .btn.primary{ background:linear-gradient(180deg, #3d84c4, var(--steel-deep)); border-color:rgba(160,210,255,.5); color:#fff; }
+      .btn.danger{ background:rgba(255,107,94,.12); border-color:rgba(255,107,94,.45); color:#ffb3ab; }
+      .btn.block{ width:100%; }
+      .btn.small{ min-height:40px; padding:7px 13px; font-size:14px; border-radius:10px; }
+      .icon-btn{
+        width:40px; height:40px; min-height:40px; border-radius:10px; flex:0 0 auto;
+        border:1px solid var(--frost-line); background:var(--panel-2); color:var(--ink-dim);
+        display:inline-grid; place-items:center; font-size:16px; line-height:1;
+      }
+      .icon-btn:active{ background:var(--panel); }
+      .check-btn{
+        width:44px; height:44px; min-height:44px; border-radius:50%; flex:0 0 auto;
+        border:2px solid var(--frost-line); background:transparent; color:transparent;
+        display:grid; place-items:center; font-size:19px;
+      }
+      .check-btn.done{ background:var(--green); border-color:var(--green); color:#06280f; }
+
+      /* ---------- forms ---------- */
+      label.f{ display:block; margin-bottom:14px; }
+      label.f > span{ display:block; font-size:13px; font-weight:600; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-dim); margin-bottom:6px; }
+      input[type="text"], input[type="number"], input[type="date"], input[type="tel"], select, textarea{
+        width:100%; min-height:48px; padding:11px 12px; border-radius:11px;
+        background:#0a1828; border:1px solid var(--frost-line); color:var(--ink); font-size:16px;
+      }
+      textarea{ min-height:84px; resize:vertical; }
+      .f-row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+      .filter-bar{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+      .filter-bar select{ min-height:46px; }
+
+      /* ---------- sheet (modal) ---------- */
+      .sheet-back{
+        position:fixed; inset:0; z-index:80; background:rgba(3,8,16,.66);
+        display:none; align-items:flex-end; justify-content:center;
+      }
+      .sheet-back.open{ display:flex; }
+      .sheet{
+        width:100%; max-width:640px; max-height:92vh; overflow-y:auto;
+        background:linear-gradient(180deg, #152a44, #0e1d31);
+        border:1px solid var(--frost-line); border-bottom:none;
+        border-radius:20px 20px 0 0; padding:20px 18px calc(20px + env(safe-area-inset-bottom, 0px));
+      }
+      .sheet h3{ margin:0 0 16px; font-family:"Barlow Semi Condensed",sans-serif; font-size:21px; font-weight:600; letter-spacing:.03em; }
+      .sheet .btn-row{ display:flex; gap:10px; margin-top:6px; }
+      .sheet .btn-row .btn{ flex:1; }
+      @media (min-width:640px){ .sheet-back{ align-items:center; } .sheet{ border-radius:20px; border-bottom:1px solid var(--frost-line); } }
+
+      /* ---------- bottom nav ---------- */
+      nav.tabbar{
+        position:fixed; left:0; right:0; bottom:0; z-index:50;
+        display:grid; grid-template-columns:repeat(5, 1fr);
+        background:rgba(8,17,32,.92); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+        border-top:1px solid var(--frost-line);
+        padding-bottom:env(safe-area-inset-bottom, 0px);
+      }
+      nav.tabbar button{
+        min-height:var(--nav-h); background:none; border:none; color:var(--ink-faint);
+        display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+        font-size:11.5px; font-weight:600; letter-spacing:.02em; padding-left:2px; padding-right:2px; white-space:nowrap;
+      }
+      nav.tabbar button .ic{ font-size:21px; line-height:1; }
+      nav.tabbar button.active{ color:var(--ice); }
+      nav.tabbar button.active .ic{ text-shadow:0 0 10px rgba(140,210,255,.7); }
+
+      .over-budget{ color:var(--red) !important; font-weight:700; }
+      .over-flag{
+        margin-top:10px; padding:9px 11px; border-radius:10px;
+        background:var(--red-bg); border:1px solid rgba(255,107,94,.4);
+        color:#ffb3ab; font-weight:600; font-size:14px;
+      }
+      .forecast-kv{ display:grid; grid-template-columns:1fr 1fr; gap:8px 14px; margin-top:10px; }
+      .forecast-kv .k{ font-size:12px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.06em; font-weight:600; }
+      .forecast-kv .v{ font-family:"Barlow Mono", monospace; font-size:16.5px; font-weight:600; margin-top:1px; }
+      select.quarter-picker{ min-height:50px; font-size:17px; font-weight:600; }
+
+      /* ---------- detail view ---------- */
+      .back-btn{ margin-bottom:14px; }
+      .chip-nav{ display:flex; gap:8px; overflow-x:auto; padding-bottom:6px; margin:14px -16px 4px; padding-left:16px; padding-right:16px; scrollbar-width:none; }
+      .chip-nav::-webkit-scrollbar{ display:none; }
+      .chip-nav button{
+        flex:0 0 auto; min-height:40px; padding:8px 15px; border-radius:999px;
+        border:1px solid var(--frost-line); background:var(--panel); color:var(--ink-dim); font-weight:600; font-size:14px;
+      }
+      .chip-nav button.active{ color:#fff; background:var(--steel-deep); border-color:rgba(160,210,255,.5); }
+      .stat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:6px; }
+      .stat{ background:var(--frost); border:1px solid var(--frost-line); border-radius:12px; padding:12px; }
+      .stat .v{ font-family:"Barlow Mono", monospace; font-size:20px; font-weight:600; }
+      .stat .k{ font-size:12px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.06em; font-weight:600; margin-top:2px; }
+      .add-row{ margin:4px 0 18px; }
+
+      /* ---------- timeline ---------- */
+      .timeline{ position:relative; height:64px; margin:18px 6px 4px; }
+      .timeline .track{ position:absolute; left:0; right:0; top:14px; height:6px; border-radius:999px; background:rgba(160,200,235,.18); }
+      .timeline .fill{ position:absolute; left:0; top:14px; height:6px; border-radius:999px; background:var(--steel-deep); }
+      .timeline .today{ position:absolute; top:4px; width:2px; height:26px; background:var(--amber); }
+      .timeline .today::after{ content:"today"; position:absolute; top:-13px; left:50%; transform:translateX(-50%); font-size:10px; color:var(--amber); font-weight:700; letter-spacing:.05em; }
+      .tl-dot{ position:absolute; top:17px; transform:translate(-50%,-50%); width:16px; height:16px; border-radius:50%; border:2px solid var(--bg); z-index:2; }
+      .tl-dot.ms{ background:var(--ice); box-shadow:0 0 0 2px rgba(207,232,255,.35); }
+      .tl-dot.ms.done{ background:var(--green); box-shadow:0 0 0 2px rgba(67,214,138,.3); }
+      .tl-dot.task{ width:10px; height:10px; background:var(--steel); top:38px; }
+      .tl-dot.task.done{ background:var(--green); }
+      .tl-dot.task.overdue{ background:var(--red); }
+      .tl-legend{ display:grid; gap:5px; font-size:13.5px; color:var(--ink-dim); margin-top:8px; }
+      .tl-legend .dotk{ display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:7px; vertical-align:0; }
+
+      .empty{
+        border:1.5px dashed rgba(160,200,235,.3); border-radius:var(--radius);
+        padding:26px 18px; text-align:center; color:var(--ink-dim); margin-bottom:12px;
+      }
+      .empty .big{ font-size:17px; font-weight:600; color:var(--ink); margin-bottom:5px; }
+      .toast{
+        position:fixed; left:50%; bottom:calc(var(--nav-h) + 18px + env(safe-area-inset-bottom, 0px));
+        transform:translateX(-50%) translateY(20px); z-index:90;
+        background:#17334f; border:1px solid rgba(160,210,255,.4); color:var(--ink);
+        padding:11px 18px; border-radius:999px; font-weight:600; font-size:14.5px;
+        opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; max-width:88vw; text-align:center;
+      }
+      .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+      .money{ font-family:"Barlow Mono", monospace; }
+      .strike{ text-decoration:line-through; color:var(--ink-faint); }
+      @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="emblem" aria-hidden="true">NH<sub>3</sub></div>
+      <div>
+        <h1 id="topTitle">Dashboard</h1>
+        <div class="sub" id="topSub">All projects at a glance</div>
+      </div>
+    </header>
+
+    <main>
+      <!-- ============ DASHBOARD ============ -->
+      <section class="view" id="view-dashboard">
+        <div id="dashSummary"></div>
+        <h2 class="sec">Active projects <span class="count" id="dashProjCount"></span></h2>
+        <div id="dashProjects"></div>
+        <h2 class="sec">This week <span class="count">due in the next 7 days</span></h2>
+        <div id="dashWeek"></div>
+        <button class="btn primary block" id="dashNewProject" style="margin-top:18px;">＋ New project</button>
+        <p class="disclaimer">A planning tool — it does not replace your company's project controls or approvals.</p>
+        <p class="privacy-note">Your data stays on this device. Nothing is uploaded or shared — files only leave this phone when you export them yourself.</p>
+      </section>
+
+      <!-- ============ PROJECTS ============ -->
+      <section class="view" id="view-projects">
+        <div id="projList"></div>
+        <button class="btn primary block" id="projNewProject">＋ New project</button>
+      </section>
+
+      <!-- ============ TASKS (all projects) ============ -->
+      <section class="view" id="view-tasks">
+        <div class="filter-bar">
+          <select id="allTaskStatus" aria-label="Filter by status">
+            <option value="">All statuses</option>
+            <option>Not started</option><option>In progress</option><option>Blocked</option><option>Done</option>
+          </select>
+          <select id="allTaskPriority" aria-label="Filter by priority">
+            <option value="">All priorities</option>
+            <option>Low</option><option>Medium</option><option>High</option><option>Critical</option>
+          </select>
+        </div>
+        <div id="allTaskList"></div>
+      </section>
+
+      <!-- ============ BUDGET (all projects) ============ -->
+      <section class="view" id="view-budget">
+        <div id="budgetSummary"></div>
+        <h2 class="sec">By project</h2>
+        <div id="budgetList"></div>
+      </section>
+
+      <!-- ============ FORECAST ============ -->
+      <section class="view" id="view-forecast">
+        <label class="f"><span>Quarter</span>
+          <select id="forecastQuarter" class="quarter-picker" aria-label="Select quarter"></select>
+        </label>
+        <div id="forecastSummary"></div>
+        <h2 class="sec">By project <span class="count" id="forecastProjCount"></span></h2>
+        <div id="forecastList"></div>
+        <button class="btn primary block" id="forecastDownload" style="margin-top:16px;">⬇ Download quarterly forecast report</button>
+        <p class="hint" style="margin-top:12px;">Forecast for the quarter = costs already logged in that quarter plus an equal share of each project's remaining budget for every open task due that quarter. Overdue open tasks count toward the current quarter, and open tasks with no due date count toward the quarter of the project's latest open due date (or the current quarter if none). Projected total at completion is estimated from spend so far versus the share of tasks done, so a project burning budget faster than it finishes tasks projects over budget. Projected completion is the latest due date among open tasks.</p>
+        <p class="privacy-note">Forecasts are calculated on this device from your projects, tasks, and logged costs. Nothing is uploaded or shared — the report only leaves this phone when you download it yourself.</p>
+      </section>
+
+      <!-- ============ PROJECT DETAIL ============ -->
+      <section class="view" id="view-project">
+        <button class="btn small back-btn" id="backBtn">← All projects</button>
+        <div id="detailBody"></div>
+      </section>
+    </main>
+
+    <nav class="tabbar" aria-label="Main">
+      <button data-tab="dashboard" class="active"><span class="ic">▦</span>Dashboard</button>
+      <button data-tab="projects"><span class="ic">🗂</span>Projects</button>
+      <button data-tab="tasks"><span class="ic">✓</span>Tasks</button>
+      <button data-tab="budget"><span class="ic">$</span>Budget</button>
+      <button data-tab="forecast"><span class="ic">📈</span>Forecast</button>
+    </nav>
+
+    <div class="sheet-back" id="sheetBack">
+      <div class="sheet" role="dialog" aria-modal="true" id="sheetBox"></div>
+    </div>
+    <div class="toast" id="toast"></div>
+
+    <script>
+    "use strict";
+    /* ================= data ================= */
+    var KEY = "projectManager.v1";
+    var state = { projects: [] };
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (raw) { var parsed = JSON.parse(raw); if (parsed && Array.isArray(parsed.projects)) state = parsed; }
+    } catch (e) { /* start empty */ }
+
+    function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+    function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+    function esc(s) {
+      return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+      });
+    }
+    function $(id) { return document.getElementById(id); }
+    function pad(n) { return (n < 10 ? "0" : "") + n; }
+    function todayStr() { var d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+    function parseDate(s) { if (!s) return null; var p = s.split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); }
+    function fmtDate(s) {
+      var d = parseDate(s); if (!d) return "—";
+      return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+    }
+    function money(n) {
+      n = Number(n) || 0;
+      return "$" + n.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    }
+    function daysUntil(s) {
+      var d = parseDate(s); if (!d) return null;
+      var t = parseDate(todayStr());
+      return Math.round((d - t) / 86400000);
+    }
+    function getProject(id) {
+      for (var i = 0; i < state.projects.length; i++) if (state.projects[i].id === id) return state.projects[i];
+      return null;
+    }
+    function projProgress(p) {
+      if (!p.tasks.length) return 0;
+      var done = p.tasks.filter(function (t) { return t.status === "Done"; }).length;
+      return Math.round(done / p.tasks.length * 100);
+    }
+    function projSpent(p) { return p.costs.reduce(function (a, c) { return a + (Number(c.amount) || 0); }, 0); }
+    function isOverdue(t) { var d = daysUntil(t.due); return d !== null && d < 0 && t.status !== "Done"; }
+    function nextMilestone(p) {
+      var open = p.milestones.filter(function (m) { return !m.done; });
+      if (!open.length) return null;
+      open.sort(function (a, b) { return (a.date || "9999") < (b.date || "9999") ? -1 : 1; });
+      return open[0];
+    }
+    function overdueTasks(p) { return p.tasks.filter(isOverdue); }
+
+    /* ================= toast ================= */
+    var toastTimer = null;
+    function toast(msg) {
+      var t = $("toast"); t.textContent = msg; t.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () { t.classList.remove("show"); }, 2200);
+    }
+
+    /* ================= sheet ================= */
+    var sheetCleanup = null;
+    function openSheet(html) {
+      $("sheetBox").innerHTML = html;
+      $("sheetBack").classList.add("open");
+      var first = $("sheetBox").querySelector("input, select, textarea");
+      if (first) setTimeout(function () { first.focus(); }, 60);
+    }
+    function closeSheet() { $("sheetBack").classList.remove("open"); $("sheetBox").innerHTML = ""; }
+    $("sheetBack").addEventListener("click", function (e) { if (e.target === this) closeSheet(); });
+
+    function confirmSheet(title, body, okLabel, onOk) {
+      openSheet(
+        "<h3>" + esc(title) + "</h3><p class='hint'>" + esc(body) + "</p>" +
+        "<div class='btn-row'><button class='btn' id='cfCancel'>Cancel</button>" +
+        "<button class='btn danger' id='cfOk'>" + esc(okLabel) + "</button></div>"
+      );
+      $("cfCancel").onclick = closeSheet;
+      $("cfOk").onclick = function () { closeSheet(); onOk(); };
+    }
+
+    /* ================= navigation ================= */
+    var currentTab = "dashboard";
+    var currentProjectId = null;
+    var detailSection = "overview";
+    var TITLES = {
+      dashboard: ["Dashboard", "All projects at a glance"],
+      projects: ["Projects", "Tap a project to open it"],
+      tasks: ["Tasks", "Across all projects"],
+      budget: ["Budget", "Spend across all projects"],
+      forecast: ["Forecast", "Quarterly forecast across all projects"],
+      project: ["Project", ""]
+    };
+    function show(tab) {
+      currentTab = tab;
+      document.querySelectorAll(".view").forEach(function (v) { v.classList.remove("active"); });
+      $("view-" + tab).classList.add("active");
+      document.querySelectorAll("nav.tabbar button").forEach(function (b) {
+        b.classList.toggle("active", b.dataset.tab === tab);
+      });
+      var t = TITLES[tab];
+      $("topTitle").textContent = tab === "project" && currentProjectId ? (getProject(currentProjectId) || {}).name || "Project" : t[0];
+      $("topSub").textContent = tab === "project" && currentProjectId ? (getProject(currentProjectId) || {}).type || "" : t[1];
+      window.scrollTo(0, 0);
+      render();
+    }
+    document.querySelectorAll("nav.tabbar button").forEach(function (b) {
+      b.addEventListener("click", function () { show(b.dataset.tab); });
+    });
+    $("backBtn").addEventListener("click", function () { currentProjectId = null; show("projects"); });
+
+    function render() {
+      if (currentTab === "dashboard") renderDashboard();
+      else if (currentTab === "projects") renderProjects();
+      else if (currentTab === "tasks") renderAllTasks();
+      else if (currentTab === "budget") renderBudget();
+      else if (currentTab === "forecast") renderForecast();
+      else if (currentTab === "project") renderDetail();
+    }
+
+    /* ================= shared bits ================= */
+    function budgetBarHTML(p) {
+      var spent = projSpent(p), total = Number(p.budget) || 0;
+      var pct = total > 0 ? Math.round(spent / total * 100) : (spent > 0 ? 100 : 0);
+      var cls = pct > 90 ? "over" : (pct >= 75 ? "warn" : "");
+      return "<div class='bar'><i class='" + cls + "' style='width:" + Math.min(pct, 100) + "%'></i></div>" +
+        "<div class='bar-label'><span>Spent <b class='money'>" + money(spent) + "</b> of <b class='money'>" + money(total) + "</b></span>" +
+        "<span class='pct'>" + pct + "%</span></div>";
+    }
+    function progressBarHTML(p) {
+      var pct = projProgress(p);
+      return "<div class='bar'><i style='width:" + pct + "%'></i></div>" +
+        "<div class='bar-label'><span>" + p.tasks.filter(function (t) { return t.status === "Done"; }).length +
+        " of " + p.tasks.length + " tasks done</span><span class='pct'>" + pct + "% complete</span></div>";
+    }
+    function projectCardHTML(p) {
+      var od = overdueTasks(p), nm = nextMilestone(p);
+      var html = "<button class='card' data-open='" + p.id + "'>" +
+        "<div class='card-head'><span class='card-title'>" + esc(p.name) + "</span><span class='type-tag'>" + esc(p.type) + "</span></div>" +
+        progressBarHTML(p) + budgetBarHTML(p) +
+        "<div class='meta-row'>";
+      if (nm) {
+        var dd = daysUntil(nm.date);
+        html += "<span>Next milestone: <b>" + esc(nm.name) + "</b> · " + fmtDate(nm.date) +
+          (dd !== null && dd < 0 ? " <span class='flag-overdue'>(overdue)</span>" : "") + "</span>";
+      } else if (p.milestones.length) html += "<span class='flag-ok'>All milestones done</span>";
+      else html += "<span>No milestones yet</span>";
+      if (p.target) html += "<span>Target: <b>" + fmtDate(p.target) + "</b></span>";
+      html += "</div>";
+      if (od.length) html += "<div class='meta-row'><span class='flag-overdue'>⚠ " + od.length + " overdue task" + (od.length > 1 ? "s" : "") + "</span></div>";
+      return html + "</button>";
+    }
+    function bindOpenCards(scope) {
+      scope.querySelectorAll("[data-open]").forEach(function (el) {
+        el.addEventListener("click", function () {
+          currentProjectId = el.dataset.open; detailSection = "overview"; show("project");
+        });
+      });
+    }
+    function taskRowHTML(t, p, opts) {
+      opts = opts || {};
+      var od = isOverdue(t), dd = daysUntil(t.due);
+      var dueCls = od ? "due-overdue" : (dd !== null && dd <= 7 && t.status !== "Done" ? "due-soon" : "");
+      var dueTxt = t.due ? fmtDate(t.due) : "No due date";
+      if (od) dueTxt += " · " + Math.abs(dd) + "d overdue";
+      else if (dd === 0 && t.status !== "Done") dueTxt += " · due today";
+      else if (dd !== null && dd > 0 && dd <= 7 && t.status !== "Done") dueTxt += " · in " + dd + "d";
+      var prCls = t.priority === "Critical" ? "crit" : t.priority === "High" ? "high" : t.priority === "Medium" ? "med" : "";
+      var stCls = t.status === "Done" ? "done" : t.status === "Blocked" ? "blocked" : t.status === "In progress" ? "prog" : "";
+      var html = "<div class='row'>" +
+        "<button class='check-btn " + (t.status === "Done" ? "done" : "") + "' data-toggle-task='" + p.id + ":" + t.id + "' aria-label='Toggle done'>✓</button>" +
+        "<div class='grow'><div class='row-title " + (t.status === "Done" ? "strike" : "") + "'>" + esc(t.title) + "</div>" +
+        "<div class='row-sub'>" +
+        (opts.showProject ? esc(p.name) + " · " : "") +
+        (t.owner ? "Owner: " + esc(t.owner) + " · " : "") +
+        "<span class='" + dueCls + "'>" + dueTxt + "</span></div>" +
+        "<div style='margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;'>" +
+        "<span class='chip " + prCls + "'>" + esc(t.priority) + "</span>" +
+        "<span class='chip " + stCls + "'>" + esc(t.status) + "</span></div>" +
+        (t.notes ? "<div class='row-sub' style='margin-top:6px;'>" + esc(t.notes) + "</div>" : "") +
+        "</div>";
+      if (!opts.readonly) {
+        html += "<div class='row-actions'>" +
+          "<button class='icon-btn' data-move-task='" + p.id + ":" + t.id + ":up' aria-label='Move up'>↑</button>" +
+          "<button class='icon-btn' data-move-task='" + p.id + ":" + t.id + ":down' aria-label='Move down'>↓</button>" +
+          "<button class='icon-btn' data-edit-task='" + p.id + ":" + t.id + "' aria-label='Edit task'>✎</button>" +
+          "<button class='icon-btn' data-del-task='" + p.id + ":" + t.id + "' aria-label='Delete task'>🗑</button></div>";
+      }
+      return html + "</div>";
+    }
+    function bindTaskActions(scope) {
+      scope.querySelectorAll("[data-toggle-task]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          var parts = b.dataset.toggleTask.split(":"); var p = getProject(parts[0]); if (!p) return;
+          var t = p.tasks.filter(function (x) { return x.id === parts[1]; })[0]; if (!t) return;
+          t.status = t.status === "Done" ? "Not started" : "Done";
+          save(); render(); toast(t.status === "Done" ? "Task marked done" : "Task reopened");
+        });
+      });
+      scope.querySelectorAll("[data-edit-task]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          var parts = b.dataset.editTask.split(":"); openTaskForm(parts[0], parts[1]);
+        });
+      });
+      scope.querySelectorAll("[data-del-task]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          var parts = b.dataset.delTask.split(":"); var p = getProject(parts[0]); if (!p) return;
+          var t = p.tasks.filter(function (x) { return x.id === parts[1]; })[0]; if (!t) return;
+          confirmSheet("Delete task?", "“" + t.title + "” will be removed from " + p.name + ".", "Delete", function () {
+            p.tasks = p.tasks.filter(function (x) { return x.id !== parts[1]; });
+            save(); render(); toast("Task deleted");
+          });
+        });
+      });
+      scope.querySelectorAll("[data-move-task]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          var parts = b.dataset.moveTask.split(":"); var p = getProject(parts[0]); if (!p) return;
+          var idx = -1;
+          p.tasks.forEach(function (x, i) { if (x.id === parts[1]) idx = i; });
+          if (idx < 0) return;
+          var swap = parts[2] === "up" ? idx - 1 : idx + 1;
+          if (swap < 0 || swap >= p.tasks.length) return;
+          var tmp = p.tasks[idx]; p.tasks[idx] = p.tasks[swap]; p.tasks[swap] = tmp;
+          save(); render();
+        });
+      });
+    }
+
+    /* ================= dashboard ================= */
+    function renderDashboard() {
+      var totalBudget = 0, totalSpent = 0, totalOverdue = 0, totalOpen = 0;
+      state.projects.forEach(function (p) {
+        totalBudget += Number(p.budget) || 0; totalSpent += projSpent(p);
+        totalOverdue += overdueTasks(p).length;
+        totalOpen += p.tasks.filter(function (t) { return t.status !== "Done"; }).length;
+      });
+      $("dashSummary").innerHTML =
+        "<div class='stat-grid'>" +
+        "<div class='stat'><div class='v'>" + state.projects.length + "</div><div class='k'>Active projects</div></div>" +
+        "<div class='stat'><div class='v'>" + totalOpen + "</div><div class='k'>Open tasks</div></div>" +
+        "<div class='stat'><div class='v money'>" + money(totalSpent) + "</div><div class='k'>Spent of " + money(totalBudget) + "</div></div>" +
+        "<div class='stat'><div class='v' style='color:" + (totalOverdue ? "var(--red)" : "var(--ink)") + "'>" + totalOverdue + "</div><div class='k'>Overdue tasks</div></div>" +
+        "</div>";
+      $("dashProjCount").textContent = state.projects.length ? "(" + state.projects.length + ")" : "";
+      var box = $("dashProjects");
+      if (!state.projects.length) {
+        box.innerHTML = "<div class='empty'><div class='big'>No projects yet</div>Create your first project to start tracking progress, milestones, and budget in one place.</div>";
+      } else {
+        box.innerHTML = state.projects.map(projectCardHTML).join("");
+        bindOpenCards(box);
+      }
+      /* this week */
+      var week = [];
+      state.projects.forEach(function (p) {
+        p.tasks.forEach(function (t) {
+          var d = daysUntil(t.due);
+          if (t.status !== "Done" && d !== null && d >= 0 && d <= 7) week.push({ t: t, p: p, d: d });
+        });
+      });
+      week.sort(function (a, b) { return a.d - b.d; });
+      var w = $("dashWeek");
+      if (!week.length) {
+        w.innerHTML = "<div class='empty'><div class='big'>Nothing due this week</div>No open tasks are due in the next 7 days.</div>";
+      } else {
+        w.innerHTML = week.map(function (x) { return taskRowHTML(x.t, x.p, { showProject: true, readonly: true }); }).join("");
+      }
+    }
+
+    /* ================= projects tab ================= */
+    function renderProjects() {
+      var box = $("projList");
+      if (!state.projects.length) {
+        box.innerHTML = "<div class='empty'><div class='big'>No projects yet</div>Add a capital project, equipment install, remodel, or shutdown to get started.</div>";
+        return;
+      }
+      box.innerHTML = state.projects.map(projectCardHTML).join("");
+      bindOpenCards(box);
+    }
+
+    /* ================= all tasks tab ================= */
+    function renderAllTasks() {
+      var fs = $("allTaskStatus").value, fp = $("allTaskPriority").value;
+      var items = [];
+      state.projects.forEach(function (p) {
+        p.tasks.forEach(function (t) {
+          if (fs && t.status !== fs) return;
+          if (fp && t.priority !== fp) return;
+          items.push({ t: t, p: p });
+        });
+      });
+      items.sort(function (a, b) {
+        var ao = isOverdue(a.t) ? 0 : 1, bo = isOverdue(b.t) ? 0 : 1;
+        if (ao !== bo) return ao - bo;
+        return (a.t.due || "9999") < (b.t.due || "9999") ? -1 : 1;
+      });
+      var box = $("allTaskList");
+      if (!items.length) {
+        box.innerHTML = "<div class='empty'><div class='big'>No tasks match</div>" +
+          (state.projects.length ? "Try a different filter, or add tasks inside a project." : "Create a project first, then add tasks to it.") + "</div>";
+        return;
+      }
+      box.innerHTML = items.map(function (x) { return taskRowHTML(x.t, x.p, { showProject: true }); }).join("");
+      bindTaskActions(box);
+    }
+    $("allTaskStatus").addEventListener("change", renderAllTasks);
+    $("allTaskPriority").addEventListener("change", renderAllTasks);
+
+    /* ================= budget tab ================= */
+    function renderBudget() {
+      var totalBudget = 0, totalSpent = 0;
+      state.projects.forEach(function (p) { totalBudget += Number(p.budget) || 0; totalSpent += projSpent(p); });
+      var pct = totalBudget > 0 ? Math.round(totalSpent / totalBudget * 100) : 0;
+      $("budgetSummary").innerHTML =
+        "<div class='stat-grid'>" +
+        "<div class='stat'><div class='v money'>" + money(totalSpent) + "</div><div class='k'>Total spent — all projects</div></div>" +
+        "<div class='stat'><div class='v money'>" + money(totalBudget) + "</div><div class='k'>Total budget</div></div>" +
+        "<div class='stat'><div class='v money'>" + money(totalBudget - totalSpent) + "</div><div class='k'>Remaining</div></div>" +
+        "<div class='stat'><div class='v'>" + pct + "%</div><div class='k'>Of budget used</div></div>" +
+        "</div>";
+      var box = $("budgetList");
+      if (!state.projects.length) {
+        box.innerHTML = "<div class='empty'><div class='big'>No projects yet</div>Budget rollups appear here once you add a project.</div>";
+        return;
+      }
+      box.innerHTML = state.projects.map(function (p) {
+        return "<button class='card' data-open-budget='" + p.id + "'><div class='card-head'><span class='card-title'>" + esc(p.name) +
+          "</span><span class='type-tag'>" + esc(p.type) + "</span></div>" + budgetBarHTML(p) +
+          "<div class='meta-row'><span>" + p.costs.length + " cost entr" + (p.costs.length === 1 ? "y" : "ies") + " logged</span></div></button>";
+      }).join("");
+      box.querySelectorAll("[data-open-budget]").forEach(function (el) {
+        el.addEventListener("click", function () {
+          currentProjectId = el.dataset.openBudget; detailSection = "budget"; show("project");
+          setTimeout(scrollToSection, 50);
+        });
+      });
+    }
+
+    /* ================= forecast tab ================= */
+    function quarterValue(year, q) { return year + "-Q" + q; }
+    function currentQuarterValue() {
+      var d = new Date();
+      return quarterValue(d.getFullYear(), Math.floor(d.getMonth() / 3) + 1);
+    }
+    var selectedQuarter = currentQuarterValue();
+    function parseQuarterValue(v) {
+      var m = /^(\d{4})-Q([1-4])$/.exec(v || "");
+      if (!m) { v = currentQuarterValue(); m = /^(\d{4})-Q([1-4])$/.exec(v); }
+      var year = +m[1], q = +m[2];
+      var startMonth = (q - 1) * 3;
+      var start = year + "-" + pad(startMonth + 1) + "-01";
+      var endD = new Date(year, startMonth + 3, 0);
+      var end = endD.getFullYear() + "-" + pad(endD.getMonth() + 1) + "-" + pad(endD.getDate());
+      return { value: v, year: year, q: q, label: "Q" + q + " " + year, start: start, end: end };
+    }
+    function quarterValueFromDateStr(s) {
+      var d = parseDate(s); if (!d) return null;
+      return quarterValue(d.getFullYear(), Math.floor(d.getMonth() / 3) + 1);
+    }
+    function quarterOptions() {
+      var now = new Date(), cy = now.getFullYear(), opts = [];
+      for (var y = cy - 1; y <= cy + 3; y++) for (var q = 1; q <= 4; q++) opts.push(quarterValue(y, q));
+      if (opts.indexOf(selectedQuarter) === -1) opts.push(selectedQuarter);
+      opts.sort();
+      return opts;
+    }
+    function forecastForProject(p, qv) {
+      var q = parseQuarterValue(qv);
+      var budget = Number(p.budget) || 0;
+      var spent = projSpent(p);
+      var remaining = budget - spent;
+      var loggedInQ = p.costs.reduce(function (a, c) {
+        return a + (c.date && c.date >= q.start && c.date <= q.end ? (Number(c.amount) || 0) : 0);
+      }, 0);
+      var open = p.tasks.filter(function (t) { return t.status !== "Done"; });
+      /* latest open due date -> projected completion + fallback quarter for undated tasks */
+      var latestDue = null;
+      open.forEach(function (t) { if (t.due && (!latestDue || t.due > latestDue)) latestDue = t.due; });
+      var futureInQ = 0;
+      var remainingPositive = Math.max(remaining, 0);
+      if (open.length && remainingPositive > 0) {
+        var share = remainingPositive / open.length;
+        var curQ = currentQuarterValue(), today = todayStr();
+        open.forEach(function (t) {
+          var effQ;
+          if (t.due) effQ = quarterValueFromDateStr(t.due < today ? today : t.due);
+          else if (latestDue) effQ = quarterValueFromDateStr(latestDue < today ? today : latestDue);
+          else effQ = curQ;
+          if (effQ === qv) futureInQ += share;
+        });
+      }
+      var forecast = loggedInQ + futureInQ;
+      /* projected total at completion: spend vs. share of tasks done (earned-value style) */
+      var totalTasks = p.tasks.length;
+      var doneTasks = p.tasks.filter(function (t) { return t.status === "Done"; }).length;
+      var projectedTotal;
+      if (!totalTasks) projectedTotal = Math.max(budget, spent);
+      else if (doneTasks === totalTasks) projectedTotal = spent;
+      else if (doneTasks > 0 && spent > 0) projectedTotal = spent / (doneTasks / totalTasks);
+      else if (doneTasks > 0) projectedTotal = budget;
+      else projectedTotal = Math.max(budget, spent);
+      if (spent > projectedTotal) projectedTotal = spent;
+      var projectedCompletion = latestDue;
+      if (!projectedCompletion && !open.length) {
+        var allDue = null;
+        p.tasks.forEach(function (t) { if (t.due && (!allDue || t.due > allDue)) allDue = t.due; });
+        projectedCompletion = allDue || p.target || null;
+      }
+      var over = budget > 0 ? projectedTotal > budget + 0.005 : projectedTotal > 0.005;
+      return {
+        project: p, budget: budget, spent: spent, remaining: remaining,
+        loggedInQ: loggedInQ, futureInQ: futureInQ, forecast: forecast,
+        projectedTotal: projectedTotal, projectedCompletion: projectedCompletion,
+        over: over, variance: budget - projectedTotal
+      };
+    }
+    function renderForecast() {
+      var sel = $("forecastQuarter");
+      var opts = quarterOptions();
+      sel.innerHTML = opts.map(function (v) {
+        var q = parseQuarterValue(v);
+        return "<option value='" + v + "' " + (v === selectedQuarter ? "selected" : "") + ">" + q.label + " · " + fmtDate(q.start) + " – " + fmtDate(q.end) + "</option>";
+      }).join("");
+      sel.value = selectedQuarter;
+      var q = parseQuarterValue(selectedQuarter);
+      var rows = state.projects.map(function (p) { return forecastForProject(p, selectedQuarter); });
+      var tForecast = 0, tBudget = 0, tSpent = 0;
+      rows.forEach(function (r) { tForecast += r.forecast; tBudget += r.budget; tSpent += r.spent; });
+      var overRows = rows.filter(function (r) { return r.over; });
+      var html = "<div class='stat-grid'>" +
+        "<div class='stat'><div class='v money'>" + money(tForecast) + "</div><div class='k'>Forecast spend — " + esc(q.label) + "</div></div>" +
+        "<div class='stat'><div class='v money'>" + money(tBudget) + "</div><div class='k'>Total budget — all projects</div></div>" +
+        "<div class='stat'><div class='v money'>" + money(tSpent) + "</div><div class='k'>Total spent to date</div></div>" +
+        "<div class='stat'><div class='v money'>" + money(tBudget - tSpent) + "</div><div class='k'>Total remaining</div></div>" +
+        "</div>";
+      if (overRows.length) {
+        html += "<div class='over-flag'>⚠ Projected over budget: " + overRows.map(function (r) {
+          return esc(r.project.name) + " (" + money(r.projectedTotal) + " projected vs " + money(r.budget) + " budget)";
+        }).join(" · ") + "</div>";
+      }
+      $("forecastSummary").innerHTML = html;
+      $("forecastProjCount").textContent = state.projects.length ? "(" + state.projects.length + ")" : "";
+      var box = $("forecastList");
+      if (!state.projects.length) {
+        box.innerHTML = "<div class='empty'><div class='big'>No projects yet</div>Forecasts appear here once you add a project with a budget, tasks, and logged costs.</div>";
+        return;
+      }
+      box.innerHTML = rows.map(function (r) {
+        var p = r.project;
+        return "<div class='card'><div class='card-head'><span class='card-title'>" + esc(p.name) + "</span><span class='type-tag'>" + esc(p.type) + "</span></div>" +
+          "<div class='forecast-kv'>" +
+          "<div><div class='k'>Forecast — " + esc(q.label) + "</div><div class='v'>" + money(r.forecast) + "</div></div>" +
+          "<div><div class='k'>Spent to date</div><div class='v'>" + money(r.spent) + "</div></div>" +
+          "<div><div class='k'>Budget</div><div class='v'>" + money(r.budget) + "</div></div>" +
+          "<div><div class='k'>Remaining budget</div><div class='v" + (r.remaining < 0 ? " over-budget" : "") + "'>" + money(r.remaining) + "</div></div>" +
+          "<div><div class='k'>Projected total at completion</div><div class='v" + (r.over ? " over-budget" : "") + "'>" + money(r.projectedTotal) + "</div></div>" +
+          "<div><div class='k'>Projected completion</div><div class='v' style='font-family:Barlow,sans-serif; font-size:15.5px;'>" + (r.projectedCompletion ? fmtDate(r.projectedCompletion) : "—") + "</div></div>" +
+          "</div>" +
+          (r.over ? "<div class='over-flag'>⚠ Projected to go over budget by " + money(r.projectedTotal - r.budget) + "</div>" : "") +
+          "</div>";
+      }).join("");
+    }
+    $("forecastQuarter").addEventListener("change", function () { selectedQuarter = this.value; renderForecast(); });
+    $("forecastDownload").addEventListener("click", function () { exportForecastReport(selectedQuarter); });
+
+    function exportForecastReport(qv) {
+      var q = parseQuarterValue(qv);
+      var rows = state.projects.map(function (p) { return forecastForProject(p, qv); });
+      var tForecast = 0, tBudget = 0, tSpent = 0, tProjected = 0;
+      rows.forEach(function (r) { tForecast += r.forecast; tBudget += r.budget; tSpent += r.spent; tProjected += r.projectedTotal; });
+      function h(s) { return esc(s); }
+      function mny(n) { return money(n); }
+      var bodyRows = rows.length ? rows.map(function (r) {
+        var over = r.over;
+        var ou = over ? "<span class='over'>Over by " + mny(r.projectedTotal - r.budget) + "</span>"
+          : (r.budget > 0 ? "Under by " + mny(r.budget - r.projectedTotal) : "—");
+        return "<tr" + (over ? " class='over-row'" : "") + "><td>" + h(r.project.name) + "</td><td class='num'>" + mny(r.budget) + "</td>" +
+          "<td class='num'>" + mny(r.spent) + "</td><td class='num'>" + mny(r.forecast) + "</td>" +
+          "<td class='num'>" + mny(r.remaining) + "</td><td class='num" + (over ? " over" : "") + "'>" + mny(r.projectedTotal) + "</td>" +
+          "<td>" + (r.projectedCompletion ? fmtDate(r.projectedCompletion) : "—") + "</td><td>" + ou + "</td></tr>";
+      }).join("") : "<tr><td colspan='8'>No projects recorded.</td></tr>";
+      var doc = "<!doctype html><html lang='en'><head><meta charset='utf-8'>" +
+        "<title>Quarterly Forecast — " + h(q.label) + "</title>" +
+        "<style>body{font-family:Arial,Helvetica,sans-serif;color:#16222e;max-width:900px;margin:32px auto;padding:0 20px;line-height:1.5;}" +
+        "h1{font-size:24px;margin:0 0 2px;} .sub{color:#5a7186;} " +
+        "table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:14px;} th,td{border:1px solid #c4d2de;padding:7px 8px;text-align:left;vertical-align:top;}" +
+        "th{background:#eef4fa;} td.num,th.num{text-align:right;white-space:nowrap;} tfoot td{font-weight:bold;background:#eef4fa;}" +
+        ".over{color:#c0392b;font-weight:bold;} tr.over-row td{background:#fdf0ee;}" +
+        ".grid{display:flex;gap:24px;flex-wrap:wrap;margin-top:16px;} .kv b{display:block;font-size:18px;} .kv span{color:#5a7186;font-size:12px;text-transform:uppercase;letter-spacing:.05em;}" +
+        "footer{margin-top:30px;color:#5a7186;font-size:12px;border-top:1px solid #c4d2de;padding-top:10px;}" +
+        "@media print{body{margin:10px auto;}}</style></head><body>" +
+        "<h1>Quarterly Forecast — " + h(q.label) + "</h1>" +
+        "<div class='sub'>Quarter: " + fmtDate(q.start) + " – " + fmtDate(q.end) + " · Report date: " + fmtDate(todayStr()) + "</div>" +
+        "<div class='grid'>" +
+        "<div class='kv'><b>" + mny(tForecast) + "</b><span>Forecast spend — " + h(q.label) + "</span></div>" +
+        "<div class='kv'><b>" + mny(tBudget) + "</b><span>Total budget</span></div>" +
+        "<div class='kv'><b>" + mny(tSpent) + "</b><span>Total spent to date</span></div>" +
+        "<div class='kv'><b>" + mny(tBudget - tSpent) + "</b><span>Total remaining</span></div>" +
+        "</div>" +
+        "<table><thead><tr><th>Project</th><th class='num'>Budget</th><th class='num'>Spent to date</th><th class='num'>Forecast — " + h(q.label) + "</th><th class='num'>Remaining</th><th class='num'>Projected total</th><th>Projected completion</th><th>Over / under budget</th></tr></thead>" +
+        "<tbody>" + bodyRows + "</tbody>" +
+        "<tfoot><tr><td>All projects (" + rows.length + ")</td><td class='num'>" + mny(tBudget) + "</td><td class='num'>" + mny(tSpent) + "</td><td class='num'>" + mny(tForecast) + "</td><td class='num'>" + mny(tBudget - tSpent) + "</td><td class='num'>" + mny(tProjected) + "</td><td>—</td><td>" +
+        (tProjected > tBudget && tBudget > 0 ? "<span class='over'>Over by " + mny(tProjected - tBudget) + "</span>" : (tBudget > 0 ? "Under by " + mny(tBudget - tProjected) : "—")) + "</td></tr></tfoot></table>" +
+        "<p style='font-size:13px;color:#5a7186;'>Forecast method: costs already logged in the quarter plus an equal share of each project's remaining budget for every open task due that quarter (overdue open tasks count toward the current quarter). Projected total at completion is estimated from spend so far versus the share of tasks done. Projected completion is the latest due date among a project's open tasks.</p>" +
+        "<footer>Generated " + fmtDate(todayStr()) + " · Prepared on-device from project records.</footer>" +
+        "</body></html>";
+      download("quarterly-forecast-" + q.label.replace(/\s+/g, "-").toLowerCase() + "-" + todayStr() + ".html", doc, "text/html");
+      toast("Quarterly forecast report downloaded");
+    }
+
+    /* ================= project detail ================= */
+    var SECTIONS = [
+      ["overview", "Overview"], ["tasks", "Tasks"], ["milestones", "Milestones"],
+      ["budget", "Budget"], ["team", "Team"], ["notes", "Notes"], ["export", "Export"]
+    ];
+    function scrollToSection() {
+      var el = $("sec-" + detailSection);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    function renderDetail() {
+      var p = getProject(currentProjectId);
+      var body = $("detailBody");
+      if (!p) { body.innerHTML = "<div class='empty'><div class='big'>Project not found</div>It may have been deleted.</div>"; return; }
+      $("topTitle").textContent = p.name;
+      $("topSub").textContent = p.type;
+
+      var html = "<div class='chip-nav'>" + SECTIONS.map(function (s) {
+        return "<button data-sec='" + s[0] + "' class='" + (detailSection === s[0] ? "active" : "") + "'>" + s[1] + "</button>";
+      }).join("") + "</div>";
+
+      /* overview */
+      var nm = nextMilestone(p), od = overdueTasks(p);
+      html += "<div id='sec-overview'></div><h2 class='sec'>Overview</h2><div class='card'>" +
+        (p.description ? "<p style='margin:0 0 10px;'>" + esc(p.description) + "</p>" : "") +
+        "<div class='meta-row'>" +
+        (p.start ? "<span>Start: <b>" + fmtDate(p.start) + "</b></span>" : "") +
+        (p.target ? "<span>Target completion: <b>" + fmtDate(p.target) + "</b></span>" : "") +
+        "</div>" + progressBarHTML(p) + budgetBarHTML(p) +
+        "<div class='meta-row'>" +
+        (nm ? "<span>Next milestone: <b>" + esc(nm.name) + "</b> · " + fmtDate(nm.date) + "</span>" : "<span>No open milestones</span>") +
+        (od.length ? "<span class='flag-overdue'>⚠ " + od.length + " overdue</span>" : "<span class='flag-ok'>Nothing overdue</span>") +
+        "</div>" +
+        "<div class='btn-row' style='display:flex; gap:10px; margin-top:14px;'>" +
+        "<button class='btn' style='flex:1;' id='editProjectBtn'>✎ Edit project</button>" +
+        "<button class='btn danger' style='flex:1;' id='delProjectBtn'>🗑 Delete</button></div></div>";
+
+      /* tasks */
+      html += "<div id='sec-tasks'></div><h2 class='sec'>Tasks <span class='count'>(" + p.tasks.length + ")</span></h2>" +
+        "<div class='filter-bar'><select id='dTaskStatus' aria-label='Filter tasks by status'>" +
+        "<option value=''>All statuses</option><option>Not started</option><option>In progress</option><option>Blocked</option><option>Done</option></select>" +
+        "<select id='dTaskPriority' aria-label='Filter tasks by priority'>" +
+        "<option value=''>All priorities</option><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select></div>" +
+        "<div id='dTaskList'></div>" +
+        "<div class='add-row'><button class='btn primary block' id='addTaskBtn'>＋ Add task</button></div>";
+
+      /* milestones + timeline */
+      html += "<div id='sec-milestones'></div><h2 class='sec'>Milestones <span class='count'>(" + p.milestones.length + ")</span></h2>" +
+        "<div id='dMsList'></div>" + timelineHTML(p) +
+        "<div class='add-row'><button class='btn primary block' id='addMsBtn'>＋ Add milestone</button></div>";
+
+      /* budget */
+      var spent = projSpent(p), total = Number(p.budget) || 0, bpct = total > 0 ? Math.round(spent / total * 100) : 0;
+      html += "<div id='sec-budget'></div><h2 class='sec'>Budget <span class='count'>(" + p.costs.length + " costs)</span></h2><div class='card'>" +
+        budgetBarHTML(p) +
+        (bpct > 90 ? "<p class='flag-overdue' style='margin:10px 0 0;'>⚠ Over 90% of budget spent.</p>" : "") +
+        "<div class='meta-row'><span>Remaining: <b class='money'>" + money(total - spent) + "</b></span></div></div>" +
+        "<div id='dCostList'></div>" +
+        "<div class='add-row'><button class='btn primary block' id='addCostBtn'>＋ Log cost</button></div>";
+
+      /* team */
+      html += "<div id='sec-team'></div><h2 class='sec'>Team <span class='count'>(" + p.team.length + ")</span></h2>" +
+        "<div id='dTeamList'></div>" +
+        "<div class='add-row'><button class='btn primary block' id='addTeamBtn'>＋ Add team member</button></div>";
+
+      /* notes */
+      html += "<div id='sec-notes'></div><h2 class='sec'>Notes log <span class='count'>(" + p.notes.length + ")</span></h2>" +
+        "<div id='dNoteList'></div>" +
+        "<div class='add-row'><button class='btn primary block' id='addNoteBtn'>＋ Add note</button></div>";
+
+      /* export */
+      html += "<div id='sec-export'></div><h2 class='sec'>Export</h2><div class='card'>" +
+        "<p class='hint' style='margin-top:0;'>Downloads save straight to this device — file them on a work computer or print them for the project file.</p>" +
+        "<div style='display:grid; gap:10px;'>" +
+        "<button class='btn primary block' id='expReport'>⬇ Status report (printable HTML)</button>" +
+        "<button class='btn block' id='expTasks'>⬇ Tasks (CSV)</button>" +
+        "<button class='btn block' id='expCosts'>⬇ Costs (CSV)</button>" +
+        "</div></div>";
+
+      body.innerHTML = html;
+
+      body.querySelectorAll("[data-sec]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          detailSection = b.dataset.sec;
+          body.querySelectorAll("[data-sec]").forEach(function (x) { x.classList.toggle("active", x === b); });
+          scrollToSection();
+        });
+      });
+      $("editProjectBtn").onclick = function () { openProjectForm(p.id); };
+      $("delProjectBtn").onclick = function () {
+        confirmSheet("Delete project?", "“" + p.name + "” and all its tasks, milestones, costs, team, and notes will be permanently deleted.", "Delete project", function () {
+          state.projects = state.projects.filter(function (x) { return x.id !== p.id; });
+          currentProjectId = null; save(); show("projects"); toast("Project deleted");
+        });
+      };
+      $("addTaskBtn").onclick = function () { openTaskForm(p.id, null); };
+      $("dTaskStatus").addEventListener("change", function () { renderDetailTasks(p); });
+      $("dTaskPriority").addEventListener("change", function () { renderDetailTasks(p); });
+      renderDetailTasks(p);
+      renderDetailMilestones(p);
+      renderDetailCosts(p);
+      renderDetailTeam(p);
+      renderDetailNotes(p);
+      $("addMsBtn").onclick = function () { openMilestoneForm(p.id, null); };
+      $("addCostBtn").onclick = function () { openCostForm(p.id, null); };
+      $("addTeamBtn").onclick = function () { openTeamForm(p.id, null); };
+      $("addNoteBtn").onclick = function () { openNoteForm(p.id, null); };
+      $("expReport").onclick = function () { exportReport(p); };
+      $("expTasks").onclick = function () { exportTasksCSV(p); };
+      $("expCosts").onclick = function () { exportCostsCSV(p); };
+    }
+
+    function renderDetailTasks(p) {
+      var fs = $("dTaskStatus") ? $("dTaskStatus").value : "";
+      var fp = $("dTaskPriority") ? $("dTaskPriority").value : "";
+      var list = p.tasks.filter(function (t) {
+        return (!fs || t.status === fs) && (!fp || t.priority === fp);
+      });
+      var box = $("dTaskList"); if (!box) return;
+      if (!p.tasks.length) box.innerHTML = "<div class='empty'><div class='big'>No tasks yet</div>Break the project into tasks with owners and due dates.</div>";
+      else if (!list.length) box.innerHTML = "<div class='empty'><div class='big'>No tasks match the filters</div>Clear a filter to see the rest.</div>";
+      else { box.innerHTML = list.map(function (t) { return taskRowHTML(t, p, {}); }).join(""); bindTaskActions(box); }
+    }
+    function renderDetailMilestones(p) {
+      var box = $("dMsList"); if (!box) return;
+      if (!p.milestones.length) { box.innerHTML = "<div class='empty'><div class='big'>No milestones yet</div>Add the key dates this project has to hit.</div>"; return; }
+      var sorted = p.milestones.slice().sort(function (a, b) { return (a.date || "9999") < (b.date || "9999") ? -1 : 1; });
+      box.innerHTML = sorted.map(function (m) {
+        var dd = daysUntil(m.date);
+        var late = !m.done && dd !== null && dd < 0;
+        return "<div class='row'><button class='check-btn " + (m.done ? "done" : "") + "' data-toggle-ms='" + m.id + "' aria-label='Toggle milestone done'>✓</button>" +
+          "<div class='grow'><div class='row-title " + (m.done ? "strike" : "") + "'>" + esc(m.name) + "</div>" +
+          "<div class='row-sub " + (late ? "due-overdue" : "") + "'>" + fmtDate(m.date) +
+          (late ? " · overdue" : m.done ? " · done" : dd === 0 ? " · due today" : dd !== null && dd > 0 ? " · in " + dd + "d" : "") + "</div></div>" +
+          "<div class='row-actions'><button class='icon-btn' data-edit-ms='" + m.id + "' aria-label='Edit milestone'>✎</button>" +
+          "<button class='icon-btn' data-del-ms='" + m.id + "' aria-label='Delete milestone'>🗑</button></div></div>";
+      }).join("");
+      box.querySelectorAll("[data-toggle-ms]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          var m = p.milestones.filter(function (x) { return x.id === b.dataset.toggleMs; })[0];
+          if (m) { m.done = !m.done; save(); renderDetail(); }
+        });
+      });
+      box.querySelectorAll("[data-edit-ms]").forEach(function (b) {
+        b.addEventListener("click", function () { openMilestoneForm(p.id, b.dataset.editMs); });
+      });
+      box.querySelectorAll("[data-del-ms]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          var m = p.milestones.filter(function (x) { return x.id === b.dataset.delMs; })[0]; if (!m) return;
+          confirmSheet("Delete milestone?", "“" + m.name + "” will be removed.", "Delete", function () {
+            p.milestones = p.milestones.filter(function (x) { return x.id !== m.id; });
+            save(); renderDetail(); toast("Milestone deleted");
+          });
+        });
+      });
+    }
+    function timelineHTML(p) {
+      var dates = [];
+      if (p.start) dates.push(p.start);
+      if (p.target) dates.push(p.target);
+      p.milestones.forEach(function (m) { if (m.date) dates.push(m.date); });
+      p.tasks.forEach(function (t) { if (t.due) dates.push(t.due); });
+      if (dates.length < 2) return "";
+      dates.sort();
+      var min = parseDate(dates[0]).getTime(), max = parseDate(dates[dates.length - 1]).getTime();
+      if (max === min) max = min + 86400000;
+      function pos(s) { return Math.max(0, Math.min(100, (parseDate(s).getTime() - min) / (max - min) * 100)); }
+      var now = Date.now();
+      var html = "<div class='card'><div style='font-weight:600; margin-bottom:2px;'>Timeline</div>" +
+        "<div class='row-sub'>" + fmtDate(dates[0]) + " → " + fmtDate(dates[dates.length - 1]) + "</div><div class='timeline'>" +
+        "<div class='track'></div><div class='fill' style='width:" + Math.max(0, Math.min(100, (now - min) / (max - min) * 100)) + "%'></div>";
+      if (now >= min && now <= max) html += "<div class='today' style='left:" + ((now - min) / (max - min) * 100) + "%'></div>";
+      p.milestones.forEach(function (m) {
+        if (m.date) html += "<span class='tl-dot ms " + (m.done ? "done" : "") + "' style='left:" + pos(m.date) + "%' title='" + esc(m.name) + "'></span>";
+      });
+      p.tasks.forEach(function (t) {
+        if (t.due) html += "<span class='tl-dot task " + (t.status === "Done" ? "done" : isOverdue(t) ? "overdue" : "") + "' style='left:" + pos(t.due) + "%' title='" + esc(t.title) + "'></span>";
+      });
+      html += "</div><div class='tl-legend'>" +
+        "<span><span class='dotk' style='background:var(--ice)'></span>Milestone (top row)<span class='dotk' style='background:var(--green); margin-left:14px;'></span>Done</span>" +
+        "<span><span class='dotk' style='background:var(--steel)'></span>Task due date (bottom row)<span class='dotk' style='background:var(--red); margin-left:14px;'></span>Overdue</span></div></div>";
+      return html;
+    }
+    function renderDetailCosts(p) {
+      var box = $("dCostList"); if (!box) return;
+      if (!p.costs.length) { box.innerHTML = "<div class='empty'><div class='big'>No costs logged yet</div>Log vendor invoices and purchases against the budget as they land.</div>"; return; }
+      var sorted = p.costs.slice().sort(function (a, b) { return (a.date || "") < (b.date || "") ? 1 : -1; });
+      box.innerHTML = sorted.map(function (c) {
+        return "<div class='row'><div class='grow'><div class='row-title'>" + esc(c.description) + "</div>" +
+          "<div class='row-sub'>" + fmtDate(c.date) + (c.vendor ? " · " + esc(c.vendor) : "") + "</div></div>" +
+          "<div style='text-align:right; flex:0 0 auto;'><div class='money' style='font-weight:700; font-size:17px;'>" + money(c.amount) + "</div>" +
+          "<div style='display:flex; gap:6px; margin-top:6px; justify-content:flex-end;'>" +
+          "<button class='icon-btn' data-edit-cost='" + c.id + "' aria-label='Edit cost'>✎</button>" +
+          "<button class='icon-btn' data-del-cost='" + c.id + "' aria-label='Delete cost'>🗑</button></div></div></div>";
+      }).join("");
+      box.querySelectorAll("[data-edit-cost]").forEach(function (b) {
+        b.addEventListener("click", function () { openCostForm(p.id, b.dataset.editCost); });
+      });
+      box.querySelectorAll("[data-del-cost]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          var c = p.costs.filter(function (x) { return x.id === b.dataset.delCost; })[0]; if (!c) return;
+          confirmSheet("Delete cost?", "“" + c.description + "” (" + money(c.amount) + ") will be removed.", "Delete", function () {
+            p.costs = p.costs.filter(function (x) { return x.id !== c.id; });
+            save(); renderDetail(); toast("Cost deleted");
+          });
+        });
+      });
+    }
+    function renderDetailTeam(p) {
+      var box = $("dTeamList"); if (!box) return;
+      if (!p.team.length) { box.innerHTML = "<div class='empty'><div class='big'>No team members yet</div>Add the roster — task owners can then be picked from it.</div>"; return; }
+      box.innerHTML = p.team.map(function (m) {
+        return "<div class='row'><div class='grow'><div class='row-title'>" + esc(m.name) + "</div>" +
+          "<div class='row-sub'>" + esc(m.role || "") + (m.phone ? " · " + esc(m.phone) : "") + "</div></div>" +
+          "<div class='row-actions'><button class='icon-btn' data-edit-team='" + m.id + "' aria-label='Edit team member'>✎</button>" +
+          "<button class='icon-btn' data-del-team='" + m.id + "' aria-label='Remove team member'>🗑</button></div></div>";
+      }).join("");
+      box.querySelectorAll("[data-edit-team]").forEach(function (b) {
+        b.addEventListener("click", function () { openTeamForm(p.id, b.dataset.editTeam); });
+      });
+      box.querySelectorAll("[data-del-team]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          var m = p.team.filter(function (x) { return x.id === b.dataset.delTeam; })[0]; if (!m) return;
+          confirmSheet("Remove team member?", m.name + " will be removed from the roster. Tasks already assigned keep the name as text.", "Remove", function () {
+            p.team = p.team.filter(function (x) { return x.id !== m.id; });
+            save(); renderDetail(); toast("Removed from roster");
+          });
+        });
+      });
+    }
+    function renderDetailNotes(p) {
+      var box = $("dNoteList"); if (!box) return;
+      if (!p.notes.length) { box.innerHTML = "<div class='empty'><div class='big'>No notes yet</div>Keep decisions, meeting notes, and change history here.</div>"; return; }
+      var sorted = p.notes.slice().sort(function (a, b) { return (a.date || "") < (b.date || "") ? 1 : -1; });
+      box.innerHTML = sorted.map(function (n) {
+        return "<div class='row'><div class='grow'><div class='row-sub' style='color:var(--steel); font-weight:600;'>" + fmtDate(n.date) + "</div>" +
+          "<div style='margin-top:3px; white-space:pre-wrap; overflow-wrap:anywhere;'>" + esc(n.text) + "</div></div>" +
+          "<div class='row-actions'><button class='icon-btn' data-edit-note='" + n.id + "' aria-label='Edit note'>✎</button>" +
+          "<button class='icon-btn' data-del-note='" + n.id + "' aria-label='Delete note'>🗑</button></div></div>";
+      }).join("");
+      box.querySelectorAll("[data-edit-note]").forEach(function (b) {
+        b.addEventListener("click", function () { openNoteForm(p.id, b.dataset.editNote); });
+      });
+      box.querySelectorAll("[data-del-note]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          confirmSheet("Delete note?", "This note will be permanently removed.", "Delete", function () {
+            p.notes = p.notes.filter(function (x) { return x.id !== b.dataset.delNote; });
+            save(); renderDetail(); toast("Note deleted");
+          });
+        });
+      });
+    }
+
+    /* ================= forms ================= */
+    var TYPES = ["Capital Project", "Equipment Install", "Remodel", "Shutdown", "Maintenance Project", "Other"];
+    function field(label, inner) { return "<label class='f'><span>" + label + "</span>" + inner + "</label>"; }
+    function formBtns(saveLabel) {
+      return "<div class='btn-row'><button class='btn' id='fmCancel' type='button'>Cancel</button>" +
+        "<button class='btn primary' id='fmSave' type='button'>" + saveLabel + "</button></div>";
+    }
+
+    function openProjectForm(id) {
+      var p = id ? getProject(id) : null;
+      openSheet("<h3>" + (p ? "Edit project" : "New project") + "</h3>" +
+        field("Project name", "<input type='text' id='pfName' placeholder='e.g. Line 2 stuffer install' value='" + esc(p ? p.name : "") + "'>") +
+        field("Description", "<textarea id='pfDesc' placeholder='Scope, equipment, why it matters'>" + esc(p ? p.description : "") + "</textarea>") +
+        field("Project type", "<select id='pfType'>" + TYPES.map(function (t) {
+          return "<option " + (p && p.type === t ? "selected" : "") + ">" + t + "</option>";
+        }).join("") + "</select>") +
+        "<div class='f-row'>" +
+        field("Start date", "<input type='date' id='pfStart' value='" + esc(p ? p.start : todayStr()) + "'>") +
+        field("Target completion", "<input type='date' id='pfTarget' value='" + esc(p ? p.target : "") + "'>") +
+        "</div>" +
+        field("Total budget ($)", "<input type='number' id='pfBudget' inputmode='decimal' min='0' step='any' placeholder='0' value='" + esc(p && p.budget ? p.budget : "") + "'>") +
+        formBtns(p ? "Save changes" : "Create project"));
+      $("fmCancel").onclick = closeSheet;
+      $("fmSave").onclick = function () {
+        var name = $("pfName").value.trim();
+        if (!name) { toast("Give the project a name"); $("pfName").focus(); return; }
+        var data = {
+          name: name, description: $("pfDesc").value.trim(), type: $("pfType").value,
+          start: $("pfStart").value, target: $("pfTarget").value,
+          budget: parseFloat($("pfBudget").value) || 0
+        };
+        if (p) { Object.keys(data).forEach(function (k) { p[k] = data[k]; }); }
+        else {
+          p = Object.assign({ id: uid(), tasks: [], milestones: [], costs: [], team: [], notes: [] }, data);
+          state.projects.push(p);
+        }
+        save(); closeSheet(); toast(p ? "Project saved" : "Project created");
+        if (currentTab === "project") renderDetail(); else render();
+        if (!id) { currentProjectId = p.id; detailSection = "overview"; show("project"); }
+      };
+    }
+
+    function openTaskForm(pid, tid) {
+      var p = getProject(pid); if (!p) return;
+      var t = tid ? p.tasks.filter(function (x) { return x.id === tid; })[0] : null;
+      var owners = p.team.map(function (m) { return m.name; });
+      openSheet("<h3>" + (t ? "Edit task" : "Add task") + "</h3>" +
+        field("Task title", "<input type='text' id='tfTitle' placeholder='e.g. Set anchor bolts for new oven' value='" + esc(t ? t.title : "") + "'>") +
+        field("Owner", "<input type='text' id='tfOwner' list='ownerList' placeholder='Name — pick from roster or type' value='" + esc(t ? t.owner : "") + "'>" +
+          "<datalist id='ownerList'>" + owners.map(function (o) { return "<option value='" + esc(o) + "'>"; }).join("") + "</datalist>") +
+        "<div class='f-row'>" +
+        field("Due date", "<input type='date' id='tfDue' value='" + esc(t ? t.due : "") + "'>") +
+        field("Priority", "<select id='tfPriority'>" + ["Low", "Medium", "High", "Critical"].map(function (x) {
+          return "<option " + (t ? (t.priority === x ? "selected" : "") : (x === "Medium" ? "selected" : "")) + ">" + x + "</option>";
+        }).join("") + "</select>") + "</div>" +
+        field("Status", "<select id='tfStatus'>" + ["Not started", "In progress", "Blocked", "Done"].map(function (x) {
+          return "<option " + (t && t.status === x ? "selected" : "") + ">" + x + "</option>";
+        }).join("") + "</select>") +
+        field("Notes", "<textarea id='tfNotes' placeholder='Parts, access, lockout, dependencies…'>" + esc(t ? t.notes : "") + "</textarea>") +
+        formBtns(t ? "Save changes" : "Add task"));
+      $("fmCancel").onclick = closeSheet;
+      $("fmSave").onclick = function () {
+        var title = $("tfTitle").value.trim();
+        if (!title) { toast("Give the task a title"); $("tfTitle").focus(); return; }
+        var data = {
+          title: title, owner: $("tfOwner").value.trim(), due: $("tfDue").value,
+          priority: $("tfPriority").value, status: $("tfStatus").value, notes: $("tfNotes").value.trim()
+        };
+        if (t) Object.keys(data).forEach(function (k) { t[k] = data[k]; });
+        else p.tasks.push(Object.assign({ id: uid() }, data));
+        save(); closeSheet(); render(); toast(t ? "Task saved" : "Task added");
+      };
+    }
+
+    function openMilestoneForm(pid, mid) {
+      var p = getProject(pid); if (!p) return;
+      var m = mid ? p.milestones.filter(function (x) { return x.id === mid; })[0] : null;
+      openSheet("<h3>" + (m ? "Edit milestone" : "Add milestone") + "</h3>" +
+        field("Milestone name", "<input type='text' id='mfName' placeholder='e.g. Equipment on site' value='" + esc(m ? m.name : "") + "'>") +
+        field("Target date", "<input type='date' id='mfDate' value='" + esc(m ? m.date : "") + "'>") +
+        formBtns(m ? "Save changes" : "Add milestone"));
+      $("fmCancel").onclick = closeSheet;
+      $("fmSave").onclick = function () {
+        var name = $("mfName").value.trim();
+        if (!name) { toast("Give the milestone a name"); $("mfName").focus(); return; }
+        if (m) { m.name = name; m.date = $("mfDate").value; }
+        else p.milestones.push({ id: uid(), name: name, date: $("mfDate").value, done: false });
+        save(); closeSheet(); renderDetail(); toast(m ? "Milestone saved" : "Milestone added");
+      };
+    }
+
+    function openCostForm(pid, cid) {
+      var p = getProject(pid); if (!p) return;
+      var c = cid ? p.costs.filter(function (x) { return x.id === cid; })[0] : null;
+      openSheet("<h3>" + (c ? "Edit cost" : "Log cost") + "</h3>" +
+        field("Date", "<input type='date' id='cfDate' value='" + esc(c ? c.date : todayStr()) + "'>") +
+        field("Description", "<input type='text' id='cfDesc' placeholder='e.g. PO 4471 — rigging crew' value='" + esc(c ? c.description : "") + "'>") +
+        field("Vendor", "<input type='text' id='cfVendor' placeholder='Vendor name' value='" + esc(c ? c.vendor : "") + "'>") +
+        field("Amount ($)", "<input type='number' id='cfAmount' inputmode='decimal' min='0' step='any' placeholder='0.00' value='" + esc(c ? c.amount : "") + "'>") +
+        formBtns(c ? "Save changes" : "Log cost"));
+      $("fmCancel").onclick = closeSheet;
+      $("fmSave").onclick = function () {
+        var desc = $("cfDesc").value.trim();
+        var amt = parseFloat($("cfAmount").value);
+        if (!desc) { toast("Add a description"); $("cfDesc").focus(); return; }
+        if (isNaN(amt) || amt < 0) { toast("Enter an amount"); $("cfAmount").focus(); return; }
+        var data = { date: $("cfDate").value, description: desc, vendor: $("cfVendor").value.trim(), amount: amt };
+        if (c) Object.keys(data).forEach(function (k) { c[k] = data[k]; });
+        else p.costs.push(Object.assign({ id: uid() }, data));
+        save(); closeSheet(); renderDetail(); toast(c ? "Cost saved" : "Cost logged");
+      };
+    }
+
+    function openTeamForm(pid, mid) {
+      var p = getProject(pid); if (!p) return;
+      var m = mid ? p.team.filter(function (x) { return x.id === mid; })[0] : null;
+      openSheet("<h3>" + (m ? "Edit team member" : "Add team member") + "</h3>" +
+        field("Name", "<input type='text' id='tmName' placeholder='Full name' value='" + esc(m ? m.name : "") + "'>") +
+        field("Role", "<input type='text' id='tmRole' placeholder='e.g. Lead mechanic, Contractor, Planner' value='" + esc(m ? m.role : "") + "'>") +
+        field("Phone (optional)", "<input type='tel' id='tmPhone' placeholder='555-0100' value='" + esc(m ? m.phone : "") + "'>") +
+        formBtns(m ? "Save changes" : "Add member"));
+      $("fmCancel").onclick = closeSheet;
+      $("fmSave").onclick = function () {
+        var name = $("tmName").value.trim();
+        if (!name) { toast("Add a name"); $("tmName").focus(); return; }
+        var data = { name: name, role: $("tmRole").value.trim(), phone: $("tmPhone").value.trim() };
+        if (m) Object.keys(data).forEach(function (k) { m[k] = data[k]; });
+        else p.team.push(Object.assign({ id: uid() }, data));
+        save(); closeSheet(); renderDetail(); toast(m ? "Member saved" : "Member added");
+      };
+    }
+
+    function openNoteForm(pid, nid) {
+      var p = getProject(pid); if (!p) return;
+      var n = nid ? p.notes.filter(function (x) { return x.id === nid; })[0] : null;
+      openSheet("<h3>" + (n ? "Edit note" : "Add note") + "</h3>" +
+        field("Date", "<input type='date' id='nfDate' value='" + esc(n ? n.date : todayStr()) + "'>") +
+        field("Note", "<textarea id='nfText' style='min-height:130px;' placeholder='Decision, meeting note, change, follow-up…'>" + esc(n ? n.text : "") + "</textarea>") +
+        formBtns(n ? "Save changes" : "Add note"));
+      $("fmCancel").onclick = closeSheet;
+      $("fmSave").onclick = function () {
+        var text = $("nfText").value.trim();
+        if (!text) { toast("Write the note first"); $("nfText").focus(); return; }
+        if (n) { n.date = $("nfDate").value; n.text = text; }
+        else p.notes.push({ id: uid(), date: $("nfDate").value, text: text });
+        save(); closeSheet(); renderDetail(); toast(n ? "Note saved" : "Note added");
+      };
+    }
+
+    /* ================= exports ================= */
+    function download(filename, content, type) {
+      var blob = new Blob([content], { type: type });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click();
+      setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 400);
+    }
+    function slugify(s) { return String(s || "project").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "project"; }
+    function csvCell(v) { v = String(v == null ? "" : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+    function exportTasksCSV(p) {
+      var rows = [["Project", "Task", "Owner", "Due date", "Priority", "Status", "Notes"]];
+      p.tasks.forEach(function (t) { rows.push([p.name, t.title, t.owner, t.due, t.priority, t.status, t.notes]); });
+      download(slugify(p.name) + "-tasks-" + todayStr() + ".csv",
+        rows.map(function (r) { return r.map(csvCell).join(","); }).join("\r\n"), "text/csv");
+      toast("Tasks CSV downloaded");
+    }
+    function exportCostsCSV(p) {
+      var rows = [["Project", "Date", "Description", "Vendor", "Amount"]];
+      p.costs.forEach(function (c) { rows.push([p.name, c.date, c.description, c.vendor, c.amount]); });
+      rows.push([p.name, "", "TOTAL", "", projSpent(p).toFixed(2)]);
+      rows.push([p.name, "", "BUDGET", "", (Number(p.budget) || 0).toFixed(2)]);
+      download(slugify(p.name) + "-costs-" + todayStr() + ".csv",
+        rows.map(function (r) { return r.map(csvCell).join(","); }).join("\r\n"), "text/csv");
+      toast("Costs CSV downloaded");
+    }
+    function exportReport(p) {
+      var pct = projProgress(p), spent = projSpent(p), total = Number(p.budget) || 0;
+      var bpct = total > 0 ? Math.round(spent / total * 100) : 0;
+      var open = p.tasks.filter(function (t) { return t.status !== "Done"; });
+      var done = p.tasks.filter(function (t) { return t.status === "Done"; });
+      var ms = p.milestones.slice().sort(function (a, b) { return (a.date || "9999") < (b.date || "9999") ? -1 : 1; });
+      function h(s) { return esc(s); }
+      var doc = "<!doctype html><html lang='en'><head><meta charset='utf-8'>" +
+        "<title>" + h(p.name) + " — Status Report " + todayStr() + "</title>" +
+        "<style>body{font-family:Arial,Helvetica,sans-serif;color:#16222e;max-width:820px;margin:32px auto;padding:0 20px;line-height:1.5;}" +
+        "h1{font-size:24px;margin:0 0 2px;} h2{font-size:16px;margin:26px 0 8px;border-bottom:2px solid #2e6ea8;padding-bottom:4px;}" +
+        ".sub{color:#5a7186;} table{width:100%;border-collapse:collapse;font-size:13.5px;} th,td{border:1px solid #c4d2de;padding:6px 8px;text-align:left;vertical-align:top;}" +
+        "th{background:#eef4fa;} .bar{height:12px;background:#dde7f0;border-radius:6px;overflow:hidden;} .bar i{display:block;height:100%;background:#2e6ea8;}" +
+        ".bar i.over{background:#c0392b;} .grid{display:flex;gap:24px;flex-wrap:wrap;} .kv b{display:block;font-size:18px;} .kv span{color:#5a7186;font-size:12px;text-transform:uppercase;letter-spacing:.05em;}" +
+        ".overdue{color:#c0392b;font-weight:bold;} footer{margin-top:34px;color:#5a7186;font-size:12px;border-top:1px solid #c4d2de;padding-top:10px;}" +
+        "@media print{body{margin:10px auto;}}</style></head><body>" +
+        "<h1>" + h(p.name) + "</h1><div class='sub'>" + h(p.type) + " · Status report · " + fmtDate(todayStr()) + "</div>" +
+        (p.description ? "<p>" + h(p.description) + "</p>" : "") +
+        "<div class='grid'>" +
+        "<div class='kv'><b>" + pct + "%</b><span>Complete</span></div>" +
+        "<div class='kv'><b>" + fmtDate(p.start) + "</b><span>Start</span></div>" +
+        "<div class='kv'><b>" + fmtDate(p.target) + "</b><span>Target completion</span></div>" +
+        "<div class='kv'><b>" + money(spent) + " / " + money(total) + "</b><span>Budget spent (" + bpct + "%)</span></div>" +
+        "</div>" +
+        "<h2>Progress</h2><div class='bar'><i style='width:" + pct + "%'></i></div>" +
+        "<p>" + done.length + " of " + p.tasks.length + " tasks done · " + open.length + " open" +
+        (overdueTasks(p).length ? " · <span class='overdue'>" + overdueTasks(p).length + " overdue</span>" : "") + "</p>" +
+        "<h2>Budget</h2><div class='bar'><i class='" + (bpct > 90 ? "over" : "") + "' style='width:" + Math.min(bpct, 100) + "%'></i></div>" +
+        "<p>Spent " + money(spent) + " of " + money(total) + " budget · Remaining " + money(total - spent) + "</p>" +
+        "<h2>Milestones</h2>" +
+        (ms.length ? "<table><tr><th>Milestone</th><th>Target date</th><th>Status</th></tr>" +
+          ms.map(function (m) { return "<tr><td>" + h(m.name) + "</td><td>" + fmtDate(m.date) + "</td><td>" + (m.done ? "Done" : "Open") + "</td></tr>"; }).join("") + "</table>"
+          : "<p>No milestones recorded.</p>") +
+        "<h2>Open tasks</h2>" +
+        (open.length ? "<table><tr><th>Task</th><th>Owner</th><th>Due</th><th>Priority</th><th>Status</th></tr>" +
+          open.map(function (t) {
+            return "<tr><td>" + h(t.title) + "</td><td>" + h(t.owner || "—") + "</td><td class='" + (isOverdue(t) ? "overdue" : "") + "'>" +
+              fmtDate(t.due) + (isOverdue(t) ? " (overdue)" : "") + "</td><td>" + h(t.priority) + "</td><td>" + h(t.status) + "</td></tr>";
+          }).join("") + "</table>" : "<p>No open tasks.</p>") +
+        "<footer>Generated " + fmtDate(todayStr()) + " · A planning tool — it does not replace your company's project controls or approvals.</footer>" +
+        "</body></html>";
+      download(slugify(p.name) + "-status-report-" + todayStr() + ".html", doc, "text/html");
+      toast("Status report downloaded");
+    }
+
+    /* ================= wire up ================= */
+    $("dashNewProject").addEventListener("click", function () { openProjectForm(null); });
+    $("projNewProject").addEventListener("click", function () { openProjectForm(null); });
+    show("dashboard");
+    </script>
+  </body>
+</html>

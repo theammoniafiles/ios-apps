@@ -8,6 +8,8 @@
 #   APPLE_TEAM_ID
 #   IOS_DIST_P12, IOS_DIST_P12_PASSWORD
 #   IOS_TOOLS_PROFILE_B64, IOS_STORE_PROFILE_B64, IOS_PLANNER_PROFILE_B64
+#   IOS_TRAINING_PROFILE_B64, IOS_PSM_PROFILE_B64, IOS_CMRP_PROFILE_B64,
+#   IOS_PROJECTS_PROFILE_B64
 #   APP_STORE_CONNECT_API_KEY_ID, APP_STORE_CONNECT_ISSUER_ID,
 #   APP_STORE_CONNECT_API_PRIVATE_KEY
 
@@ -20,6 +22,10 @@ on:
       - 'tools-app/**'
       - 'store-app/**'
       - 'planner-app/**'
+      - 'training-app/**'
+      - 'psm-app/**'
+      - 'cmrp-app/**'
+      - 'projects-app/**'
   workflow_dispatch:
 
 jobs:
@@ -45,6 +51,26 @@ jobs:
             bundle_id: com.theammoniafiles.planner
             profile_name: TAF Planner App Store
             ipa_name: weekly-planner
+          - app_dir: training-app
+            app_name: Operator Training
+            bundle_id: com.theammoniafiles.training
+            profile_name: TAF Training App Store
+            ipa_name: operator-training
+          - app_dir: psm-app
+            app_name: PSM Tracker
+            bundle_id: com.theammoniafiles.psm
+            profile_name: TAF PSM App Store
+            ipa_name: psm-tracker
+          - app_dir: cmrp-app
+            app_name: CMRP Practice Exam
+            bundle_id: com.theammoniafiles.cmrp
+            profile_name: TAF CMRP App Store
+            ipa_name: cmrp-practice-exam
+          - app_dir: projects-app
+            app_name: Project Manager
+            bundle_id: com.theammoniafiles.projects
+            profile_name: TAF Projects App Store
+            ipa_name: project-manager
 
     steps:
       - name: Check out
@@ -105,6 +131,46 @@ jobs:
         if: matrix.app_dir == 'planner-app'
         env:
           PROFILE_B64: ${{ secrets.IOS_PLANNER_PROFILE_B64 }}
+        run: |
+          mkdir -p ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "$PROFILE_B64" | base64 -d > ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles/profile.mobileprovision
+          cp ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+
+      - name: Install provisioning profile (Training)
+        if: matrix.app_dir == 'training-app'
+        env:
+          PROFILE_B64: ${{ secrets.IOS_TRAINING_PROFILE_B64 }}
+        run: |
+          mkdir -p ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "$PROFILE_B64" | base64 -d > ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles/profile.mobileprovision
+          cp ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+
+      - name: Install provisioning profile (PSM)
+        if: matrix.app_dir == 'psm-app'
+        env:
+          PROFILE_B64: ${{ secrets.IOS_PSM_PROFILE_B64 }}
+        run: |
+          mkdir -p ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "$PROFILE_B64" | base64 -d > ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles/profile.mobileprovision
+          cp ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+
+      - name: Install provisioning profile (CMRP)
+        if: matrix.app_dir == 'cmrp-app'
+        env:
+          PROFILE_B64: ${{ secrets.IOS_CMRP_PROFILE_B64 }}
+        run: |
+          mkdir -p ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "$PROFILE_B64" | base64 -d > ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles/profile.mobileprovision
+          cp ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+
+      - name: Install provisioning profile (Projects)
+        if: matrix.app_dir == 'projects-app'
+        env:
+          PROFILE_B64: ${{ secrets.IOS_PROJECTS_PROFILE_B64 }}
         run: |
           mkdir -p ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles

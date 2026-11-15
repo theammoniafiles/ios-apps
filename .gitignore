@@ -5,12 +5,24 @@ node_modules/
 tools-app/ios/App/build/
 store-app/ios/App/build/
 planner-app/ios/App/build/
+training-app/ios/App/build/
+psm-app/ios/App/build/
+cmrp-app/ios/App/build/
+projects-app/ios/App/build/
 tools-app/ios/App/Pods/
 store-app/ios/App/Pods/
 planner-app/ios/App/Pods/
+training-app/ios/App/Pods/
+psm-app/ios/App/Pods/
+cmrp-app/ios/App/Pods/
+projects-app/ios/App/Pods/
 tools-app/build/
 store-app/build/
 planner-app/build/
+training-app/build/
+psm-app/build/
+cmrp-app/build/
+projects-app/build/
 *.xcarchive
 *.ipa
 
@@ -19,6 +31,10 @@ planner-app/build/
 tools-app/ios/App/App/public/
 store-app/ios/App/App/public/
 planner-app/ios/App/App/public/
+training-app/ios/App/App/public/
+psm-app/ios/App/App/public/
+cmrp-app/ios/App/App/public/
+projects-app/ios/App/App/public/
 
 # Signing material — NEVER commit
 signing/

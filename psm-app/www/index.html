@@ -1,0 +1,1146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<link rel="icon" href="data:," />
+<title>PSM Compliance Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#081120; --bg2:#0b1a30; --panel:#0e2038; --panel2:#12283f; --line:#1e3a56;
+  --ink:#e8f1f8; --muted:#9db4c6; --faint:#6d879c;
+  --frost:#7fd4f2; --frost-dim:#3d7ea3; --steel:#8fa9bd;
+  --green:#34c47c; --amber:#f0a832; --red:#f0564a;
+  --green-bg:rgba(52,196,124,.14); --amber-bg:rgba(240,168,50,.14); --red-bg:rgba(240,86,74,.14);
+  --radius:14px; --tabbar-h:68px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.45;display:flex;flex-direction:column;height:100dvh;overflow:hidden}
+main.wrap{flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;width:100%}
+h1,h2,h3,.cond{font-family:"Barlow Condensed","Barlow",sans-serif;letter-spacing:.02em}
+button,[role="button"],select,input,textarea{font-family:inherit}
+button{min-height:44px;cursor:pointer}
+input,select,textarea{min-height:44px}
+a{color:var(--frost)}
+.wrap{max-width:1060px;margin:0 auto;padding:0 14px}
+
+/* ---------- Header ---------- */
+.topbar{flex:0 0 auto;background:linear-gradient(180deg,#0a1830,#081120);border-bottom:1px solid var(--line)}
+.topbar-in{max-width:1060px;margin:0 auto;padding:10px 14px;display:flex;align-items:center;gap:12px}
+.emblem{flex:0 0 auto;width:46px;height:46px}
+.brand h1{margin:0;font-size:24px;font-weight:700;line-height:1;color:#fff;text-transform:uppercase}
+.brand p{margin:2px 0 0;font-size:12.5px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.topscore{margin-left:auto;text-align:right}
+.topscore b{display:block;font-family:"Barlow Condensed",sans-serif;font-size:26px;line-height:1;color:var(--frost)}
+.topscore span{font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em}
+
+/* ---------- Views ---------- */
+.view{display:none;padding:16px 0 8px}
+.view.active{display:block}
+.view h2.vtitle{font-size:27px;margin:2px 0 4px;text-transform:uppercase;color:#fff}
+.view .vsub{color:var(--muted);margin:0 0 14px;font-size:15px}
+
+/* ---------- Dashboard ---------- */
+.scorecard{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:var(--radius);padding:18px;display:flex;gap:18px;align-items:center}
+.ring{position:relative;width:118px;height:118px;flex:0 0 auto}
+.ring svg{transform:rotate(-90deg)}
+.ring .pct{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .pct b{font-family:"Barlow Condensed",sans-serif;font-size:32px;line-height:1;color:#fff}
+.ring .pct span{font-size:10.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em}
+.scorecard .facts{flex:1;min-width:0}
+.scorecard .facts h2{margin:0 0 6px;font-size:22px;text-transform:uppercase;color:#fff}
+.scorecard .facts p{margin:0 0 10px;color:var(--muted);font-size:14.5px}
+.meter{height:10px;background:#0a1a2e;border:1px solid var(--line);border-radius:99px;overflow:hidden}
+.meter i{display:block;height:100%;background:linear-gradient(90deg,var(--frost-dim),var(--frost));border-radius:99px;transition:width .4s}
+.statrow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:12px;text-align:center}
+.stat b{display:block;font-family:"Barlow Condensed",sans-serif;font-size:26px;line-height:1.1}
+.stat span{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.stat.red b{color:var(--red)} .stat.amber b{color:var(--amber)} .stat.green b{color:var(--green)}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:22px 0 10px}
+.sec-head h3{margin:0;font-size:21px;text-transform:uppercase;color:#fff}
+.sec-head .hint{font-size:12.5px;color:var(--faint)}
+.disclaimer{margin-top:22px;border:1px solid var(--line);border-left:4px solid var(--frost-dim);background:var(--panel);border-radius:10px;padding:12px 14px;color:var(--muted);font-size:14px}
+.data-tools{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.plant-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.plant-card label{display:block;font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+.plant-card input{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:11px 12px;font-size:16px}
+.plant-card .hint{margin:7px 0 0;font-size:13px;color:var(--faint)}
+.export-bar{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 14px}
+.export-bar .btn{flex:1 1 auto}
+.log-export{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.log-export .btn{flex:1 1 160px}
+.btn{border:1px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:10px;padding:10px 16px;font-size:15px;font-weight:600;min-height:44px}
+.btn:active{background:var(--panel)}
+.btn.primary{background:var(--frost);border-color:var(--frost);color:#06283d}
+.btn.danger{border-color:#5c2a26;color:#ff9d95;background:var(--red-bg)}
+.btn.small{min-height:40px;padding:6px 12px;font-size:14px}
+
+/* ---------- Element cards / rows ---------- */
+.elgrid{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:680px){.elgrid{grid-template-columns:1fr 1fr}}
+.elcard{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:13px 14px;color:var(--ink)}
+.elcard:active{background:var(--panel2)}
+.elnum{flex:0 0 auto;width:40px;height:40px;border-radius:10px;background:var(--bg2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:"Barlow Condensed",sans-serif;font-size:19px;font-weight:700;color:var(--frost)}
+.elcard .mid{flex:1;min-width:0}
+.elcard .mid b{display:block;font-size:16.5px;line-height:1.25}
+.elcard .mid span{font-size:12.5px;color:var(--faint)}
+.elcard .bar{height:6px;background:#0a1a2e;border-radius:99px;margin-top:7px;overflow:hidden}
+.elcard .bar i{display:block;height:100%;border-radius:99px}
+.dot{flex:0 0 auto;width:13px;height:13px;border-radius:50%}
+.dot.green{background:var(--green)} .dot.amber{background:var(--amber)} .dot.red{background:var(--red)}
+.elcard .pc{flex:0 0 auto;font-family:"Barlow Condensed",sans-serif;font-size:20px;font-weight:600;min-width:44px;text-align:right}
+.pill{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:99px;padding:2px 9px;vertical-align:middle}
+.pill.red{background:var(--red-bg);color:#ff9d95}.pill.amber{background:var(--amber-bg);color:#ffc964}.pill.green{background:var(--green-bg);color:#6fe3a5}.pill.grey{background:#1a2f47;color:var(--muted)}
+
+/* ---------- Due list / action rows ---------- */
+.duelist{display:flex;flex-direction:column;gap:8px}
+.duerow{display:flex;gap:11px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px 13px;width:100%;text-align:left;color:var(--ink)}
+.duerow:active{background:var(--panel2)}
+.duerow.overdue{border-color:#5c2a26;background:linear-gradient(0deg,var(--red-bg),var(--red-bg)),var(--panel)}
+.duerow .when{flex:0 0 auto;text-align:center;background:var(--bg2);border:1px solid var(--line);border-radius:9px;padding:5px 8px;min-width:56px}
+.duerow .when b{display:block;font-family:"Barlow Condensed",sans-serif;font-size:19px;line-height:1}
+.duerow .when span{font-size:10.5px;color:var(--faint);text-transform:uppercase}
+.duerow.overdue .when b{color:var(--red)}
+.duerow .mid{flex:1;min-width:0}
+.duerow .mid b{display:block;font-size:15.5px;line-height:1.3}
+.duerow .mid span{font-size:13px;color:var(--muted)}
+.empty{background:var(--panel);border:1px dashed var(--line);border-radius:var(--radius);padding:18px;text-align:center;color:var(--muted)}
+.empty b{color:var(--ink)}
+
+/* ---------- Element detail ---------- */
+.backbtn{display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:var(--frost);font-size:16px;font-weight:600;padding:8px 4px;min-height:44px}
+.detail-head{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.detail-head h2{margin:0 0 2px;font-size:26px;text-transform:uppercase;color:#fff}
+.detail-head .ref{color:var(--frost);font-size:13px;letter-spacing:.05em;text-transform:uppercase}
+.detail-head p{color:var(--muted);margin:10px 0 0;font-size:15px}
+.detail-head .meter{margin-top:12px}
+.checklist{display:flex;flex-direction:column;gap:9px}
+.task{display:flex;gap:11px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
+.task.done{opacity:.72}
+.task .cbwrap{flex:0 0 auto;padding-top:1px}
+.task input[type="checkbox"]{width:26px;height:26px;min-height:26px;accent-color:var(--frost);margin:0}
+.task .tbody{flex:1;min-width:0}
+.task .tbody>button{display:block;width:100%;background:none;border:none;color:var(--ink);text-align:left;padding:0;min-height:0;font-size:16px;font-weight:600;line-height:1.35}
+.task.done .tbody>button{text-decoration:line-through;color:var(--muted)}
+.task .meta{font-size:13px;color:var(--muted);margin-top:4px;display:flex;flex-wrap:wrap;gap:4px 12px}
+.task .meta .od{color:#ff9d95;font-weight:700}
+.task .note{font-size:13.5px;color:var(--steel);margin-top:4px;font-style:italic}
+.addrow{margin-top:12px}
+
+/* ---------- Toolbar / filters ---------- */
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.toolbar select{background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:15px;min-height:44px}
+.chip{border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:99px;padding:8px 14px;font-size:14px;font-weight:600;min-height:40px}
+.chip.on{background:var(--frost);border-color:var(--frost);color:#06283d}
+
+/* ---------- Documents ---------- */
+.docgroup{margin-bottom:18px}
+.docgroup h3{font-size:19px;text-transform:uppercase;margin:0 0 8px;color:#fff}
+.docgroup h3 span{color:var(--frost);font-size:14px}
+.docrow{display:flex;gap:11px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px 12px;margin-bottom:8px}
+.docrow input[type="checkbox"]{width:26px;height:26px;min-height:26px;accent-color:var(--frost);margin:2px 0 0;flex:0 0 auto}
+.docrow .dbody{flex:1;min-width:0}
+.docrow .dbody b{display:block;font-size:15.5px;line-height:1.3}
+.docrow .dbody span{font-size:13px;color:var(--muted)}
+.docrow label{font-size:12px;color:var(--faint);display:block;margin-top:7px;text-transform:uppercase;letter-spacing:.05em}
+.docrow input[type="date"]{background:var(--bg2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:6px 8px;font-size:14.5px;color-scheme:dark;margin-top:3px;width:100%;max-width:190px}
+
+/* ---------- Audit ---------- */
+.aq{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:9px}
+.aq p{margin:0 0 10px;font-size:15.5px;font-weight:500}
+.seg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+.seg button{border:1px solid var(--line);background:var(--bg2);color:var(--muted);border-radius:9px;font-size:14.5px;font-weight:700;padding:9px 4px;min-height:44px}
+.seg button.on-yes{background:var(--green-bg);border-color:var(--green);color:#6fe3a5}
+.seg button.on-no{background:var(--red-bg);border-color:var(--red);color:#ff9d95}
+.seg button.on-unsure{background:var(--amber-bg);border-color:var(--amber);color:#ffc964}
+.audit-el-head{display:flex;align-items:center;gap:10px;margin:20px 0 10px}
+.audit-el-head h3{margin:0;font-size:20px;text-transform:uppercase;color:#fff;flex:1}
+.audit-el-head .score{font-family:"Barlow Condensed",sans-serif;font-size:20px}
+
+/* ---------- Logs ---------- */
+.logtabs{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:14px}
+.logtabs button{border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:10px;font-weight:700;font-size:14.5px;padding:10px 4px;min-height:48px}
+.logtabs button.on{background:var(--frost);border-color:var(--frost);color:#06283d}
+.logrow{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 13px;margin-bottom:9px}
+.logrow .lr-top{display:flex;gap:10px;align-items:baseline}
+.logrow .lr-top b{flex:1;font-size:15.5px;line-height:1.3}
+.logrow .lr-top time{font-size:13px;color:var(--frost);white-space:nowrap}
+.logrow p{margin:5px 0 0;color:var(--muted);font-size:14px}
+.logrow .lr-actions{display:flex;gap:8px;margin-top:10px}
+.logrow .lr-actions button{min-height:40px}
+
+/* ---------- Tab bar ---------- */
+.tabbar{flex:0 0 auto;background:rgba(8,19,36,.97);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+.tabbar-in{max-width:1060px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr)}
+.tabbar button{background:none;border:none;color:var(--faint);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 2px 7px;font-size:11px;font-weight:600;letter-spacing:.03em;min-height:var(--tabbar-h)}
+.tabbar button svg{width:23px;height:23px}
+.tabbar button.on{color:var(--frost)}
+
+/* ---------- Modal / sheet ---------- */
+.scrim{position:fixed;inset:0;background:rgba(3,8,16,.72);z-index:50;display:none}
+.scrim.open{display:block}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:51;background:var(--bg2);border-top:1px solid var(--line);border-radius:18px 18px 0 0;max-height:92vh;overflow-y:auto;display:none;padding:18px 16px calc(20px + env(safe-area-inset-bottom));max-width:640px;margin:0 auto}
+.sheet.open{display:block}
+.sheet h3{margin:0 40px 4px 0;font-size:22px;text-transform:uppercase;color:#fff}
+.sheet .sub{color:var(--muted);font-size:13.5px;margin:0 0 14px}
+.sheet .x{position:absolute;top:12px;right:12px;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:19px}
+.field{margin-bottom:13px}
+.field label{display:block;font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:10px 12px;font-size:16px;color-scheme:dark}
+.field textarea{min-height:74px;resize:vertical}
+.checkline{display:flex;align-items:center;gap:11px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px 12px}
+.checkline input{width:26px;height:26px;min-height:26px;accent-color:var(--frost)}
+.checkline span{font-weight:600}
+.sheet-actions{display:flex;gap:9px;margin-top:16px;flex-wrap:wrap}
+.sheet-actions .grow{flex:1}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 14px);background:var(--frost);color:#06283d;font-weight:700;padding:11px 20px;border-radius:99px;z-index:60;display:none;font-size:15px;box-shadow:0 6px 24px rgba(0,0,0,.5)}
+.toast.show{display:block}
+footer.foot{color:var(--faint);font-size:12.5px;text-align:center;padding:20px 14px 6px}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <svg class="emblem" viewBox="0 0 64 64" aria-hidden="true">
+      <defs>
+        <radialGradient id="frostG" cx="42%" cy="38%" r="75%">
+          <stop offset="0%" stop-color="#cdeffb"/><stop offset="45%" stop-color="#7fd4f2"/><stop offset="100%" stop-color="#2b6a8f"/>
+        </radialGradient>
+      </defs>
+      <circle cx="32" cy="32" r="29" fill="none" stroke="#3d7ea3" stroke-width="2.5"/>
+      <circle cx="32" cy="32" r="24.5" fill="rgba(127,212,242,.07)"/>
+      <circle cx="32" cy="27" r="8.5" fill="url(#frostG)"/>
+      <circle cx="19" cy="43" r="6" fill="url(#frostG)" opacity=".92"/>
+      <circle cx="45" cy="43" r="6" fill="url(#frostG)" opacity=".92"/>
+      <circle cx="32" cy="48" r="6" fill="url(#frostG)" opacity=".92"/>
+      <path d="M27 33 L22 38 M37 33 L42 38 M32 36 L32 42" stroke="#7fd4f2" stroke-width="2.4" stroke-linecap="round"/>
+      <text x="32" y="31" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-weight="700" font-size="10" fill="#06283d">N</text>
+      <text x="19" y="46" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-weight="700" font-size="7.5" fill="#06283d">H</text>
+      <text x="45" y="46" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-weight="700" font-size="7.5" fill="#06283d">H</text>
+      <text x="32" y="51" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-weight="700" font-size="7.5" fill="#06283d">H</text>
+    </svg>
+    <div class="brand">
+      <h1>PSM Compliance Tracker</h1>
+      <p>Ammonia Refrigeration · 14 Elements</p>
+    </div>
+    <div class="topscore"><b id="topScore">0%</b><span>Complete</span></div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ DASHBOARD ============ -->
+  <section class="view active" id="view-dash">
+    <div class="plant-card">
+      <label for="plantNameInput">Plant name</label>
+      <input id="plantNameInput" type="text" placeholder="e.g. Alma Plant" autocomplete="off" />
+      <p class="hint">Shown on your exported compliance report. Saved on this device.</p>
+    </div>
+    <div class="scorecard">
+      <div class="ring">
+        <svg width="118" height="118" viewBox="0 0 118 118">
+          <circle cx="59" cy="59" r="50" fill="none" stroke="#14304d" stroke-width="11"/>
+          <circle id="ringArc" cx="59" cy="59" r="50" fill="none" stroke="#7fd4f2" stroke-width="11" stroke-linecap="round" stroke-dasharray="314.2" stroke-dashoffset="314.2"/>
+        </svg>
+        <div class="pct"><b id="ringPct">0%</b><span>Complete</span></div>
+      </div>
+      <div class="facts">
+        <h2>Overall Compliance</h2>
+        <p id="scoreLine">Checklist items completed across all 14 elements.</p>
+        <div class="meter"><i id="scoreBar" style="width:0%"></i></div>
+      </div>
+    </div>
+
+    <div class="statrow">
+      <div class="stat red"><b id="statOverdue">0</b><span>Overdue</span></div>
+      <div class="stat amber"><b id="statSoon">0</b><span>Due in 30 days</span></div>
+      <div class="stat green"><b id="statDone">0</b><span>Items done</span></div>
+    </div>
+
+    <div class="sec-head"><h3>Element Status</h3><span class="hint">Tap an element to open it</span></div>
+    <div class="elgrid" id="dashElements"></div>
+
+    <div class="sec-head"><h3>Overdue</h3><span class="hint" id="overdueHint"></span></div>
+    <div class="duelist" id="dashOverdue"></div>
+
+    <div class="sec-head"><h3>Due in the Next 30 Days</h3><span class="hint">Sorted by due date</span></div>
+    <div class="duelist" id="dashSoon"></div>
+
+    <div class="disclaimer">A tracking tool to help manage your PSM program — it does not replace your site's written program, procedures, or regulatory advice.</div>
+
+    <div class="data-tools">
+      <button class="btn primary" id="exportReportBtn" type="button">Export compliance report</button>
+      <button class="btn" id="exportBtn" type="button">Download backup (JSON)</button>
+      <button class="btn danger" id="resetBtn" type="button">Erase all data</button>
+    </div>
+    <p style="color:var(--faint);font-size:13px;margin:10px 0 0">Everything is stored on this device only — no account, no sign-in. Download a backup before switching phones.</p>
+  </section>
+
+  <!-- ============ ELEMENTS ============ -->
+  <section class="view" id="view-elements">
+    <div id="elementsList">
+      <h2 class="vtitle">The 14 Elements</h2>
+      <p class="vsub">OSHA Process Safety Management, 29 CFR 1910.119 — applied to an ammonia refrigeration plant. Open an element to work its checklist.</p>
+      <div class="elgrid" id="elementsGrid"></div>
+    </div>
+    <div id="elementDetail" style="display:none"></div>
+  </section>
+
+  <!-- ============ ACTIONS ============ -->
+  <section class="view" id="view-actions">
+    <h2 class="vtitle">Action Items</h2>
+    <p class="vsub">Every open item across all 14 elements, in one list. Tap an item to edit its owner, due date, notes, and status.</p>
+    <div class="export-bar">
+      <button class="btn" id="exportActionsBtn" type="button">Export action items (CSV)</button>
+    </div>
+    <div class="toolbar">
+      <button class="chip on" data-afilter="open" type="button">Open</button>
+      <button class="chip" data-afilter="overdue" type="button">Overdue</button>
+      <button class="chip" data-afilter="all" type="button">All incl. done</button>
+      <select id="actionSort" aria-label="Sort action items">
+        <option value="due">Sort: due date</option>
+        <option value="element">Sort: element</option>
+        <option value="owner">Sort: owner</option>
+      </select>
+    </div>
+    <div class="duelist" id="actionsList"></div>
+  </section>
+
+  <!-- ============ DOCUMENTS ============ -->
+  <section class="view" id="view-docs">
+    <h2 class="vtitle">Documents &amp; Records</h2>
+    <p class="vsub">What records each element requires the plant to keep, and for how long. Check a record off when it's on file and set the date it was last updated.</p>
+    <div class="export-bar">
+      <button class="btn" id="exportDocsBtn" type="button">Export records checklist (CSV)</button>
+    </div>
+    <div class="statrow" style="margin:0 0 16px">
+      <div class="stat green"><b id="docDone">0</b><span>On file</span></div>
+      <div class="stat"><b id="docTotal">0</b><span>Records tracked</span></div>
+      <div class="stat amber"><b id="docPct">0%</b><span>Records ready</span></div>
+    </div>
+    <div id="docsList"></div>
+  </section>
+
+  <!-- ============ AUDIT ============ -->
+  <section class="view" id="view-audit">
+    <h2 class="vtitle">Audit Ready</h2>
+    <p class="vsub">A mock audit walkthrough — the questions an auditor typically asks, element by element. Answer honestly to find your weak spots before a real audit does.</p>
+    <div class="scorecard" style="margin-bottom:6px">
+      <div class="facts">
+        <h2 id="auditScoreTitle">Readiness: 0%</h2>
+        <p id="auditScoreLine">Answer the questions below. Yes = 100%, Not sure = 50%, No = 0%.</p>
+        <div class="meter"><i id="auditBar" style="width:0%"></i></div>
+      </div>
+    </div>
+    <div id="auditList"></div>
+  </section>
+
+  <!-- ============ LOGS ============ -->
+  <section class="view" id="view-logs">
+    <h2 class="vtitle">Logs</h2>
+    <p class="vsub">Working logs kept on this device. Add, edit, or delete entries as the work happens.</p>
+    <div class="logtabs" role="tablist">
+      <button type="button" data-logtab="hotwork" class="on">Hot Work Permits</button>
+      <button type="button" data-logtab="moc">MOC Entries</button>
+      <button type="button" data-logtab="incidents">Incidents</button>
+    </div>
+    <div class="log-export" aria-label="Export logs">
+      <button class="btn" type="button" data-export-log="hotwork">Export logs (CSV) — Hot Work Permits</button>
+      <button class="btn" type="button" data-export-log="moc">Export logs (CSV) — Management of Change</button>
+      <button class="btn" type="button" data-export-log="incidents">Export logs (CSV) — Incidents</button>
+    </div>
+    <div class="export-bar">
+      <button class="btn" id="exportCurrentLogBtn" type="button">Export logs (CSV)</button>
+    </div>
+    <button class="btn primary" id="addLogBtn" type="button" style="width:100%;margin-bottom:14px">+ Add entry</button>
+    <div id="logsList"></div>
+  </section>
+
+  <footer class="foot">PSM Compliance Tracker · Data stays on this device · Works offline</footer>
+</main>
+
+<!-- ============ TAB BAR ============ -->
+<nav class="tabbar" aria-label="Main">
+  <div class="tabbar-in">
+    <button type="button" data-view="dash" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg>Dashboard</button>
+    <button type="button" data-view="elements"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Elements</button>
+    <button type="button" data-view="actions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M3.5 6l1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>Actions</button>
+    <button type="button" data-view="docs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h8L19 7.5V21a.5.5 0 0 1-.5.5h-12A.5.5 0 0 1 6 21z"/><path d="M13.5 2.5v6H19M9 13h6M9 17h6"/></svg>Documents</button>
+    <button type="button" data-view="audit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8.5 11l2 2 3.5-4"/></svg>Audit</button>
+    <button type="button" data-view="logs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3.5h14v17H5z"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Logs</button>
+  </div>
+</nav>
+
+<!-- ============ SHEETS ============ -->
+<div class="scrim" id="scrim"></div>
+
+<div class="sheet" id="taskSheet" role="dialog" aria-modal="true" aria-labelledby="taskTitle">
+  <button class="x" type="button" data-close aria-label="Close">×</button>
+  <h3 id="taskTitle">Edit item</h3>
+  <p class="sub" id="taskSub"></p>
+  <div class="field"><label for="fTitle">Task</label><input id="fTitle" type="text" /></div>
+  <div class="field"><label for="fOwner">Owner</label><input id="fOwner" type="text" placeholder="Who owns this? e.g. Maintenance Supervisor" autocomplete="off" /></div>
+  <div class="field"><label for="fDue">Due date</label><input id="fDue" type="date" /></div>
+  <div class="field"><label for="fStatus">Status</label>
+    <select id="fStatus"><option value="open">Open</option><option value="progress">In progress</option><option value="done">Done</option></select>
+  </div>
+  <div class="field"><label for="fNote">Note</label><textarea id="fNote" placeholder="Short note — where it stands, what's blocking it…"></textarea></div>
+  <div class="sheet-actions">
+    <button class="btn danger" id="taskDelete" type="button" style="display:none">Delete task</button>
+    <button class="btn grow" type="button" data-close>Cancel</button>
+    <button class="btn primary grow" id="taskSave" type="button">Save</button>
+  </div>
+</div>
+
+<div class="sheet" id="logSheet" role="dialog" aria-modal="true" aria-labelledby="logTitle">
+  <button class="x" type="button" data-close aria-label="Close">×</button>
+  <h3 id="logTitle">Log entry</h3>
+  <p class="sub" id="logSub"></p>
+  <div id="logFields"></div>
+  <div class="sheet-actions">
+    <button class="btn danger" id="logDelete" type="button" style="display:none">Delete entry</button>
+    <button class="btn grow" type="button" data-close>Cancel</button>
+    <button class="btn primary grow" id="logSave" type="button">Save</button>
+  </div>
+</div>
+
+<div class="sheet" id="confirmSheet" role="dialog" aria-modal="true">
+  <h3 id="confirmTitle">Are you sure?</h3>
+  <p class="sub" id="confirmText"></p>
+  <div class="sheet-actions">
+    <button class="btn grow" type="button" data-close>Cancel</button>
+    <button class="btn danger grow" id="confirmYes" type="button">Yes, do it</button>
+  </div>
+</div>
+
+<div class="toast" id="toast">Saved</div>
+
+<script>
+"use strict";
+/* ================= DATA: the 14 elements ================= */
+var ELEMENTS = [
+{ id:"participation", n:1, name:"Employee Participation", ref:"1910.119(c)",
+  blurb:"The people who run the process get a say in how it's kept safe. The plant needs a written plan for involving employees, must consult them on hazard analyses, and must give them access to PHA results and all other process safety information.",
+  items:["Written employee participation plan in place","Employees consulted on PHA development and updates","Employees have access to PSI, PHAs, and all PSM records","Employee representatives involved in incident investigations and audits","Participation plan reviewed with all shifts"],
+  docs:[["Employee participation plan","Life of the process"]],
+  questions:["Can operators see PHA reports and process safety information without asking a supervisor?","Were employees consulted on the most recent PHA?","Is there a written participation plan that people on the floor actually know about?"] },
+{ id:"psi", n:2, name:"Process Safety Information", ref:"1910.119(d)",
+  blurb:"Before you can analyze hazards you need the facts written down: what ammonia does to people, the limits of the process, and exactly how every vessel, pipe, and relief device is built. If the PSI is wrong or missing, every decision built on it is shaky.",
+  items:["Toxicity, exposure limits, and health effects of ammonia documented","Process chemistry and safe operating limits compiled","Block flow and process flow diagrams current","P&IDs current and verified against the field","Equipment design codes, materials of construction, and relief system design documented","Electrical classification and ventilation design documented"],
+  docs:[["PSI package — chemical, technology, and equipment information","Life of the process"],["Current P&IDs","Life of the process"],["Relief system design basis and calculations","Life of the process"]],
+  questions:["Do the P&IDs in the office match what is actually installed in the engine room?","Are safe operating limits written down for every vessel and system?","Is relief device sizing documentation on file and current?"] },
+{ id:"pha", n:3, name:"Process Hazard Analysis", ref:"1910.119(e)",
+  blurb:"A team walks the process looking for what could go wrong — a failed valve, a wrong lineup, an uncontrolled release — and writes down what protects against it. The PHA must be revalidated at least every 5 years, and its recommendations tracked to closure.",
+  items:["Initial PHA completed by a qualified team","PHA addresses hazards, previous incidents, engineering and administrative controls, facility siting, and human factors","Recommendation list with owners and due dates","PHA revalidated within the last 5 years","PHA findings communicated to affected employees","Recommendations resolved and documented as closed"],
+  docs:[["PHA reports and revalidations","Life of the process"],["PHA recommendation closure records","Life of the process"]],
+  questions:["Is the current PHA less than 5 years old?","Are all PHA recommendations closed, or on a tracked schedule with owners?","Did the PHA team include someone who operates the process every day?"] },
+{ id:"procedures", n:4, name:"Operating Procedures", ref:"1910.119(f)",
+  blurb:"Written, step-by-step procedures for startup, normal operation, temporary operation, emergency shutdown, and emergency operations. They must reflect how the job is actually done, state the safe operating limits and what happens if you exceed them, and be certified current every year.",
+  items:["Procedures cover initial startup, normal, temporary, and emergency operations, and normal and emergency shutdown","Safe operating limits, consequences of deviation, and steps to correct or avoid deviation stated in each procedure","Safety and health considerations included — PPE, exposure controls, chemical properties","Procedures readily accessible to operators at the point of use","Annual certification that procedures are current and accurate completed","Safe work practices referenced — lockout/tagout, confined space entry, line breaking, hot work"],
+  docs:[["Operating procedures (current version)","Keep current; certify annually"],["Annual procedure certification records","Keep the last 3 certifications"]],
+  questions:["Could a new operator run a startup from the written procedure alone?","Is the annual procedure certification signed within the last 12 months?","Does each procedure state what happens if an operating limit is exceeded?"] },
+{ id:"training", n:5, name:"Training", ref:"1910.119(g)",
+  blurb:"Every operator must be trained on the process overview, the hazards, the procedures, and emergency operations before working unsupervised — with refresher training at least every 3 years. Training is documented with who, when, and how competency was verified.",
+  items:["Initial training completed before operators work unsupervised","Training covers process overview, hazards, procedures, and emergency operations","Refresher training completed at least every 3 years","Competency verified by test, demonstration, or observation — and documented","Training records include employee name, date, and verification method","Operators consulted on refresher training frequency and content"],
+  docs:[["Training records — name, date, verification method","Duration of employment"]],
+  questions:["Can you pull a complete training record for any operator in under five minutes?","Is anyone past due on 3-year refresher training?","Is competency actually verified, or is it just an attendance sheet?"] },
+{ id:"contractors", n:6, name:"Contractors", ref:"1910.119(h)",
+  blurb:"Contractors working on or near the process must be screened for safety performance, told about the hazards and the emergency plan, and controlled while on site. Injuries and illnesses they suffer working on your process are part of your record too.",
+  items:["Contractor safety performance evaluated before selection","Contractors informed of process hazards, the emergency action plan, and safe work practices","Contractor access to process areas controlled and documented","Log of contractor work and any injuries or illnesses maintained","Contractor performance periodically evaluated","Contractors provide proof their own employees are trained for the work"],
+  docs:[["Contractor evaluation and orientation records","Keep 3 years"],["Contractor injury and illness log","Keep 3 years"]],
+  questions:["Do contractors get a documented hazard briefing before starting work?","Is there a current log of contractor work in process areas?","When was contractor performance last evaluated?"] },
+{ id:"pssr", n:7, name:"Pre-Startup Safety Review", ref:"1910.119(i)",
+  blurb:"Before a new or significantly modified system is charged and started, a team confirms construction matches the design, procedures and training are in place, and the PHA is done. No ammonia goes in until the review is signed off.",
+  items:["PSSR completed for new systems and significant modifications","Construction and equipment verified against design specifications and P&IDs","Safety, operating, maintenance, and emergency procedures in place before startup","Training of affected employees completed before startup","PHA completed and recommendations resolved or formally scheduled","PSSR sign-off documented by the review team"],
+  docs:[["PSSR checklists and sign-offs","Life of the process"]],
+  questions:["Was a PSSR signed off before the last modified system was charged with ammonia?","Does the PSSR verify field construction against the drawings?","Were procedures and training finished before startup — not after?"] },
+{ id:"mi", n:8, name:"Mechanical Integrity", ref:"1910.119(j)",
+  blurb:"The equipment has to keep the ammonia in. Pressure vessels, piping, relief devices, controls, pumps, and compressors need written maintenance procedures, trained technicians, and inspections and tests at the frequency the manufacturer and good engineering practice call for — with deficiencies corrected before they become releases.",
+  items:["Written maintenance procedures for covered equipment in place","Inspection and testing schedules followed — vessels, piping, relief devices, controls, pumps, compressors","Relief devices tested or replaced on schedule","Equipment deficiency log maintained; deficiencies corrected promptly or equipment removed from service","Quality assurance verified for new equipment, replacement parts, and maintenance materials","Maintenance technicians trained on procedures, hazards, and safe work practices","Inspection and test results documented — equipment ID, date, inspector, results"],
+  docs:[["Mechanical integrity inspection and test records","Life of the process"],["Equipment deficiency log","Life of the process"],["Relief device test and replacement records","Life of the process"]],
+  questions:["Is any relief device past its test or replacement date right now?","Are equipment deficiencies logged — and is any fix sitting open past its date?","Can you produce the last inspection record for every pressure vessel?"] },
+{ id:"hotwork", n:9, name:"Hot Work Permit", ref:"1910.119(k)",
+  blurb:"Welding, cutting, grinding — anything that makes a spark — in or near the process needs a permit: the area inspected, combustibles moved or covered, a fire watch posted, and the permit kept on file showing when the work was authorized and done.",
+  items:["Hot work permit issued for all non-routine hot work in or near the process","Area inspected and combustibles removed or protected before work starts","Fire watch assigned during the work and for a period after","Permits show date, location, work performed, and authorizing signature","Completed permits filed and periodically reviewed for gaps"],
+  docs:[["Hot work permits","Keep 1 year after completion"]],
+  questions:["Is a permit issued every time hot work happens — or only when someone remembers?","Is a fire watch named on each permit?","Are completed permits filed where an auditor can find them?"] },
+{ id:"moc", n:10, name:"Management of Change", ref:"1910.119(l)",
+  blurb:"Any change — a different valve, a new setpoint, a revised procedure, a substitute part, even a 'temporary' jumper — goes through MOC first: the technical basis written down, hazards reviewed, affected people trained, and procedures and P&IDs updated before startup. Temporary changes expire on schedule.",
+  items:["MOC form completed and approved before changes are made","Technical basis and impact on safety and health documented for each change","Affected employees informed and trained on the change before startup","Operating procedures and P&IDs updated to reflect the change","Process safety information updated for equipment and chemical changes","Temporary changes tracked with expiration dates and removed or made permanent on time"],
+  docs:[["Management of change records","Life of the process"]],
+  questions:["Can you find an MOC for the last three changes you can point at in the field?","Are there any 'temporary' changes older than their expiration date?","Were operators trained on the last change before it was started up?"] },
+{ id:"incident", n:11, name:"Incident Investigation", ref:"1910.119(m)",
+  blurb:"Every incident that resulted in — or could reasonably have resulted in — a catastrophic release is investigated, starting within 48 hours. The team includes someone knowledgeable in the process, finds the root cause, and assigns corrective actions with owners and due dates. Reports are kept 5 years and shared with affected employees.",
+  items:["Investigation started within 48 hours of the incident","Investigation team includes at least one person knowledgeable in the process","Root cause or causes identified and documented","Corrective actions assigned owners and due dates and tracked to closure","Report reviewed with affected employees and contractors","Near-miss events that could have caused a release investigated, not just actual releases"],
+  docs:[["Incident investigation reports","Keep 5 years"]],
+  questions:["Was the last investigation started within 48 hours of the incident?","Do corrective actions carry named owners and due dates?","Are near misses investigated, or only releases that drew attention?"] },
+{ id:"emergency", n:12, name:"Emergency Planning & Response", ref:"1910.119(n)",
+  blurb:"When ammonia gets out, there is no time to improvise. The plant needs a written emergency action plan: alarms, evacuation routes, who responds, who calls whom, and coordination with local responders — and people drilled on it so the plan works at 2 a.m., not just on paper.",
+  items:["Written emergency action plan in place and current","Alarm systems tested on schedule and evacuation routes posted","Employees trained on the plan and their roles","Drills or exercises conducted and documented","Coordination established with the local fire department and emergency planners","Emergency equipment — respiratory protection, protective suits, eyewash and showers — inspected on schedule","Procedures define what employees may handle (small incidental releases) and what requires evacuation and responders"],
+  docs:[["Emergency action plan (current version)","Keep current"],["Drill and exercise records","Keep 3 years"],["Emergency equipment inspection records","Keep 3 years"]],
+  questions:["When was the last drill — and has one ever run on a night or weekend shift?","Do local responders know this plant, its ammonia inventory, and its layout?","Is all emergency response equipment inspected and in date right now?"] },
+{ id:"audits", n:13, name:"Compliance Audits", ref:"1910.119(o)",
+  blurb:"At least every 3 years the plant audits itself against all 14 elements — honestly. Findings get a written response, deficiencies are corrected and documented, and the two most recent audit reports are kept. The audit is where gaps are supposed to surface, before an inspector finds them.",
+  items:["Compliance audit completed at least every 3 years","Audit team includes at least one person knowledgeable in the process","Written response documented for each audit finding","Deficiencies corrected and closure documented","Two most recent audit reports retained and accessible"],
+  docs:[["Compliance audit reports — two most recent","Until replaced by two newer audits"],["Audit finding response and closure records","Keep with the audit report"]],
+  questions:["Is the most recent compliance audit less than 3 years old?","Are both of the two most recent audit reports on file?","Were the last audit's findings actually closed out — with evidence?"] },
+{ id:"tradesecrets", n:14, name:"Trade Secrets", ref:"1910.119(p)",
+  blurb:"A trade secret claim never blocks safety. Everyone carrying out PSM duties — employees, contractors, investigators, auditors — gets the information they need to do the work safely, under a confidentiality agreement if one is required.",
+  items:["Process information made available to everyone who needs it for PSM duties","Confidentiality agreements used where genuine trade secrets are involved","Employee representatives granted access as the standard provides","No safety-critical information withheld from responders, investigators, or auditors as 'proprietary'"],
+  docs:[["Confidentiality agreements","Keep while in effect"]],
+  questions:["Has 'proprietary' ever been used to keep safety information away from operators?","Can investigators and auditors get the information they need without a fight?"] }
+];
+
+/* ================= STATE ================= */
+var LS_KEY = "psm-compliance-tracker-v1";
+var state = loadState();
+function blankState(){ return { plantName:"", items:{}, docs:{}, audit:{}, custom:{}, logs:{ hotwork:[], moc:[], incidents:[] } }; }
+function loadState(){
+  try{ var raw = localStorage.getItem(LS_KEY); if(raw){ var s = JSON.parse(raw); if(s && s.items && s.logs){ if(typeof s.plantName !== "string") s.plantName = ""; if(!s.docs) s.docs = {}; if(!s.audit) s.audit = {}; if(!s.custom) s.custom = {}; if(!s.logs.hotwork) s.logs.hotwork = []; if(!s.logs.moc) s.logs.moc = []; if(!s.logs.incidents) s.logs.incidents = []; return s; } } }catch(e){}
+  return blankState();
+}
+function save(){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){}
+  renderAll(false);
+}
+function itemState(elId, idx){
+  var k = elId + ":" + idx;
+  if(!state.items[k]) state.items[k] = { done:false, status:"open", owner:"", due:"", note:"" };
+  return state.items[k];
+}
+function peekItem(elId, idx){ return state.items[elId + ":" + idx] || { done:false, status:"open", owner:"", due:"", note:"" }; }
+function customItems(elId){ return state.custom[elId] || []; }
+function allTasks(el){
+  var out = [];
+  el.items.forEach(function(t, i){ out.push({ key: el.id + ":" + i, elId: el.id, idx: i, title: t, custom:false }); });
+  customItems(el.id).forEach(function(c, i){ out.push({ key: el.id + ":c" + i, elId: el.id, idx: "c" + i, title: c.title, custom:true }); });
+  return out;
+}
+function elById(id){ for(var i=0;i<ELEMENTS.length;i++) if(ELEMENTS[i].id===id) return ELEMENTS[i]; return null; }
+
+/* ================= HELPERS ================= */
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function todayStart(){ var d = new Date(); d.setHours(0,0,0,0); return d; }
+function parseDue(s){ if(!s) return null; var p = s.split("-"); if(p.length!==3) return null; return new Date(+p[0], +p[1]-1, +p[2]); }
+function daysUntil(s){ var d = parseDue(s); if(!d) return null; return Math.round((d - todayStart())/86400000); }
+function fmtDate(s){ var d = parseDue(s); if(!d) return ""; return d.toLocaleDateString(undefined, { month:"short", day:"numeric", year:"numeric" }); }
+function dueLabel(s){
+  var n = daysUntil(s);
+  if(n===null) return "";
+  if(n < 0) return Math.abs(n) + (Math.abs(n)===1 ? " day overdue" : " days overdue");
+  if(n === 0) return "Due today";
+  if(n === 1) return "Due tomorrow";
+  return "Due in " + n + " days";
+}
+function statusOf(st){ if(st.done || st.status === "done") return "done"; if(st.status === "progress") return "progress"; return "open"; }
+function elStats(el){
+  var tasks = allTasks(el), done = 0, overdue = 0;
+  tasks.forEach(function(t){ var st = peekItem(t.elId, t.idx); if(statusOf(st)==="done") done++; else { var n = daysUntil(st.due); if(n!==null && n<0) overdue++; } });
+  var pct = tasks.length ? Math.round(done/tasks.length*100) : 0;
+  return { total: tasks.length, done: done, pct: pct, overdue: overdue };
+}
+function ragOf(pct){ return pct >= 80 ? "green" : (pct >= 50 ? "amber" : "red"); }
+var toastTimer = null;
+function toast(msg){
+  var t = document.getElementById("toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastTimer); toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 1800);
+}
+
+/* ================= NAVIGATION ================= */
+function scrollMainTop(){ var m = document.querySelector("main"); if(m) m.scrollTop = 0; }
+var currentView = "dash";
+document.querySelectorAll(".tabbar button").forEach(function(b){
+  b.addEventListener("click", function(){ showView(b.getAttribute("data-view")); });
+});
+function showView(v){
+  currentView = v;
+  document.querySelectorAll(".tabbar button").forEach(function(b){ b.classList.toggle("on", b.getAttribute("data-view")===v); });
+  document.querySelectorAll(".view").forEach(function(s){ s.classList.remove("active"); });
+  document.getElementById("view-" + v).classList.add("active");
+  if(v !== "elements"){ document.getElementById("elementDetail").style.display = "none"; document.getElementById("elementsList").style.display = ""; }
+  scrollMainTop();
+  renderAll(false);
+}
+
+/* ================= RENDER: shared bits ================= */
+function elCardHTML(el){
+  var s = elStats(el), rag = ragOf(s.pct);
+  var barColor = rag==="green" ? "var(--green)" : rag==="amber" ? "var(--amber)" : "var(--red)";
+  var badge = s.overdue ? ' <span class="pill red">' + s.overdue + " overdue</span>" : "";
+  return '<button type="button" class="elcard" data-open-el="' + el.id + '">' +
+    '<span class="elnum">' + el.n + '</span>' +
+    '<span class="mid"><b>' + esc(el.name) + badge + '</b><span>' + s.done + " of " + s.total + " items done · " + el.ref + '</span>' +
+    '<span class="bar"><i style="width:' + s.pct + '%;background:' + barColor + '"></i></span></span>' +
+    '<span class="pc">' + s.pct + '%</span><span class="dot ' + rag + '"></span></button>';
+}
+function dueRowHTML(t){
+  var el = elById(t.elId), st = peekItem(t.elId, t.idx);
+  var n = daysUntil(st.due), overdue = n!==null && n<0 && statusOf(st)!=="done";
+  var d = parseDue(st.due);
+  var when = d ? '<span class="when"><b>' + d.getDate() + '</b><span>' + d.toLocaleDateString(undefined,{month:"short"}) + "</span></span>" : '<span class="when"><b>—</b><span>No date</span></span>';
+  var stat = statusOf(st);
+  var statPill = stat==="done" ? '<span class="pill green">Done</span>' : stat==="progress" ? '<span class="pill amber">In progress</span>' : '<span class="pill grey">Open</span>';
+  var meta = esc(el.name) + (st.owner ? " · Owner: " + esc(st.owner) : " · No owner set");
+  var dueTxt = st.due ? " · " + dueLabel(st.due) : "";
+  return '<button type="button" class="duerow' + (overdue ? " overdue" : "") + '" data-edit-task="' + t.key + '">' + when +
+    '<span class="mid"><b>' + esc(t.title) + '</b><span>' + meta + dueTxt + '</span></span>' + statPill + "</button>";
+}
+function collectTasks(filterFn){
+  var out = [];
+  ELEMENTS.forEach(function(el){ allTasks(el).forEach(function(t){ var st = peekItem(t.elId, t.idx); if(!filterFn || filterFn(t, st)) out.push(t); }); });
+  return out;
+}
+function byDue(a, b){
+  var sa = peekItem(a.elId, a.idx), sb = peekItem(b.elId, b.idx);
+  if(!sa.due && !sb.due) return 0; if(!sa.due) return 1; if(!sb.due) return -1;
+  return sa.due < sb.due ? -1 : sa.due > sb.due ? 1 : 0;
+}
+
+/* ================= RENDER: dashboard ================= */
+function renderDash(){
+  var total = 0, done = 0, overdue = [], soon = [];
+  ELEMENTS.forEach(function(el){
+    allTasks(el).forEach(function(t){
+      var st = peekItem(t.elId, t.idx); total++;
+      if(statusOf(st)==="done"){ done++; return; }
+      var n = daysUntil(st.due);
+      if(n!==null && n<0) overdue.push(t);
+      else if(n!==null && n<=30) soon.push(t);
+    });
+  });
+  overdue.sort(byDue); soon.sort(byDue);
+  var pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById("topScore").textContent = pct + "%";
+  document.getElementById("ringPct").textContent = pct + "%";
+  document.getElementById("ringArc").style.strokeDashoffset = (314.2 * (1 - pct/100)).toFixed(1);
+  document.getElementById("ringArc").style.stroke = pct>=80 ? "#34c47c" : pct>=50 ? "#f0a832" : "#7fd4f2";
+  document.getElementById("scoreBar").style.width = pct + "%";
+  document.getElementById("scoreLine").textContent = done + " of " + total + " checklist items completed across all 14 elements.";
+  document.getElementById("statOverdue").textContent = overdue.length;
+  document.getElementById("statSoon").textContent = soon.length;
+  document.getElementById("statDone").textContent = done;
+  document.getElementById("overdueHint").textContent = overdue.length ? "Tap to open and fix" : "";
+  document.getElementById("dashElements").innerHTML = ELEMENTS.map(elCardHTML).join("");
+  document.getElementById("dashOverdue").innerHTML = overdue.length ? overdue.map(dueRowHTML).join("") :
+    '<div class="empty"><b>Nothing overdue.</b><br>Every dated item is current.</div>';
+  document.getElementById("dashSoon").innerHTML = soon.length ? soon.map(dueRowHTML).join("") :
+    '<div class="empty"><b>Nothing due in the next 30 days.</b><br>Set due dates on checklist items and they will show up here.</div>';
+}
+
+/* ================= RENDER: elements ================= */
+var openElId = null;
+function renderElements(){
+  document.getElementById("elementsGrid").innerHTML = ELEMENTS.map(elCardHTML).join("");
+  if(openElId) renderDetail();
+}
+function openElement(id){
+  openElId = id;
+  document.getElementById("elementsList").style.display = "none";
+  document.getElementById("elementDetail").style.display = "";
+  renderDetail();
+  scrollMainTop();
+}
+function closeElement(){
+  openElId = null;
+  document.getElementById("elementDetail").style.display = "none";
+  document.getElementById("elementsList").style.display = "";
+  renderElements();
+  scrollMainTop();
+}
+function renderDetail(){
+  var el = elById(openElId); if(!el) return;
+  var s = elStats(el);
+  var tasksHTML = allTasks(el).map(function(t){
+    var st = peekItem(t.elId, t.idx), stat = statusOf(st);
+    var n = daysUntil(st.due), od = n!==null && n<0 && stat!=="done";
+    var meta = [];
+    if(st.owner) meta.push("Owner: " + esc(st.owner));
+    if(st.due) meta.push('<span class="' + (od ? "od" : "") + '">' + fmtDate(st.due) + " · " + dueLabel(st.due) + "</span>");
+    if(stat==="progress") meta.push("In progress");
+    if(!meta.length) meta.push("Tap to assign an owner and due date");
+    return '<div class="task' + (stat==="done" ? " done" : "") + '">' +
+      '<span class="cbwrap"><input type="checkbox" data-check-task="' + t.key + '"' + (stat==="done" ? " checked" : "") + ' aria-label="Mark done: ' + esc(t.title) + '"></span>' +
+      '<span class="tbody"><button type="button" data-edit-task="' + t.key + '">' + esc(t.title) + '</button>' +
+      '<span class="meta">' + meta.join("") + "</span>" +
+      (st.note ? '<span class="note">“' + esc(st.note) + "”</span>" : "") + "</span></div>";
+  }).join("");
+  document.getElementById("elementDetail").innerHTML =
+    '<button type="button" class="backbtn" id="backToElements">‹ All elements</button>' +
+    '<div class="detail-head"><span class="ref">Element ' + el.n + " · 29 CFR " + el.ref + '</span>' +
+    "<h2>" + esc(el.name) + "</h2><p>" + esc(el.blurb) + "</p>" +
+    '<div class="meter"><i style="width:' + s.pct + '%"></i></div>' +
+    '<p style="margin-top:8px">' + s.done + " of " + s.total + " items done · " + s.pct + "% complete" + (s.overdue ? ' · <span style="color:#ff9d95;font-weight:700">' + s.overdue + " overdue</span>" : "") + "</p></div>" +
+    '<div class="checklist">' + tasksHTML + "</div>" +
+    '<div class="addrow"><button type="button" class="btn" id="addCustomTask" style="width:100%">+ Add a task to this element</button></div>';
+  document.getElementById("backToElements").addEventListener("click", closeElement);
+  document.getElementById("addCustomTask").addEventListener("click", function(){ openTaskSheet(el.id, "new"); });
+}
+
+/* ================= RENDER: actions ================= */
+var actionFilter = "open", actionSort = "due";
+document.querySelectorAll("[data-afilter]").forEach(function(b){
+  b.addEventListener("click", function(){
+    actionFilter = b.getAttribute("data-afilter");
+    document.querySelectorAll("[data-afilter]").forEach(function(x){ x.classList.toggle("on", x===b); });
+    renderActions();
+  });
+});
+document.getElementById("actionSort").addEventListener("change", function(){ actionSort = this.value; renderActions(); });
+function renderActions(){
+  var list = collectTasks(function(t, st){
+    if(actionFilter === "all") return true;
+    if(actionFilter === "overdue"){ var n = daysUntil(st.due); return statusOf(st)!=="done" && n!==null && n<0; }
+    return statusOf(st) !== "done";
+  });
+  if(actionSort === "due") list.sort(byDue);
+  else if(actionSort === "element") list.sort(function(a,b){ return elById(a.elId).n - elById(b.elId).n || byDue(a,b); });
+  else if(actionSort === "owner") list.sort(function(a,b){ var oa = peekItem(a.elId,a.idx).owner || "￿", ob = peekItem(b.elId,b.idx).owner || "￿"; return oa < ob ? -1 : oa > ob ? 1 : byDue(a,b); });
+  document.getElementById("actionsList").innerHTML = list.length ? list.map(dueRowHTML).join("") :
+    '<div class="empty"><b>Nothing here.</b><br>' + (actionFilter==="overdue" ? "No overdue items — good shape." : actionFilter==="open" ? "Every checklist item is marked done." : "No items yet.") + "</div>";
+}
+
+/* ================= RENDER: documents ================= */
+function renderDocs(){
+  var done = 0, total = 0, html = "";
+  ELEMENTS.forEach(function(el){
+    html += '<div class="docgroup"><h3><span>' + el.n + ".</span> " + esc(el.name) + "</h3>";
+    el.docs.forEach(function(d, i){
+      total++;
+      var k = el.id + ":d" + i;
+      var ds = state.docs[k] || { onFile:false, updated:"" };
+      if(ds.onFile) done++;
+      html += '<div class="docrow"><input type="checkbox" data-doc-check="' + k + '"' + (ds.onFile ? " checked" : "") + ' aria-label="On file: ' + esc(d[0]) + '">' +
+        '<span class="dbody"><b>' + esc(d[0]) + '</b><span>Keep: ' + esc(d[1]) + "</span>" +
+        '<label>Last updated <input type="date" data-doc-date="' + k + '" value="' + esc(ds.updated || "") + '"></label></span></div>';
+    });
+    html += "</div>";
+  });
+  document.getElementById("docsList").innerHTML = html;
+  document.getElementById("docDone").textContent = done;
+  document.getElementById("docTotal").textContent = total;
+  document.getElementById("docPct").textContent = (total ? Math.round(done/total*100) : 0) + "%";
+}
+
+/* ================= RENDER: audit ================= */
+function auditScore(el){
+  var ans = 0, pts = 0;
+  el.questions.forEach(function(q, i){
+    var a = state.audit[el.id + ":q" + i];
+    if(a){ ans++; pts += a==="yes" ? 1 : a==="unsure" ? 0.5 : 0; }
+  });
+  return { ans: ans, total: el.questions.length, pct: el.questions.length ? Math.round(pts/el.questions.length*100) : 0 };
+}
+function renderAudit(){
+  var totQ = 0, totPts = 0, html = "";
+  ELEMENTS.forEach(function(el){
+    var sc = auditScore(el);
+    totQ += el.questions.length;
+    el.questions.forEach(function(q, i){ var a = state.audit[el.id + ":q" + i]; totPts += a==="yes" ? 1 : a==="unsure" ? 0.5 : 0; });
+    var color = sc.ans===0 ? "var(--faint)" : sc.pct>=80 ? "var(--green)" : sc.pct>=50 ? "var(--amber)" : "var(--red)";
+    html += '<div class="audit-el-head"><h3>' + el.n + ". " + esc(el.name) + '</h3><span class="score" style="color:' + color + '">' + (sc.ans ? sc.pct + "% ready" : "Not started") + "</span></div>";
+    el.questions.forEach(function(q, i){
+      var k = el.id + ":q" + i, a = state.audit[k] || "";
+      html += '<div class="aq"><p>' + esc(q) + '</p><div class="seg">' +
+        '<button type="button" data-audit="' + k + '" data-val="yes" class="' + (a==="yes" ? "on-yes" : "") + '">Yes</button>' +
+        '<button type="button" data-audit="' + k + '" data-val="unsure" class="' + (a==="unsure" ? "on-unsure" : "") + '">Not sure</button>' +
+        '<button type="button" data-audit="' + k + '" data-val="no" class="' + (a==="no" ? "on-no" : "") + '">No</button></div></div>';
+    });
+  });
+  document.getElementById("auditList").innerHTML = html;
+  var pct = totQ ? Math.round(totPts/totQ*100) : 0;
+  document.getElementById("auditScoreTitle").textContent = "Readiness: " + pct + "%";
+  document.getElementById("auditBar").style.width = pct + "%";
+  var weak = ELEMENTS.map(function(el){ return { el: el, sc: auditScore(el) }; }).filter(function(x){ return x.sc.ans>0 && x.sc.pct<60; });
+  document.getElementById("auditScoreLine").textContent = weak.length ?
+    "Weak spots so far: " + weak.map(function(x){ return x.el.name + " (" + x.sc.pct + "%)"; }).join(", ") + "." :
+    "Answer the questions below. Yes = 100%, Not sure = 50%, No = 0%. Unanswered questions count as 0%.";
+}
+
+/* ================= RENDER: logs ================= */
+var logTab = "hotwork";
+var LOG_DEFS = {
+  hotwork: { label:"Hot Work Permit", fields:[
+    { k:"date", label:"Date issued", type:"date", req:true },
+    { k:"permit", label:"Permit number", type:"text", ph:"e.g. HW-2026-041" },
+    { k:"location", label:"Location", type:"text", ph:"e.g. Engine room, compressor 2", req:true },
+    { k:"work", label:"Work performed", type:"text", ph:"e.g. Welding pipe support", req:true } ],
+    title: function(e){ return (e.permit ? e.permit + " — " : "") + (e.location || "Hot work"); },
+    sub: function(e){ return e.work || ""; } },
+  moc: { label:"MOC Entry", fields:[
+    { k:"date", label:"Date", type:"date", req:true },
+    { k:"desc", label:"Change description", type:"text", ph:"What changed?", req:true },
+    { k:"hazard", label:"Hazard review done?", type:"select", options:["Yes","No"] } ],
+    title: function(e){ return e.desc || "Change"; },
+    sub: function(e){ return "Hazard review done: " + (e.hazard || "—"); } },
+  incidents: { label:"Incident Entry", fields:[
+    { k:"date", label:"Date", type:"date", req:true },
+    { k:"desc", label:"Description", type:"text", ph:"What happened?", req:true },
+    { k:"status", label:"Investigation status", type:"select", options:["Not started","Under investigation","Investigation complete","Actions closed"] } ],
+    title: function(e){ return e.desc || "Incident"; },
+    sub: function(e){ return "Investigation: " + (e.status || "—"); } }
+};
+document.querySelectorAll("[data-logtab]").forEach(function(b){
+  b.addEventListener("click", function(){
+    logTab = b.getAttribute("data-logtab");
+    document.querySelectorAll("[data-logtab]").forEach(function(x){ x.classList.toggle("on", x===b); });
+    renderLogs();
+  });
+});
+function renderLogs(){
+  var def = LOG_DEFS[logTab];
+  document.getElementById("addLogBtn").textContent = "+ Add " + def.label.toLowerCase();
+  var entries = state.logs[logTab].slice().sort(function(a,b){ return (b.date||"") < (a.date||"") ? -1 : (b.date||"") > (a.date||"") ? 1 : 0; });
+  document.getElementById("logsList").innerHTML = entries.length ? entries.map(function(e){
+    var realIdx = state.logs[logTab].indexOf(e);
+    return '<div class="logrow"><div class="lr-top"><b>' + esc(def.title(e)) + "</b><time>" + (e.date ? fmtDate(e.date) : "No date") + "</time></div>" +
+      (def.sub(e) ? "<p>" + esc(def.sub(e)) + "</p>" : "") +
+      '<div class="lr-actions"><button type="button" class="btn small" data-edit-log="' + realIdx + '">Edit</button>' +
+      '<button type="button" class="btn small danger" data-del-log="' + realIdx + '">Delete</button></div></div>';
+  }).join("") : '<div class="empty"><b>No entries yet.</b><br>Tap “+ Add ' + def.label.toLowerCase() + '” to record the first one.</div>';
+}
+
+/* ================= RENDER ALL ================= */
+function renderAll(rerenderDetail){
+  renderDash(); renderElements(); renderActions(); renderDocs(); renderAudit(); renderLogs();
+  if(rerenderDetail && openElId) renderDetail();
+}
+
+/* ================= SHEETS ================= */
+var scrim = document.getElementById("scrim");
+function openSheet(id){
+  closeSheets();
+  scrim.classList.add("open");
+  document.getElementById(id).classList.add("open");
+}
+function closeSheets(){
+  scrim.classList.remove("open");
+  document.querySelectorAll(".sheet").forEach(function(s){ s.classList.remove("open"); });
+}
+scrim.addEventListener("click", closeSheets);
+document.querySelectorAll("[data-close]").forEach(function(b){ b.addEventListener("click", closeSheets); });
+
+var confirmCb = null;
+function askConfirm(title, text, cb){
+  document.getElementById("confirmTitle").textContent = title;
+  document.getElementById("confirmText").textContent = text;
+  confirmCb = cb; openSheet("confirmSheet");
+}
+document.getElementById("confirmYes").addEventListener("click", function(){ var cb = confirmCb; confirmCb = null; closeSheets(); if(cb) cb(); });
+
+/* ---- Task sheet ---- */
+var editCtx = null; // {elId, idx} or {elId, idx:"new"}
+function findTask(key){
+  for(var i=0;i<ELEMENTS.length;i++){
+    var el = ELEMENTS[i], tasks = allTasks(el);
+    for(var j=0;j<tasks.length;j++) if(tasks[j].key===key) return tasks[j];
+  }
+  return null;
+}
+function openTaskSheet(elId, idx){
+  var el = elById(elId); if(!el) return;
+  editCtx = { elId: elId, idx: idx };
+  var isNew = idx === "new";
+  var title = "", st = { owner:"", due:"", note:"", status:"open" };
+  if(!isNew){
+    var t = findTask(elId + ":" + idx); if(!t) return;
+    title = t.title; st = peekItem(elId, idx);
+    document.getElementById("taskDelete").style.display = t.custom ? "" : "none";
+  } else {
+    document.getElementById("taskDelete").style.display = "none";
+  }
+  document.getElementById("taskTitle").textContent = isNew ? "Add task" : "Edit item";
+  document.getElementById("taskSub").textContent = "Element " + el.n + " · " + el.name;
+  var fT = document.getElementById("fTitle");
+  fT.value = title; fT.readOnly = !isNew && !findTask(elId + ":" + idx).custom;
+  document.getElementById("fOwner").value = st.owner || "";
+  document.getElementById("fDue").value = st.due || "";
+  document.getElementById("fNote").value = st.note || "";
+  document.getElementById("fStatus").value = statusOf(st);
+  openSheet("taskSheet");
+}
+document.getElementById("taskSave").addEventListener("click", function(){
+  if(!editCtx) return;
+  var elId = editCtx.elId, idx = editCtx.idx;
+  var status = document.getElementById("fStatus").value;
+  var vals = { owner: document.getElementById("fOwner").value.trim(), due: document.getElementById("fDue").value, note: document.getElementById("fNote").value.trim(), status: status, done: status==="done" };
+  if(idx === "new"){
+    var title = document.getElementById("fTitle").value.trim();
+    if(!title){ toast("Give the task a title first"); return; }
+    if(!state.custom[elId]) state.custom[elId] = [];
+    state.custom[elId].push({ title: title });
+    idx = "c" + (state.custom[elId].length - 1);
+  }
+  state.items[elId + ":" + idx] = vals;
+  editCtx = null; closeSheets(); save(); toast("Saved");
+  if(openElId) renderDetail();
+});
+document.getElementById("taskDelete").addEventListener("click", function(){
+  if(!editCtx || editCtx.idx==="new") return;
+  var elId = editCtx.elId, idx = editCtx.idx;
+  askConfirm("Delete this task?", "This removes the custom task and its tracking data from this element.", function(){
+    var ci = parseInt(String(idx).slice(1), 10);
+    var customs = state.custom[elId] || [];
+    var rebuilt = {}, newCustom = [];
+    customs.forEach(function(c, i){ if(i !== ci) newCustom.push(c); });
+    Object.keys(state.items).forEach(function(k){
+      if(k.indexOf(elId + ":c") === 0){
+        var oi = parseInt(k.slice(elId.length + 2), 10);
+        if(oi < ci) rebuilt[k] = state.items[k];
+        else if(oi > ci) rebuilt[elId + ":c" + (oi - 1)] = state.items[k];
+      } else rebuilt[k] = state.items[k];
+    });
+    state.items = rebuilt; state.custom[elId] = newCustom;
+    editCtx = null; save(); if(openElId) renderDetail(); toast("Task deleted");
+  });
+});
+
+/* ---- Log sheet ---- */
+var logCtx = null; // {tab, idx or -1}
+function openLogSheet(idx){
+  var def = LOG_DEFS[logTab];
+  logCtx = { tab: logTab, idx: idx };
+  var e = idx >= 0 ? state.logs[logTab][idx] : {};
+  document.getElementById("logTitle").textContent = (idx >= 0 ? "Edit " : "Add ") + def.label.toLowerCase();
+  document.getElementById("logSub").textContent = def.label + " log · stored on this device";
+  document.getElementById("logDelete").style.display = idx >= 0 ? "" : "none";
+  document.getElementById("logFields").innerHTML = def.fields.map(function(f){
+    var v = e[f.k] || (f.type==="date" ? new Date().toISOString().slice(0,10) : "");
+    if(f.type === "select"){
+      return '<div class="field"><label for="lf-' + f.k + '">' + f.label + '</label><select id="lf-' + f.k + '">' +
+        f.options.map(function(o){ return '<option value="' + esc(o) + '"' + (v===o ? " selected" : "") + ">" + esc(o) + "</option>"; }).join("") + "</select></div>";
+    }
+    return '<div class="field"><label for="lf-' + f.k + '">' + f.label + (f.req ? " *" : "") + '</label><input id="lf-' + f.k + '" type="' + f.type + '" value="' + esc(v) + '" placeholder="' + esc(f.ph || "") + '"></div>';
+  }).join("");
+  openSheet("logSheet");
+}
+document.getElementById("addLogBtn").addEventListener("click", function(){ openLogSheet(-1); });
+document.getElementById("logSave").addEventListener("click", function(){
+  if(!logCtx) return;
+  var def = LOG_DEFS[logCtx.tab], e = {}, missing = false;
+  def.fields.forEach(function(f){
+    var el = document.getElementById("lf-" + f.k);
+    e[f.k] = el ? el.value.trim() : "";
+    if(f.req && !e[f.k]) missing = true;
+  });
+  if(missing){ toast("Fill in the required fields (*)"); return; }
+  if(logCtx.idx >= 0) state.logs[logCtx.tab][logCtx.idx] = e; else state.logs[logCtx.tab].push(e);
+  logCtx = null; closeSheets(); save(); toast("Log entry saved");
+});
+document.getElementById("logDelete").addEventListener("click", function(){
+  if(!logCtx || logCtx.idx < 0) return;
+  var tab = logCtx.tab, idx = logCtx.idx;
+  askConfirm("Delete this entry?", "This log entry will be permanently removed from this device.", function(){
+    state.logs[tab].splice(idx, 1); logCtx = null; save(); toast("Entry deleted");
+  });
+});
+
+/* ================= GLOBAL CLICK DELEGATION ================= */
+document.addEventListener("click", function(ev){
+  var open = ev.target.closest("[data-open-el]");
+  if(open){ showView("elements"); openElement(open.getAttribute("data-open-el")); return; }
+  var edit = ev.target.closest("[data-edit-task]");
+  if(edit){ var t = findTask(edit.getAttribute("data-edit-task")); if(t) openTaskSheet(t.elId, t.idx); return; }
+  var al = ev.target.closest("[data-audit]");
+  if(al){
+    var k = al.getAttribute("data-audit"), v = al.getAttribute("data-val");
+    state.audit[k] = state.audit[k] === v ? "" : v;
+    save(); return;
+  }
+  var el2 = ev.target.closest("[data-edit-log]");
+  if(el2){ openLogSheet(parseInt(el2.getAttribute("data-edit-log"), 10)); return; }
+  var dl = ev.target.closest("[data-del-log]");
+  if(dl){
+    var idx = parseInt(dl.getAttribute("data-del-log"), 10), tab = logTab;
+    askConfirm("Delete this entry?", "This log entry will be permanently removed from this device.", function(){
+      state.logs[tab].splice(idx, 1); save(); toast("Entry deleted");
+    });
+    return;
+  }
+});
+document.addEventListener("change", function(ev){
+  var cb = ev.target.closest("[data-check-task]");
+  if(cb){
+    var t = findTask(cb.getAttribute("data-check-task")); if(!t) return;
+    var st = itemState(t.elId, t.idx);
+    st.done = cb.checked; st.status = cb.checked ? "done" : "open";
+    save(); if(openElId) renderDetail();
+    return;
+  }
+  var dc = ev.target.closest("[data-doc-check]");
+  if(dc){
+    var k = dc.getAttribute("data-doc-check");
+    if(!state.docs[k]) state.docs[k] = { onFile:false, updated:"" };
+    state.docs[k].onFile = dc.checked; save(); return;
+  }
+  var dd = ev.target.closest("[data-doc-date]");
+  if(dd){
+    var k2 = dd.getAttribute("data-doc-date");
+    if(!state.docs[k2]) state.docs[k2] = { onFile:false, updated:"" };
+    state.docs[k2].updated = dd.value; save(); return;
+  }
+});
+
+/* ================= EXPORT HELPERS ================= */
+function dateStamp(d){
+  d = d || new Date();
+  var m = String(d.getMonth()+1).padStart(2,"0"), day = String(d.getDate()).padStart(2,"0");
+  return d.getFullYear() + "-" + m + "-" + day;
+}
+function downloadBlob(blob, filename){
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 600);
+}
+function csvEscape(v){
+  var s = String(v == null ? "" : v);
+  if(/[",\n\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+  return s;
+}
+function toCSV(headers, rows){
+  var lines = [headers.map(csvEscape).join(",")];
+  rows.forEach(function(r){ lines.push(r.map(csvEscape).join(",")); });
+  return "\ufeff" + lines.join("\r\n") + "\r\n";
+}
+function statusLabel(st){
+  var s = statusOf(st);
+  return s === "done" ? "Done" : s === "progress" ? "In progress" : "Open";
+}
+function overallStats(){
+  var total = 0, done = 0;
+  ELEMENTS.forEach(function(el){ allTasks(el).forEach(function(t){ total++; if(statusOf(peekItem(t.elId, t.idx))==="done") done++; }); });
+  return { total: total, done: done, pct: total ? Math.round(done/total*100) : 0 };
+}
+
+/* Plant name field */
+(function(){
+  var inp = document.getElementById("plantNameInput");
+  if(!inp) return;
+  inp.value = state.plantName || "";
+  inp.addEventListener("input", function(){
+    state.plantName = inp.value;
+    try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){}
+  });
+  inp.addEventListener("change", function(){
+    state.plantName = inp.value.trim();
+    inp.value = state.plantName;
+    try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){}
+  });
+})();
+
+/* ================= EXPORT / RESET ================= */
+document.getElementById("exportBtn").addEventListener("click", function(){
+  var blob = new Blob([JSON.stringify({ app:"PSM Compliance Tracker", exported:new Date().toISOString(), data: state }, null, 2)], { type:"application/json" });
+  downloadBlob(blob, "psm-tracker-backup.json");
+  toast("Backup downloaded");
+});
+var exportReportBtn = document.getElementById("exportReportBtn");
+if(exportReportBtn) exportReportBtn.addEventListener("click", function(){
+  var plant = (state.plantName || "").trim() || "Unnamed plant";
+  var now = new Date();
+  var stamp = dateStamp(now);
+  var reportDate = now.toLocaleDateString(undefined, { year:"numeric", month:"long", day:"numeric" });
+  var ov = overallStats();
+  var sections = ELEMENTS.map(function(el){
+    var s = elStats(el);
+    var rows = allTasks(el).map(function(t){
+      var st = peekItem(t.elId, t.idx);
+      var done = statusOf(st) === "done";
+      return "<tr>" +
+        "<td>" + esc(t.title) + "</td>" +
+        "<td>" + (done ? '<span class="st done">Done</span>' : '<span class="st open">Open</span>') + "</td>" +
+        "<td>" + esc(st.owner || "—") + "</td>" +
+        "<td>" + esc(st.due ? fmtDate(st.due) : "—") + "</td>" +
+        "</tr>";
+    }).join("");
+    return '<section class="el"><div class="el-head"><h2>' + el.n + ". " + esc(el.name) + '</h2><span class="pct">' + s.pct + '% complete</span></div>' +
+      '<p class="ref">29 CFR ' + esc(el.ref) + " · " + s.done + " of " + s.total + " items done</p>" +
+      '<table><thead><tr><th style="width:52%">Checklist item</th><th>Status</th><th>Owner</th><th>Due date</th></tr></thead><tbody>' + rows + "</tbody></table></section>";
+  }).join("");
+  var html = '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+    "<title>PSM Compliance Report — " + esc(plant) + " — " + stamp + "</title>" +
+    "<style>" +
+    "*{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;color:#111;margin:0;padding:32px 28px;line-height:1.45;background:#fff}" +
+    "header{border-bottom:3px solid #0b3a5c;padding-bottom:16px;margin-bottom:20px}h1{margin:0 0 6px;font-size:28px;line-height:1.1;color:#0b3a5c}" +
+    ".meta{color:#444;font-size:14px;margin:2px 0}.score{margin-top:14px;background:#eef6fb;border:1px solid #c9dde9;border-radius:8px;padding:14px 16px;display:flex;gap:20px;flex-wrap:wrap}" +
+    ".score b{font-size:28px;color:#0b3a5c}.score span{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#555}" +
+    "section.el{margin:0 0 22px;page-break-inside:avoid}.el-head{display:flex;justify-content:space-between;gap:12px;align-items:baseline;border-bottom:1px solid #ddd;padding-bottom:6px}" +
+    "section.el h2{margin:0;font-size:17px;color:#0b3a5c}.pct{font-weight:700;white-space:nowrap}.ref{margin:6px 0 8px;color:#555;font-size:13px}" +
+    "table{width:100%;border-collapse:collapse;font-size:13.5px}th{text-align:left;background:#0b3a5c;color:#fff;padding:7px 8px}td{padding:7px 8px;border-bottom:1px solid #e5e5e5;vertical-align:top}" +
+    ".st{font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.04em}.st.done{color:#147a3d}.st.open{color:#9a5a00}" +
+    "footer{margin-top:28px;border-top:1px solid #ddd;padding-top:10px;color:#666;font-size:12px}" +
+    "@media print{body{padding:18px}section.el{page-break-inside:avoid}a{color:#111;text-decoration:none}}" +
+    "</style></head><body>" +
+    "<header><h1>PSM Compliance Report</h1>" +
+    '<p class="meta"><strong>Plant:</strong> ' + esc(plant) + "</p>" +
+    '<p class="meta"><strong>Report date:</strong> ' + esc(reportDate) + "</p>" +
+    '<p class="meta">OSHA Process Safety Management · 29 CFR 1910.119 · 14 Elements</p>' +
+    '<div class="score"><div><b>' + ov.pct + '%</b><span>Overall compliance</span></div><div><b>' + ov.done + " / " + ov.total + '</b><span>Checklist items done</span></div><div><b>' + (ov.total - ov.done) + '</b><span>Open items</span></div></div>' +
+    "</header>" + sections +
+    "<footer>Generated from PSM Compliance Tracker on " + esc(reportDate) + ". This report is a tracking summary — it does not replace the site's written PSM program, procedures, or regulatory advice. File with plant PSM records.</footer>" +
+    "</body></html>";
+  downloadBlob(new Blob([html], { type:"text/html;charset=utf-8" }), "psm-compliance-report-" + stamp + ".html");
+  toast("Report downloaded");
+});
+var exportActionsBtn = document.getElementById("exportActionsBtn");
+if(exportActionsBtn) exportActionsBtn.addEventListener("click", function(){
+  var rows = [];
+  ELEMENTS.forEach(function(el){
+    allTasks(el).forEach(function(t){
+      var st = peekItem(t.elId, t.idx);
+      rows.push([el.n + ". " + el.name, t.title, st.owner || "", st.due || "", statusLabel(st), st.note || ""]);
+    });
+  });
+  var csv = toCSV(["Element","Item","Owner","Due Date","Status","Notes"], rows);
+  downloadBlob(new Blob([csv], { type:"text/csv;charset=utf-8" }), "psm-action-items-" + dateStamp() + ".csv");
+  toast("Action items exported");
+});
+var exportDocsBtn = document.getElementById("exportDocsBtn");
+if(exportDocsBtn) exportDocsBtn.addEventListener("click", function(){
+  var rows = [];
+  ELEMENTS.forEach(function(el){
+    el.docs.forEach(function(d, i){
+      var k = el.id + ":d" + i;
+      var ds = state.docs[k] || { onFile:false, updated:"" };
+      rows.push([el.n + ". " + el.name, d[0], d[1], ds.onFile ? "Yes" : "No", ds.updated || ""]);
+    });
+  });
+  var csv = toCSV(["Element","Record","Retention","On File","Last Updated"], rows);
+  downloadBlob(new Blob([csv], { type:"text/csv;charset=utf-8" }), "psm-records-checklist-" + dateStamp() + ".csv");
+  toast("Records checklist exported");
+});
+function exportLogCSV(tab){
+  var def = LOG_DEFS[tab]; if(!def) return;
+  var headers = def.fields.map(function(f){ return f.label; });
+  var entries = (state.logs[tab] || []).slice().sort(function(a,b){ return (a.date||"") < (b.date||"") ? -1 : (a.date||"") > (b.date||"") ? 1 : 0; });
+  var rows = entries.map(function(e){ return def.fields.map(function(f){ return e[f.k] || ""; }); });
+  var csv = toCSV(headers, rows);
+  var slug = tab === "hotwork" ? "hot-work-permits" : tab === "moc" ? "management-of-change" : "incidents";
+  downloadBlob(new Blob([csv], { type:"text/csv;charset=utf-8" }), "psm-" + slug + "-" + dateStamp() + ".csv");
+  toast(def.label + " log exported");
+}
+document.querySelectorAll("[data-export-log]").forEach(function(b){
+  b.addEventListener("click", function(){ exportLogCSV(b.getAttribute("data-export-log")); });
+});
+var exportCurrentLogBtn = document.getElementById("exportCurrentLogBtn");
+if(exportCurrentLogBtn) exportCurrentLogBtn.addEventListener("click", function(){ exportLogCSV(logTab); });
+document.getElementById("resetBtn").addEventListener("click", function(){
+  askConfirm("Erase all data?", "Every check, owner, date, note, audit answer, and log entry on this device will be deleted. Download a backup first if you need one.", function(){
+    state = blankState(); var inp = document.getElementById("plantNameInput"); if(inp) inp.value = ""; save(); toast("All data erased");
+  });
+});
+
+/* ================= INIT ================= */
+renderAll(false);
+</script>
+</body>
+</html>

@@ -1,0 +1,904 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<meta name="description" content="Operator training for industrial ammonia refrigeration: lessons, quizzes, and plant-floor tips. Training and preparation only — this app does not grant any certification." />
+<link rel="icon" href="data:," />
+<title>The Ammonia Files Operator Training</title>
+<style>
+:root{
+  --bg:#0a1220; --bg2:#0e1a2e; --panel:#12233d; --panel2:#16293f; --line:#24405f;
+  --steel:#8fb4d6; --ice:#bfe3ff; --accent:#38b6e3; --accent2:#7fd4f7;
+  --text:#e8f1fa; --muted:#a9bfd4; --good:#3ddc84; --bad:#ff6b6b; --warn:#ffc857;
+  --radius:14px;
+}
+*{box-sizing:border-box}
+html{scrollbar-color:var(--line) var(--bg)}
+body{margin:0;background:linear-gradient(180deg,var(--bg) 0%,#0c1626 100%);color:var(--text);
+  font-family:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;
+  -webkit-tap-highlight-color:transparent;padding-bottom:96px}
+button{font:inherit;cursor:pointer}
+h1,h2,h3{line-height:1.2;margin:0}
+p{line-height:1.55}
+.wrap{max-width:760px;margin:0 auto;padding:16px 16px 8px}
+/* Header emblem */
+.tophead{display:flex;align-items:center;gap:14px;padding:10px 2px 4px}
+.emblem{flex:0 0 auto;width:64px;height:64px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#2a5a86,#12304f 70%);
+  border:2px solid #4d84b8;box-shadow:0 0 0 4px rgba(56,182,227,.15),inset 0 0 18px rgba(191,227,255,.35);
+  display:flex;align-items:center;justify-content:center;text-align:center}
+.emblem b{font-size:19px;letter-spacing:.5px;color:#eaf7ff}
+.emblem small{display:block;font-size:9px;color:var(--accent2);letter-spacing:2px}
+.tophead h1{font-size:21px;font-weight:800}
+.tophead .sub{color:var(--muted);font-size:13.5px;margin-top:3px;line-height:1.45}
+.disclaimer{margin-top:10px;font-size:12.5px;color:var(--warn);background:rgba(255,200,87,.08);
+  border:1px solid rgba(255,200,87,.35);border-radius:10px;padding:9px 12px;line-height:1.45}
+/* Progress ring */
+.ringrow{display:flex;gap:18px;align-items:center;background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);padding:16px;margin-top:14px}
+.ringwrap{position:relative;width:118px;height:118px;flex:0 0 auto}
+.ringwrap svg{transform:rotate(-90deg)}
+.ringpct{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ringpct b{font-size:26px}
+.ringpct span{font-size:11px;color:var(--muted);letter-spacing:.4px}
+.ringstats{flex:1;min-width:0}
+.ringstats h2{font-size:16px;margin-bottom:6px}
+.ringstats p{margin:0 0 10px;color:var(--muted);font-size:13.5px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;
+  padding:10px 18px;border-radius:12px;border:1px solid var(--accent);background:var(--accent);
+  color:#04263a;font-weight:700;font-size:15px;text-decoration:none}
+.btn.ghost{background:transparent;color:var(--accent2)}
+.btn.block{width:100%}
+.btn:disabled{opacity:.45;cursor:default}
+/* Badges */
+.sectiontitle{font-size:17px;font-weight:800;margin:22px 0 10px}
+.badgerow{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none}
+.badgerow::-webkit-scrollbar{display:none}
+.badge{flex:0 0 auto;width:118px;background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  padding:12px 10px;text-align:center;opacity:.45}
+.badge.on{opacity:1;border-color:var(--warn);box-shadow:0 0 0 1px rgba(255,200,87,.4)}
+.badge .bic{font-size:24px;display:block;margin-bottom:6px}
+.badge b{font-size:12.5px;display:block;line-height:1.3}
+.badge span{font-size:11px;color:var(--muted)}
+/* Course cards */
+.coursecard{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px;margin-bottom:12px;width:100%;text-align:left;color:var(--text);display:block}
+.coursecard h3{font-size:17px;margin-bottom:4px}
+.coursecard p{margin:0 0 10px;color:var(--muted);font-size:13.5px}
+.bar{height:10px;background:#0a1828;border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,#1f7fb8,var(--accent2));border-radius:99px;transition:width .4s}
+.barlabel{font-size:12.5px;color:var(--steel);margin-top:6px}
+/* Lesson list */
+.lessonrow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--panel);
+  border:1px solid var(--line);border-radius:12px;padding:13px 14px;margin-bottom:9px;color:var(--text);min-height:56px}
+.lessonrow .num{flex:0 0 auto;width:34px;height:34px;border-radius:50%;background:var(--panel2);
+  border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--steel)}
+.lessonrow.done .num{background:var(--good);color:#052e16;border-color:var(--good)}
+.lessonrow .lt{flex:1;min-width:0}
+.lessonrow .lt b{font-size:15px;display:block;line-height:1.3}
+.lessonrow .lt span{font-size:12px;color:var(--muted)}
+.lessonrow .chev{color:var(--steel);font-size:20px}
+/* Lesson page */
+.backbtn{background:none;border:none;color:var(--accent2);font-size:15px;font-weight:700;min-height:44px;padding:8px 4px}
+.lessontitle{font-size:23px;font-weight:800;margin:4px 0 4px}
+.lessonmeta{color:var(--muted);font-size:13px;margin-bottom:14px}
+.sect{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:15px 16px;margin-bottom:11px}
+.sect h3{font-size:16px;color:var(--ice);margin-bottom:7px}
+.sect p{margin:0;font-size:15px;color:#d7e6f3}
+.watchbox{background:rgba(255,200,87,.07);border:1px solid rgba(255,200,87,.45);border-radius:var(--radius);padding:15px 16px;margin-bottom:14px}
+.watchbox h3{color:var(--warn);font-size:16px;margin-bottom:8px}
+.watchbox ul{margin:0;padding-left:19px}
+.watchbox li{margin-bottom:6px;font-size:14.5px;line-height:1.5;color:#f3e9cf}
+.keybox{background:rgba(56,182,227,.08);border:1px solid rgba(56,182,227,.4);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px}
+.keybox h3{color:var(--accent2);font-size:15px;margin-bottom:6px}
+.keybox p{margin:0;font-size:14.5px;color:#d7e6f3}
+/* Quiz */
+.quizhead{font-size:19px;font-weight:800;margin:20px 0 4px}
+.quizsub{color:var(--muted);font-size:13.5px;margin:0 0 14px}
+.qcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:15px 16px;margin-bottom:12px}
+.qcard .qq{font-size:15.5px;font-weight:700;line-height:1.45;margin-bottom:11px}
+.qcard .qnum{font-size:12px;color:var(--steel);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px}
+.opt{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;background:var(--panel2);
+  border:1px solid var(--line);border-radius:11px;padding:12px 13px;margin-bottom:8px;color:var(--text);
+  font-size:14.5px;line-height:1.45;min-height:48px}
+.opt .ol{flex:0 0 auto;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--steel);
+  display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;color:var(--steel)}
+.opt.correct{border-color:var(--good);background:rgba(61,220,132,.12)}
+.opt.correct .ol{background:var(--good);color:#052e16;border-color:var(--good)}
+.opt.wrong{border-color:var(--bad);background:rgba(255,107,107,.12)}
+.opt.wrong .ol{background:var(--bad);color:#3d0606;border-color:var(--bad)}
+.opt:disabled{cursor:default;opacity:1}
+.feedback{font-size:13.5px;line-height:1.5;border-radius:9px;padding:9px 11px;margin-top:2px;display:none}
+.feedback.show{display:block}
+.feedback.ok{background:rgba(61,220,132,.12);color:#b9f4d2}
+.feedback.no{background:rgba(255,107,107,.12);color:#ffd2d2}
+.resultbox{text-align:center;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:22px 16px;margin:16px 0}
+.resultbox .big{font-size:40px;font-weight:800}
+.resultbox p{color:var(--muted);font-size:14.5px}
+.passline{color:var(--good);font-weight:700}
+.failline{color:var(--warn);font-weight:700}
+/* Frosty */
+.frostyhead{display:flex;gap:14px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px}
+.frostyface{flex:0 0 auto;width:58px;height:58px}
+.tipcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:15px 16px;margin-bottom:11px}
+.tipcard .twhen{font-size:11.5px;color:var(--accent2);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.tipcard p{margin:0;font-size:15.5px;line-height:1.55}
+.tipcard .sig{color:var(--muted);font-size:12.5px;margin-top:8px}
+/* Bottom nav */
+.tabbar{position:fixed;left:0;right:0;bottom:0;background:rgba(10,20,36,.97);border-top:1px solid var(--line);
+  display:flex;z-index:50;padding-bottom:env(safe-area-inset-bottom)}
+.tabbar button{flex:1;background:none;border:none;color:var(--muted);padding:9px 2px 10px;min-height:60px;
+  display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11.5px;font-weight:600}
+.tabbar button .tic{font-size:21px;line-height:1}
+.tabbar button.active{color:var(--accent2)}
+.view{display:none}
+.view.active{display:block}
+.misseditem{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:9px;font-size:14px;line-height:1.5}
+.misseditem b{color:var(--ice)}
+.misseditem .ca{color:var(--good)}
+.resetlink{background:none;border:none;color:var(--muted);text-decoration:underline;font-size:13px;min-height:44px;padding:10px}
+@media (min-width:640px){ .wrap{padding:22px 20px 8px} .tophead h1{font-size:25px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HOME -->
+  <section id="view-home" class="view active">
+    <div class="tophead">
+      <div class="emblem"><div><b>NH&#8323;</b><small>FROSTED</small></div></div>
+      <div>
+        <h1>The Ammonia Files<br>Operator Training</h1>
+        <div class="sub">Plain-language lessons for new and working ammonia refrigeration operators — taught the way a senior operator would teach them on the plant floor.</div>
+      </div>
+    </div>
+    <div class="disclaimer">Training and preparation only — this app does not grant any certification.</div>
+
+    <div class="ringrow">
+      <div class="ringwrap">
+        <svg width="118" height="118" viewBox="0 0 118 118" aria-hidden="true">
+          <circle cx="59" cy="59" r="50" fill="none" stroke="#1c3552" stroke-width="11"/>
+          <circle id="ringFg" cx="59" cy="59" r="50" fill="none" stroke="#38b6e3" stroke-width="11" stroke-linecap="round" stroke-dasharray="314.16" stroke-dashoffset="314.16"/>
+        </svg>
+        <div class="ringpct"><b id="ringPct">0%</b><span>COMPLETE</span></div>
+      </div>
+      <div class="ringstats">
+        <h2>Your progress</h2>
+        <p id="ringText">0 of 30 lessons passed. A lesson counts when you score 4 out of 5 or better on its quiz.</p>
+        <button class="btn" id="continueBtn">Start learning</button>
+      </div>
+    </div>
+
+    <h2 class="sectiontitle">Badges</h2>
+    <div class="badgerow" id="badgeRow"></div>
+
+    <h2 class="sectiontitle">Course tracks</h2>
+    <div id="homeCourses"></div>
+
+    <h2 class="sectiontitle">Quick practice</h2>
+    <div class="coursecard">
+      <h3>Quiz Bank</h3>
+      <p>20 mixed questions pulled from every lesson in the app. See your score and review everything you missed.</p>
+      <button class="btn ghost" data-goto="quizbank">Open Quiz Bank</button>
+    </div>
+    <div style="text-align:center;margin-top:8px">
+      <button class="resetlink" id="resetBtn">Reset all progress</button>
+    </div>
+  </section>
+
+  <!-- COURSES -->
+  <section id="view-courses" class="view">
+    <h2 class="sectiontitle" style="margin-top:8px">Courses</h2>
+    <div id="courseList"></div>
+  </section>
+
+  <!-- LESSON -->
+  <section id="view-lesson" class="view">
+    <button class="backbtn" id="lessonBack">&#8592; Back to courses</button>
+    <div id="lessonBody"></div>
+  </section>
+
+  <!-- QUIZ BANK -->
+  <section id="view-quizbank" class="view">
+    <h2 class="sectiontitle" style="margin-top:8px">Quiz Bank</h2>
+    <div id="quizBankBody"></div>
+  </section>
+
+  <!-- FROSTY -->
+  <section id="view-frosty" class="view">
+    <h2 class="sectiontitle" style="margin-top:8px">Frosty Says</h2>
+    <div class="frostyhead">
+      <svg class="frostyface" viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="32" cy="34" r="24" fill="#bfe3ff"/>
+        <path d="M12 24 Q32 6 52 24 L52 29 L12 29 Z" fill="#eef6fc"/>
+        <rect x="10" y="27" width="44" height="4" rx="2" fill="#d7ecfa"/>
+        <circle cx="24" cy="38" r="3" fill="#12304f"/><circle cx="40" cy="38" r="3" fill="#12304f"/>
+        <path d="M22 44 Q27 40 32 44 Q37 48 42 44" stroke="#12304f" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M18 33 L27 31 M37 31 L46 33" stroke="#38b6e3" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <b style="font-size:16px">Meet Frosty</b>
+        <p style="margin:3px 0 0;color:var(--muted);font-size:13.5px;line-height:1.5">The shop mascot. Short on patience, long on experience. One practical tip at a time — the stuff that keeps you, the plant, and the product safe.</p>
+      </div>
+    </div>
+    <div id="frostyList"></div>
+  </section>
+</div>
+
+<nav class="tabbar" aria-label="Main">
+  <button data-tab="home" class="active"><span class="tic">&#8962;</span>Home</button>
+  <button data-tab="courses"><span class="tic">&#9776;</span>Courses</button>
+  <button data-tab="quizbank"><span class="tic">?</span>Quiz Bank</button>
+  <button data-tab="frosty"><span class="tic">&#10052;</span>Frosty Says</button>
+</nav>
+
+<script>
+"use strict";
+/* ================= COURSE DATA ================= */
+var COURSES = [
+{ id:"beginner", title:"Beginner Operator", tag:"Start here",
+  desc:"The eight foundations every ammonia operator needs: how the system works, the big components, oil, and staying safe.",
+  lessons:[
+{ id:"b1", title:"How Industrial Ammonia Refrigeration Works", mins:5,
+  sections:[
+   {h:"Refrigeration is moving heat, not making cold", p:"An ammonia system does not manufacture cold. It picks up heat where you do not want it — inside a freezer, a cooler, a blast cell — and carries that heat outside to a condenser where it is thrown away. Ammonia is the truck that hauls the heat. Every piece of equipment in the plant exists to keep that truck loaded, moving, and unloaded on schedule."},
+   {h:"Why ammonia?", p:"Ammonia (R-717) is used in big industrial plants because it moves a lot of heat for its size, it is cheap, and it does not hide: you can smell it at about 5 parts per million, long before it reaches dangerous levels. The trade-off is that it is toxic and must be respected. A well-run ammonia plant is one of the safest places in industry — a neglected one is not."},
+   {h:"The four stops on the route", p:"Liquid ammonia boils in the evaporator and absorbs heat. The compressor squeezes that vapor so it gets hot. The condenser dumps the heat outside and turns the vapor back into liquid. An expansion device drops the pressure so the liquid gets cold again, and the loop repeats. If you understand those four stops, you understand every ammonia plant ever built — the rest is plumbing and controls."},
+   {h:"Pressures tell the story", p:"Operators live by two pressures: suction (the low side) and discharge (the high side). Suction pressure sets your evaporating temperature — about 16 psig of suction means ammonia is boiling near 0°F. Discharge pressure follows your condensing temperature — around 166 psig means you are condensing near 95°F. When a room will not pull down, the gauges usually tell you why before anything else does."}],
+  watch:["Thinking the compressor makes cold — it does not; it moves vapor so heat can be rejected outside.","Ignoring a slow drift in suction or discharge pressure because 'it still runs.' Drifts are early warnings.","Assuming a warm room is always a refrigeration problem — check door seals, product load, and defrost first."],
+  quiz:[
+   {q:"What does a refrigeration system actually do?", opts:["Manufactures cold air","Moves heat from where it is not wanted to where it can be rejected","Destroys heat inside the evaporator","Turns ammonia into ice"], a:1, why:"Refrigeration moves heat — the evaporator absorbs it and the condenser rejects it outside."},
+   {q:"At roughly what concentration can most people first smell ammonia?", opts:["About 5 ppm","About 300 ppm","About 1,000 ppm","Ammonia has no smell"], a:0, why:"Ammonia is detectable by smell around 5 ppm, well below harmful levels — a built-in warning."},
+   {q:"Suction pressure of about 16 psig means ammonia is boiling at roughly what temperature?", opts:["About 60°F","About 32°F","About 0°F","About -40°F"], a:2, why:"For ammonia, 16 psig saturation is about 0°F — suction pressure and evaporating temperature move together."},
+   {q:"Which component rejects the heat to the outdoors?", opts:["Evaporator","Expansion valve","Compressor","Condenser"], a:3, why:"The condenser dumps the heat the system collected, turning hot vapor back into liquid."},
+   {q:"What is the correct order around the loop, starting at the evaporator?", opts:["Evaporator, condenser, valve, compressor","Evaporator, compressor, condenser, expansion device","Compressor, evaporator, condenser, valve","Condenser, evaporator, compressor, valve"], a:1, why:"Vapor leaves the evaporator, gets compressed, condenses to liquid, then expands cold back to the evaporator."}]},
+{ id:"b2", title:"The Refrigeration Cycle", mins:5,
+  sections:[
+   {h:"Four processes, one loop", p:"The vapor-compression cycle has four processes: evaporation (liquid boils and absorbs heat), compression (vapor is squeezed and heats up), condensation (heat is rejected and vapor becomes liquid), and expansion (pressure drops and the liquid flashes cold). Plot it on a pressure-enthalpy chart and you get the rectangle every operator should be able to sketch from memory."},
+   {h:"What changes, what stays", p:"Through the evaporator and condenser, pressure stays roughly constant while temperature and state change. Through the expansion device, pressure and temperature crash but no heat is added or removed. Through the compressor, pressure and temperature both climb. Knowing which variable changes where is how you troubleshoot: a temperature that is wrong in the wrong place points straight at the guilty component."},
+   {h:"Superheat and subcooling in one breath", p:"Superheat is how much hotter the vapor is than its saturation temperature — it proves all the liquid boiled off before the compressor. Subcooling is how much cooler the liquid is than saturation — it proves you have solid liquid feeding the expansion device. A healthy system shows a little of both. Zero superheat risks liquid floodback; zero subcooling risks flash gas and starved coils."},
+   {h:"A worked pass around the loop", p:"Say the freezer runs at -10°F: suction sits near 9 psig. The compressor raises that vapor to about 150 psig, where it condenses near 90°F on a mild day. Liquid leaves the condenser, drops through the expansion valve back to 9 psig, and flashes down to -10°F, ready to boil again. Same ammonia, four different jobs, thousands of times a day."}],
+  watch:["Judging the cycle by temperature alone — pressure and temperature only agree at saturation; learn to use both.","Chasing superheat on a flooded system the same way as a direct-expansion coil — they are controlled differently.","Forgetting that every pressure drop in piping is lost capacity the compressor has to pay for."],
+  quiz:[
+   {q:"In the expansion device, what happens to the ammonia?", opts:["It gains heat and boils","Its pressure and temperature drop sharply","It is compressed","It becomes a superheated vapor"], a:1, why:"Expansion is a pressure drop: pressure and temperature fall, and part of the liquid flashes to vapor."},
+   {q:"Superheat at the compressor suction proves what?", opts:["The condenser is clean","All liquid boiled off before reaching the compressor","The receiver is full","The oil is returning"], a:1, why:"Superheat means the vapor is warmer than saturation — no liquid remains to damage the compressor."},
+   {q:"During condensation, what stays roughly constant?", opts:["Volume","Pressure","Oil level","Superheat"], a:1, why:"In the condenser the pressure holds roughly steady while heat leaves and vapor turns to liquid."},
+   {q:"Zero subcooling at the expansion device inlet can cause what?", opts:["Flash gas and a starved evaporator","Liquid floodback","High discharge temperature","Oil foaming"], a:0, why:"Without subcooling, liquid can flash to gas in the line, and the valve cannot feed the coil properly."},
+   {q:"A freezer at -10°F should show suction pressure near what?", opts:["About 58 psig","About 150 psig","About 9 psig","About 33 psig"], a:2, why:"Ammonia saturates near -10°F at about 9 psig — suction pressure tracks evaporating temperature."}]},
+{ id:"b3", title:"Compressors", mins:6,
+  sections:[
+   {h:"The heart of the plant", p:"The compressor does two jobs: it pulls vapor out of the evaporators to hold your suction pressure, and it raises that vapor to discharge pressure so the condenser can reject the heat. Industrial plants mainly use reciprocating compressors (pistons, great for smaller loads and high ratios) and screw compressors (rotors, smooth and efficient at big loads). Both hate the same thing: liquid."},
+   {h:"Liquid is the enemy", p:"Compressors are vapor pumps. Liquid ammonia does not compress — it slugs. A slug can bend rods, break valves, blow gaskets, and wash oil off bearing surfaces in seconds. That is why suction accumulators, superheat, and careful liquid feed control exist. If you hear a recip start to knock or a screw get loud and rough, think liquid first and act fast."},
+   {h:"Capacity control and ratios", p:"Load changes all day, so compressors unload: recips drop cylinders in and out, screws slide a valve to change their effective length. Watch the compression ratio — discharge pressure divided by suction pressure (in absolute terms). High ratios mean hot discharge gas, thin oil, and wasted power. Discharge temperature is your early warning: most plants alarm well before 225°F, and sustained high discharge temperature cooks oil and shortens compressor life."},
+   {h:"Your rounds matter", p:"On rounds, record suction and discharge pressure, discharge temperature, oil pressure and level, and listen. A compressor talks: new rattles, a hotter crankcase, oil pressure creeping down. Log it, compare it to yesterday, and report changes. More compressors are saved by operators who noticed a trend than by any alarm."}],
+  watch:["Running with a flooded suction and calling the knocking 'normal for that machine.' It is not.","Ignoring discharge temperature creep — it is the compressor asking for help.","Closing suction or discharge valves on a running machine without understanding what dead-heading does."],
+  quiz:[
+   {q:"Why is liquid ammonia dangerous to a compressor?", opts:["It makes the oil too thick","Liquid does not compress and can slug and break internal parts","It raises suction pressure","It freezes the discharge line"], a:1, why:"Compressors are vapor pumps; liquid slugging can bend, break, and wash oil from parts in seconds."},
+   {q:"What does rising discharge temperature usually warn of?", opts:["Too much subcooling","High compression ratio or other stress that cooks oil and wears the machine","A full receiver","Low condenser water flow only"], a:1, why:"Hot discharge gas points to high ratio or mechanical stress and breaks oil down fast."},
+   {q:"How does a screw compressor typically unload?", opts:["It drops cylinders","A slide valve changes its effective compression length","It slows the motor to half speed only","It opens the discharge to suction"], a:1, why:"Screw compressors use a slide valve to match capacity to load."},
+   {q:"On rounds, which reading belongs in the compressor log?", opts:["Only run hours","Suction and discharge pressure, discharge temperature, oil pressure and level","Only oil level","The weather"], a:1, why:"Pressures, discharge temperature, and oil readings together reveal trends before failures."},
+   {q:"What is compression ratio?", opts:["Suction divided by discharge, in gauge pressure","Discharge absolute pressure divided by suction absolute pressure","Discharge temperature divided by suction temperature","Run hours divided by starts"], a:1, why:"Ratio uses absolute pressures: discharge psia over suction psia — high ratios mean hard, hot work."}]},
+{ id:"b4", title:"Evaporators", mins:5,
+  sections:[
+   {h:"Where the work gets done", p:"The evaporator is where refrigeration actually happens: cold liquid ammonia boils inside coils or plates, absorbing heat from air, product, or liquid being chilled. Fans blow room air across finned coils in freezers and coolers; flooded vessels and plate exchangers chill liquids. If the evaporator cannot absorb heat, nothing downstream matters."},
+   {h:"Flooded, recirculated, and direct expansion", p:"In a flooded coil, liquid surrounds the tubes and boils off the surfaces — efficient and forgiving. Pumped recirculation pushes several times more liquid through the coil than actually evaporates, keeping tubes wet. Direct expansion feeds just enough liquid through a valve to boil dry by the coil outlet, controlled by superheat. Know which type you are looking at before you judge its pressures or frost pattern."},
+   {h:"Frost, airflow, and load", p:"Frost is insulation. A coil frosted thick moves a fraction of its rated heat, fans strain, and room temperature climbs while suction pressure falls. Airflow matters just as much: blocked return air, product stacked to the ceiling, or a dead fan motor will starve a perfect coil. Before condemning the refrigeration, walk the room: doors, fans, frost, and product placement."},
+   {h:"Reading a coil like an operator", p:"Even frost from inlet to outlet on a DX coil means a good feed. Frost only at the inlet means starved. A recirculated coil running warm with good liquid supply may be oil-logged or air-bound. Suction pressure low and room warm? Think frost or airflow. Suction normal and room warm? Think load or a coil out of service."}],
+  watch:["Hosing frost off with water without a plan — you can make ice, damage fins, and flood the floor.","Stacking product tight against the coil or blocking the air discharge path.","Assuming low suction always means low charge — frost and airflow cause it more often."],
+  quiz:[
+   {q:"What happens inside the evaporator?", opts:["Vapor condenses to liquid","Liquid ammonia boils and absorbs heat","Ammonia is compressed","Oil is separated"], a:1, why:"The evaporator is where liquid boils at low pressure, pulling heat out of the space or product."},
+   {q:"Why does heavy frost hurt capacity?", opts:["Frost conducts heat too well","Frost insulates the coil and chokes airflow","Frost raises suction pressure","Frost adds load to the condenser only"], a:1, why:"Frost is insulation on the fins and blocks air — heat transfer falls off fast."},
+   {q:"A DX coil frosted only at the inlet most likely is what?", opts:["Overfed","Starved for liquid","Oil-logged","In defrost"], a:1, why:"Frost stopping early means the liquid boiled off too soon — the coil is underfed."},
+   {q:"Pumped recirculation sends how much liquid through a coil?", opts:["Exactly what evaporates","Several times what evaporates, keeping tubes wet","Half of what evaporates","Only vapor"], a:1, why:"Recirculation overfeeds on purpose — excess liquid returns to the surge drum."},
+   {q:"Room warm and suction pressure low — first things to check?", opts:["Condenser water","Frost on the coil and fan airflow","Receiver level","Oil return timing"], a:1, why:"A frosted or air-starved coil cannot boil off ammonia, so suction falls while the room warms."}]},
+{ id:"b5", title:"Condensers", mins:5,
+  sections:[
+   {h:"Throwing the heat away", p:"Every Btu the evaporators collect, plus the heat of compression, leaves through the condenser. Most ammonia plants use evaporative condensers: hot vapor inside coils, water sprayed over the outside, and fans pulling air through so evaporation carries the heat off. Air-cooled and water-cooled shell-and-tube units exist too, but the evaporative condenser rules big ammonia plants."},
+   {h:"Head pressure follows the weather", p:"An evaporative condenser can only condense as cool as the wet-bulb temperature allows, plus an approach. On a 78°F wet-bulb day, expect condensing near 90–95°F and head pressure around 150–166 psig. On a cool, dry morning, head pressure falls — and smart plants let it float down to save compressor power. High head pressure on a mild day is a condenser crying for attention."},
+   {h:"Scale, spray, and airflow", p:"Mineral scale on the tubes insulates just like frost does on a coil. Plugged spray nozzles leave dry streaks that scale fast. Fan belts slip, blades get damaged, and basins grow algae. Water treatment is not optional paperwork — untreated water eats the coil and breeds dangerous bacteria. Your job: watch basin level, spray pattern, fan operation, and bleed-off, and report scale before head pressure tells on you."},
+   {h:"Non-condensables", p:"Air and other non-condensable gases sneak in during service or through leaks on the vacuum side. They ride to the condenser, blanket the tubes, and fake a higher head pressure than the ammonia alone would make. The fix is purging at the proper purge points — never by cracking a random fitting. If head pressure is high but condensing temperature says it should not be, suspect air."}],
+  watch:["Running fans and pumps with a low basin and wondering why head pressure climbs.","Ignoring scale because 'the water looks fine' — check the tubes, not the water color.","Purging air from wherever is handy instead of the designated purge points."],
+  quiz:[
+   {q:"In an evaporative condenser, what carries most of the heat away?", opts:["The steel coils","Evaporation of the spray water","The fan motors","The basin"], a:1, why:"Evaporating water does the heavy lifting — that is why wet-bulb temperature sets the limit."},
+   {q:"Head pressure around 166 psig corresponds to condensing near what temperature?", opts:["About 60°F","About 75°F","About 95°F","About 120°F"], a:2, why:"Ammonia saturates near 95°F at about 166 psig — head pressure and condensing temperature move together."},
+   {q:"Scale on condenser tubes causes what?", opts:["Lower head pressure","Insulated tubes and higher head pressure","Better heat transfer","Lower water use"], a:1, why:"Scale insulates the tubes, so condensing temperature and head pressure rise."},
+   {q:"Air trapped in the condenser does what?", opts:["Nothing — it dissolves","Blankets tubes and drives head pressure up","Lowers discharge temperature","Improves capacity"], a:1, why:"Non-condensables occupy tube surface and add their own partial pressure, raising head pressure."},
+   {q:"On a cool dry morning, what should head pressure do in a well-run plant?", opts:["Stay pinned at summer levels","Fall with the wet-bulb temperature, saving compressor power","Rise sharply","Drop to zero"], a:1, why:"Condensing follows wet bulb — letting head pressure float down cuts compressor energy."}]},
+{ id:"b6", title:"Receivers and Surge Drums", mins:5,
+  sections:[
+   {h:"The system's savings account", p:"The high-pressure receiver stores liquid ammonia between the condenser and the plant. It absorbs the swings: charge shifts as loads change, coils defrost, and vessels fill and drain. The liquid level you see in the gauge glass is the plant's bank balance — too low and expansion devices starve; too high and you are courting trouble."},
+   {h:"The 90 percent rule", p:"Never fill a receiver — or any ammonia vessel — beyond 90 percent full, and follow your plant's posted fill limits, which may be lower. Liquid ammonia expands as it warms. A vessel pumped liquid-full has nowhere for that expansion to go, and hydrostatic pressure can rupture steel that easily holds normal vapor pressure. This is one of the rules with no exceptions and no 'just this once.'"},
+   {h:"Surge drums: the low-side buffer", p:"A surge drum sits above or beside flooded and recirculated evaporators. Liquid feeds the coils from it, and the wet return stream comes back into it, where liquid drops out and dry vapor goes to the compressor. Its level control is the heartbeat of a flooded system: too high risks carrying liquid to the compressor; too low starves the coils. The king valve on the receiver outlet is your main liquid shutoff — know where it is and that it works."},
+   {h:"Reading levels honestly", p:"Gauge glasses lie when valves are closed, frosted, or the glass is oil-coated. Verify the isolating valves are open, know what the level should be for the load running, and trend it. A receiver level that steadily falls with no explanation means charge is hiding somewhere — an overfed vessel, a logged coil — or leaving through a leak. Find out which before you just add ammonia."}],
+  watch:["Filling a vessel past its limit because 'we need the charge in the system.' Move the charge, not the limit.","Trusting a gauge glass without checking that its valves are open.","Valving a liquid-full vessel or line segment off between two closed valves on a warm day."],
+  quiz:[
+   {q:"What is the maximum fill rule for ammonia vessels taught in this course?", opts:["100 percent if the day is cold","Never over 90 percent full — and follow plant limits if lower","75 percent at all times","There is no limit on receivers"], a:1, why:"Liquid expansion in an overfilled vessel can rupture it hydrostatically — 90 percent is the ceiling."},
+   {q:"What does a surge drum do?", opts:["Stores high-pressure liquid","Separates liquid from return vapor and feeds flooded coils","Removes oil","Purges air"], a:1, why:"The surge drum buffers the low side: liquid feeds out, wet vapor returns, dry vapor goes to the compressor."},
+   {q:"A receiver level that keeps falling with no explanation means what?", opts:["Everything is fine","Charge is hiding in another vessel or leaving through a leak — investigate","The condenser is oversized","Add ammonia immediately without checking"], a:1, why:"Charge does not vanish; find where it went before adding more."},
+   {q:"What is the king valve?", opts:["The compressor discharge valve","The main liquid outlet shutoff valve on the receiver","A defrost valve","The oil drain valve"], a:1, why:"The king valve is the receiver's main liquid outlet — closing it isolates liquid feed to the plant."},
+   {q:"A gauge glass shows no level change for days. What should you suspect?", opts:["Perfect operation","Its isolating valves may be closed or the glass is fouled — verify before trusting it","The plant has no ammonia","The compressor is oversized"], a:1, why:"A dead gauge glass is a classic trap — confirm the valves are open and the reading is real."}]},
+{ id:"b7", title:"Oil Management", mins:5,
+  sections:[
+   {h:"Oil goes where it is not wanted", p:"Compressor oil lubricates the machine, seals clearances, and carries heat away. The trouble: ammonia and oil do not mix. Oil that leaves with the discharge vapor does not dissolve and ride home — it settles out in the coldest, lowest places: evaporators, surge drums, receivers, and low piping. Every plant has a slow one-way oil migration out of the compressors and into the system."},
+   {h:"What oil does to a system", p:"Oil coating evaporator tubes insulates them just like frost or scale. Coils lose capacity, suction pressure sags, rooms warm up, and the compressor works harder to do less. Meanwhile the compressor's own crankcase level quietly falls. Oil management is two jobs: keep the right oil in the machines, and drain the oil that collects in the system on schedule."},
+   {h:"Draining oil safely", p:"Oil is drained from designated low-point drain valves into a proper oil pot or approved container — slowly, with PPE, an ammonia-rated respirator available, and never alone on a big drain. Open the drain a crack; oil comes first, and when ammonia starts, you stop. Log how much you drained from each point. A drain point that suddenly gives far more oil than usual is telling you something changed upstream."},
+   {h:"Levels, samples, and records", p:"Check compressor oil levels on rounds and keep them in the sight-glass range the manufacturer specifies — overfilling foams and carries over; underfilling starves bearings. Oil analysis on a schedule catches wear metals and moisture before they become a teardown. When you add oil, log the amount: a machine quietly drinking oil is a machine with a problem developing."}],
+  watch:["Draining oil fast or into an open bucket — oil drains can flash ammonia and bite hard.","Skipping drain points because 'that one never gives anything.' Low points collect oil on their own schedule.","Topping off a compressor for weeks without asking where the oil is going."],
+  quiz:[
+   {q:"Why does oil collect in evaporators and low points?", opts:["Ammonia dissolves oil and deposits it","Ammonia and oil do not mix, so oil settles in the coldest, lowest places","Oil is heavier than vapor only","Gravity pulls oil uphill"], a:1, why:"Oil and ammonia do not mix — oil drops out and pools in low, cold spots instead of returning on its own."},
+   {q:"Oil coating evaporator tubes causes what?", opts:["Better heat transfer","Insulation, lost capacity, and sagging suction pressure","Higher oil pressure","Faster defrost"], a:1, why:"An oil film insulates the tubes, so the coil moves less heat and the plant works harder."},
+   {q:"When draining oil and ammonia starts coming out, what do you do?", opts:["Keep going until it clears","Stop — close the drain; the oil is out","Open the valve wider","Leave it for the next shift"], a:1, why:"Ammonia at the drain means the oil is gone — close it down in a controlled way."},
+   {q:"A compressor that needs oil added every week is telling you what?", opts:["It is healthy","Oil is leaving the machine — find out why instead of just topping off","The oil is evaporating","Nothing, all machines do that"], a:1, why:"Steady oil consumption means carryover or a leak path — investigate and log it."},
+   {q:"Where is oil drained from?", opts:["Any low fitting you can find","Designated low-point drains into a proper oil pot or approved container","The suction line","The receiver top valve"], a:1, why:"Use the engineered drain points and an oil pot, slowly, with PPE — never improvised fittings."}]},
+{ id:"b8", title:"Safety Basics and PPE", mins:6,
+  sections:[
+   {h:"Know what ammonia does to people", p:"Ammonia attacks moisture — eyes, lungs, skin. At about 25–50 ppm it is a strong irritant you will not want to stay in. The 8-hour exposure limit is 50 ppm, and 300 ppm is immediately dangerous to life and health. Your nose detects it near 5 ppm, but smell fades with exposure — olfactory fatigue means 'it doesn't smell bad anymore' is a danger sign, not an all-clear."},
+   {h:"PPE that matches the job", p:"For routine rounds: safety glasses, gloves, and your plant's required gear, with a proper ammonia respirator available where your procedures require it. For line-breaking, draining oil, or any task that can release ammonia: chemical splash goggles plus face shield, ammonia-resistant gloves, and respiratory protection per your plant's written procedures. PPE in a locker across the plant is PPE you do not have."},
+   {h:"Emergency basics every operator owns", p:"Know your plant's alarm sounds, evacuation routes, muster points, and wind direction indicators — ammonia vapor rises and drifts with the wind, so move crosswind and upwind. Know where the emergency shutoffs, eyewash stations, and safety showers are, and test eyewash on your rounds. If someone is down in a vapor cloud, do not rush in unprotected: raise the alarm and let equipped responders make the entry. Two victims help no one."},
+   {h:"The habits that prevent the emergency", p:"Most ammonia incidents grow out of small neglect: a valve left in the wrong position, a drain left open, a leak 'we'll watch.' Report leaks the shift you find them, tag out equipment properly before work, and never defeat a safety device to keep production running. Relief valves, high-level cutouts, and gas detectors are the last line — treat them like it."}],
+  watch:["Trusting your nose after 20 minutes in a leak — smell fatigue lies to you.","Entering a vapor cloud to drag someone out without respiratory protection.","Wearing contact lenses and skipping goggles on a line-break 'just for a second.'"],
+  quiz:[
+   {q:"At what concentration is ammonia considered immediately dangerous to life and health (IDLH)?", opts:["25 ppm","50 ppm","300 ppm","5,000 ppm"], a:2, why:"300 ppm is the IDLH for ammonia — at that level, escape without injury cannot be counted on."},
+   {q:"Why is 'the smell went away' a danger sign?", opts:["The leak fixed itself","Smell fatigue sets in — your nose stops warning you while exposure continues","Ammonia turns odorless when cold","The wind always removes it"], a:1, why:"Olfactory fatigue dulls the warning while the hazard stays — never trust a fading smell."},
+   {q:"A coworker is down inside a vapor cloud. Your first move?", opts:["Run in and drag them out","Raise the alarm and let responders with proper respiratory protection make entry","Open every door and wait","Throw water on the cloud"], a:1, why:"Unprotected rescue attempts routinely create a second victim — alarm first, equipped entry second."},
+   {q:"Which PPE fits line-breaking or oil draining?", opts:["Safety glasses only","Splash goggles and face shield, ammonia-resistant gloves, and respiratory protection per procedure","A dust mask and cotton gloves","Steel toes only"], a:1, why:"Tasks that can release ammonia demand full splash and respiratory protection per your plant's procedures."},
+   {q:"Ammonia vapor generally does what after a release outdoors?", opts:["Sinks and hugs the ground forever","Rises and drifts with the wind — evacuate crosswind and upwind","Stays in one spot","Turns into liquid"], a:1, why:"Ammonia vapor rises and moves with the wind, so crosswind-then-upwind is the escape rule."}]}
+  ]
+},
+{ id:"psm", title:"PSM Compliance, Explained", tag:"14 elements",
+  desc:"Process Safety Management in plain language: what each of the 14 elements requires on the plant floor, and what your part in it is as an operator.",
+  lessons:[
+{ id:"p1", title:"Employee Participation", mins:4,
+  sections:[
+   {h:"What it requires", p:"The plant must have a written plan for involving employees in process safety — in hazard analyses, incident investigations, audits, and developing the safety program itself. Operators must be consulted, given access to process safety information, and able to report hazards without fear of punishment."},
+   {h:"What it looks like on the floor", p:"It looks like an operator sitting in the hazard analysis room saying, 'That valve is behind the vessel and you can't reach it with gloves on' — and that comment changing the design. It looks like safety committee meetings where floor concerns get written down, assigned, and answered."},
+   {h:"Your part", p:"Speak up in analyses and audits, report hazards in writing, and read the answers you get back. If you are asked to join a team, go — your hands-on knowledge of how the system really runs is exactly what the element exists to capture. Silence is the only wrong answer."}],
+  watch:["Treating participation as a suggestion box nobody reads — if concerns vanish, raise that too.","Letting only office staff speak for operations in safety meetings.","Assuming reporting a hazard is 'complaining.' It is a required part of the program."],
+  quiz:[
+   {q:"Employee Participation requires the plant to do what?", opts:["Hold a yearly picnic","Have a written plan to involve employees in process safety decisions and give them access to safety information","Let operators skip training","Post production numbers"], a:1, why:"The element requires real, documented employee involvement and access — not optional goodwill."},
+   {q:"Where does operator input matter most?", opts:["Hazard analyses, investigations, and audits","Only at hiring","Only during shutdowns","Nowhere — engineers decide"], a:0, why:"Operators belong on the teams that analyze hazards, investigate incidents, and audit the program."},
+   {q:"You report a hazard and hear nothing back. Best move?", opts:["Forget it","Follow up through the written process — unanswered reports are themselves a finding","Fix it yourself without telling anyone","Tell only your friends"], a:1, why:"The program must respond to employee concerns; a silent process is a broken process."},
+   {q:"Can an operator be punished for reporting a safety hazard?", opts:["Yes, if production suffered","No — reporting hazards is protected participation","Only on night shift","Yes, once a year"], a:1, why:"Participation includes reporting hazards without retaliation."},
+   {q:"What makes operator knowledge valuable on a hazard team?", opts:["Operators know how the system actually runs day to day","Operators type faster","Operators own the plant","Nothing special"], a:0, why:"Real operating experience catches hazards that drawings and procedures miss."}]},
+{ id:"p2", title:"Process Safety Information", mins:4,
+  sections:[
+   {h:"What it requires", p:"Before anything else, the plant must compile written information about the chemicals, the technology, and the equipment: ammonia's hazards and limits, P&IDs and process diagrams, relief system design, maximum inventories, safe operating limits, and equipment specifications."},
+   {h:"What it looks like on the floor", p:"It is the binder — or the shared drive — that answers: What is this vessel rated for? Where does this relief valve discharge? What is the maximum intended inventory? What happens above 90 percent fill? If the drawing shows a valve that is not in the field, the information is wrong, and wrong information is a hazard all by itself."},
+   {h:"Your part", p:"Use the information, and police it. When you find a drawing, label, or spec that does not match the plant, report it so it gets corrected. When you do rounds, you are verifying that the documented plant and the real plant are still the same plant."}],
+  watch:["Working from an old revision of a drawing because it is the one in the drawer.","Assuming a vessel's limits are 'whatever it has always run at.'","Finding a mismatch between field and drawing and not telling anyone."],
+  quiz:[
+   {q:"Process Safety Information covers which three areas?", opts:["Payroll, schedules, production","Chemicals, technology of the process, and equipment","Vendors, visitors, vehicles","Weather, water, waste"], a:1, why:"PSI documents the hazards of the chemicals, how the process works, and what the equipment is rated for."},
+   {q:"Which item belongs in PSI?", opts:["Relief system design basis and P&IDs","The lunch menu","Shift bid results","Parking assignments"], a:0, why:"Relief design, diagrams, limits, and inventories are core PSI."},
+   {q:"You find a valve in the field that is not on the P&ID. What should happen?", opts:["Ignore it","Report it so the information gets corrected","Remove the valve","Paint it red"], a:1, why:"PSI must match the real plant — mismatches get reported and fixed."},
+   {q:"Why does PSI come before hazard analysis?", opts:["It is alphabetical","You cannot analyze hazards of a process you have not documented","It fills a binder","Auditors like it first"], a:1, why:"Accurate information is the foundation every other element builds on."},
+   {q:"Maximum intended inventory is part of PSI because…", opts:["Accountants need it","It defines how much ammonia the process is designed to hold — a core safety boundary","It sets the price of ammonia","It is not part of PSI"], a:1, why:"Knowing the designed inventory limit is essential to operating within safe bounds."}]},
+{ id:"p3", title:"Process Hazard Analysis", mins:4,
+  sections:[
+   {h:"What it requires", p:"A team must systematically study what can go wrong: what happens if this valve fails shut, that level control dies, power drops mid-defrost. The analysis identifies hazards, reviews past incidents, ranks consequences, and produces recommendations the plant must resolve. It gets revalidated at least every five years."},
+   {h:"What it looks like on the floor", p:"Most of what a hazard analysis recommends shows up in your world as hardware and habits: the high-level cutout on the surge drum, the second check valve, the procedure step that says 'verify before you open.' When a recommendation closes, something in the plant physically or procedurally changed because a team imagined the bad day in advance."},
+   {h:"Your part", p:"Operators sit on these teams — your 'what if' instincts are the raw material. Between studies, your part is reporting near-misses and failures honestly. A level switch that failed once and got tapped back to life is exactly the kind of fact the next analysis needs."}],
+  watch:["Hiding a near-miss because nobody got hurt — near-misses are free lessons.","Thinking recommendations are paperwork; each one is a fix someone must own and finish.","Assuming the five-year revalidation is a rubber stamp. The plant changed; the analysis must too."],
+  quiz:[
+   {q:"What does a Process Hazard Analysis do?", opts:["Sets production rates","Systematically identifies what can go wrong and recommends fixes","Inspects oil quality","Writes job postings"], a:1, why:"A PHA is a structured study of hazards, consequences, and safeguards, with tracked recommendations."},
+   {q:"How often must a PHA be revalidated at minimum?", opts:["Every year","Every five years","Every twenty years","Never"], a:1, why:"PHAs are revalidated at least every five years so changes and new lessons get captured."},
+   {q:"Why do operators belong on the PHA team?", opts:["They bring real-world knowledge of failures, workarounds, and how equipment behaves","They bring coffee","They sign the cover page","They do not belong"], a:0, why:"Floor experience is what turns a paper study into a useful one."},
+   {q:"A safeguard fails during the week and gets reset. Why does the PHA process care?", opts:["It does not","Failed safeguards are data — the analysis assumed they work, so failures must be reported","It changes the inventory","It affects overtime"], a:1, why:"PHAs credit safeguards; if safeguards fail in real life, the analysis conclusions change."},
+   {q:"What happens to PHA recommendations?", opts:["They are optional reading","They must be resolved with documented actions and schedules","They expire in 30 days","They go to the vendor"], a:1, why:"Recommendations require resolution — assigned, scheduled, and documented."}]},
+{ id:"p4", title:"Operating Procedures", mins:4,
+  sections:[
+   {h:"What it requires", p:"Written procedures must cover each operating phase: initial startup, normal operation, temporary operations, emergency shutdown, normal shutdown, and startup after a turnaround or emergency. They must state the steps, the safe operating limits, the consequences of deviating, and how to correct a deviation. Procedures must be current, accessible, and reviewed at least annually."},
+   {h:"What it looks like on the floor", p:"A good procedure reads like the plant actually runs: real valve numbers, real setpoints, the order that matters ('open the discharge before you bump the compressor'). A bad one is generic text nobody can follow at 3 a.m. The annual review is where operators certify the written steps still match reality."},
+   {h:"Your part", p:"Run the plant by the procedures, and when reality and the paper disagree, stop and get the paper fixed — do not quietly freelance. Your redlines during the annual review are not nitpicking; they are the mechanism the whole element depends on."}],
+  watch:["Keeping 'how we really do it' in your head while the book says something else.","Skipping steps on a familiar startup because you have done it a hundred times.","Using a procedure from another plant or an old revision."],
+  quiz:[
+   {q:"Operating procedures must cover which phases?", opts:["Startup, normal, temporary, emergency shutdown, normal shutdown, and startup after turnaround","Only normal operation","Only emergencies","Only startup"], a:0, why:"All operating phases need written procedures, including temporary operations and emergency shutdown."},
+   {q:"How often must operating procedures be reviewed and certified current?", opts:["Every five years","At least annually","Only when changed","Never"], a:1, why:"Procedures are reviewed at least annually to confirm they reflect current operations."},
+   {q:"The procedure says one thing; the plant runs differently. Correct response?", opts:["Freelance quietly","Raise it and get the procedure corrected — do not run on unwritten practice","Ignore both","Wait for the audit"], a:1, why:"Procedures and practice must match; mismatches get fixed through the process, not around it."},
+   {q:"A good procedure includes what besides steps?", opts:["Operating limits, consequences of deviation, and how to correct deviations","Only valve numbers","The author's name","Historical trivia"], a:0, why:"Limits and deviation guidance are required parts of a complete procedure."},
+   {q:"Where must procedures be kept?", opts:["Locked in an office","Readily accessible to the employees who use them","At the vendor's site","In a sealed archive"], a:1, why:"Procedures only work if operators can reach them when needed."}]},
+{ id:"p5", title:"Training (PSM Element)", mins:4,
+  sections:[
+   {h:"What it requires", p:"Every operator must be trained in the process, its hazards, and the procedures for their job before working independently — and given refresher training at least every three years. The plant must document who was trained, when, and how their understanding was verified. Training is not attendance; it is demonstrated competence."},
+   {h:"What it looks like on the floor", p:"It is the difference between 'I sat through the class' and 'I can start this compressor, recognize this alarm, and shut this system down safely.' Verification can be a test, a walk-through, or a supervised run — but somebody qualified confirms you can actually do the job."},
+   {h:"Your part", p:"Take it seriously in both directions: as a trainee, ask until you understand, not until the clock runs out. As an experienced operator, you are part of the training system — how you show a new hire the rounds teaches them what this plant really values."}],
+  watch:["Signing a training roster for a session you slept through.","Letting a new operator run solo before their training and verification are complete.","Treating the three-year refresher as a formality — systems and procedures change."],
+  quiz:[
+   {q:"PSM training requires refresher training at least how often?", opts:["Every year","Every three years","Every ten years","Only once"], a:1, why:"Refresher training is required at least every three years, or sooner if the process changes."},
+   {q:"What must training documentation show?", opts:["Just the date","Who was trained, when, and how competence was verified","The room number","The instructor's lunch order"], a:1, why:"Records must identify the employee, the date, and the means used to verify understanding."},
+   {q:"When can a new operator work a process independently?", opts:["After their first shift","After completing required training and verification for the job","After 30 days regardless","Immediately if supervised last week"], a:1, why:"Initial training and verified competence come before independent work."},
+   {q:"Training under PSM means what?", opts:["Attendance","Demonstrated ability to do the job safely per procedures","Owning a binder","Watching a video once"], a:1, why:"The standard is competence — the operator can perform the tasks and handle the hazards."},
+   {q:"Who needs PSM process training?", opts:["Only supervisors","Employees involved in operating the process, including those newly assigned","Only mechanics","Only the safety department"], a:1, why:"Anyone who operates or is assigned to the covered process must be trained for their role."}]},
+{ id:"p6", title:"Contractors", mins:4,
+  sections:[
+   {h:"What it requires", p:"When outside contractors work on or near the process, the plant must check their safety record and programs before hiring, inform them of the process hazards and emergency procedures, control their entry and work, and evaluate them afterward. Contractors, in turn, must train their own people and follow plant rules."},
+   {h:"What it looks like on the floor", p:"The insulator crew, the compressor rebuild team, the electricians — they may be excellent at their trade and still not know your plant: where the ammonia lines run, what that alarm means, which valve isolates what. The pre-job briefing, the permit, and your willingness to stop a job that drifts outside its scope are the element in action."},
+   {h:"Your part", p:"Treat contractor work in your area as partly your watch. Know what they are authorized to do, escort or check in as your procedures require, and never let a contractor open, cut, or energize process equipment on a verbal 'go ahead' from the floor."}],
+  watch:["Assuming the contractor 'must know ammonia' because they have a logo on the truck.","Letting scope creep: 'while we're here, open that line too.'","Skipping the hazard briefing for a crew that 'was just here last month.'"],
+  quiz:[
+   {q:"Before hiring a contractor for process work, the plant must do what?", opts:["Nothing","Review their safety performance and programs","Check only their price","Ask for references from friends"], a:1, why:"Contractor selection includes evaluating safety history and programs, not just cost."},
+   {q:"What must contractors be told before work starts?", opts:["Production targets","The known hazards of the process and the plant's emergency procedures","Where to park only","Nothing — they are experts"], a:1, why:"Contractors must be informed of process hazards and emergency action information."},
+   {q:"A contractor asks you to open a process valve outside their permit scope. You should…", opts:["Do it — they are the experts","Stop and route it through the permit and authorization process","Do it if they ask twice","Let the next shift decide"], a:1, why:"Work stays inside its authorized scope; changes go through the proper process."},
+   {q:"Who trains the contractor's own employees on their tasks?", opts:["Your plant, always","The contractor employer is responsible for training its people","Nobody","The newest operator"], a:1, why:"The contractor must assure its employees are trained; the plant informs and controls the work."},
+   {q:"Why does the plant control contractor entry and presence near the process?", opts:["To count heads for lunch","So the plant knows who is exposed and can account for them in an emergency","For billing","It does not need to"], a:1, why:"Entry control protects contractors and lets the plant account for everyone during an incident."}]},
+{ id:"p7", title:"Pre-Startup Safety Review", mins:4,
+  sections:[
+   {h:"What it requires", p:"Before ammonia is introduced into a new process — or a modified one where the change requires it — a review must confirm: construction matches design, procedures are in place, training is complete, the hazard analysis recommendations are addressed, and safety systems are functional."},
+   {h:"What it looks like on the floor", p:"It is the disciplined pause before the king valve opens on a rebuilt system: Are the relief valves installed and in date? Do the gauges read right? Is the new procedure in the book and the crew trained on it? Has every punch-list safety item actually been walked down, not just signed?" },
+   {h:"Your part", p:"If you are on the walk-down, walk it like you will run it — because you will. Check valve positions against the line-up sheet, test the alarms you can test, and refuse to let schedule pressure turn 'we'll fix it after startup' into the plan for a safety item."}],
+  watch:["Starting up with a known safety punch item open because production is waiting.","Treating the review as a signature hunt instead of a field verification.","Forgetting that modifications — not just new plants — can trigger a review."],
+  quiz:[
+   {q:"When is a Pre-Startup Safety Review required?", opts:["Every Monday","Before introducing the chemical into a new process, and for modifications where required","Only after an incident","Never for ammonia"], a:1, why:"A PSSR confirms readiness before startup of new or significantly modified processes."},
+   {q:"Which item is checked in a PSSR?", opts:["That procedures are in place and training is complete","The parking lot paint","The cafeteria menu","Office supplies"], a:0, why:"Procedures, training, construction-to-design, and addressed recommendations are core PSSR checks."},
+   {q:"A safety punch item is still open at startup time. Correct approach?", opts:["Start up and fix it later","Resolve it or formally address it before introducing ammonia","Hide it from the list","Let the vendor decide"], a:1, why:"Safety items must be resolved before startup — schedule pressure does not waive them."},
+   {q:"Who should participate in the field walk-down?", opts:["Only managers","People who know the design and people who will operate it","Only the contractor","Nobody — it is paperwork"], a:1, why:"Operations eyes on the walk-down catch what drawings miss."},
+   {q:"A PSSR verifies construction was done according to what?", opts:["Habit","Design specifications","The last plant's layout","Verbal instructions"], a:1, why:"Construction and equipment must match the design specs before startup."}]},
+{ id:"p8", title:"Mechanical Integrity", mins:5,
+  sections:[
+   {h:"What it requires", p:"Equipment that keeps ammonia contained must be inspected, tested, and maintained on a schedule, following recognized and generally accepted good engineering practices: pressure vessels, piping, relief valves, pumps, compressors, controls, alarms, and interlocks. Deficiencies get corrected, inspections get documented, and the people doing the work must be trained for it."},
+   {h:"What it looks like on the floor", p:"It is the relief valve with an in-date tag, the thickness readings on the receiver, the tested high-level cutout, the ammonia detector that gets calibrated instead of ignored. It is also the work order system: a corroded pipe support you report today becomes a planned repair instead of next year's leak."},
+   {h:"Your part", p:"Your rounds are the front line of mechanical integrity. You cannot ultrasound a vessel wall, but you see the rust bloom, hear the bearing going, notice the detector in fault. Report it in the system, with detail. 'Compressor 2 sounds bad' helps nobody; 'Compressor 2 has a new knock on the head end, started Tuesday, worse under load' gets it fixed."}],
+  watch:["Silencing or bypassing a faulty alarm instead of writing it up.","Letting an overdue relief valve 'ride one more season.'","Vague work orders that cannot be prioritized or found later."],
+  quiz:[
+   {q:"Mechanical Integrity applies to which equipment?", opts:["Only compressors","Vessels, piping, relief systems, controls, alarms, and other process equipment","Only office equipment","Only vehicles"], a:1, why:"MI covers the full set of equipment whose failure could release ammonia or fail to protect against one."},
+   {q:"Inspections and tests must follow what basis?", opts:["Guesswork","Recognized and generally accepted good engineering practices, on a documented schedule","The oldest operator's memory","Whatever is fastest"], a:1, why:"MI work follows established engineering practice and manufacturer guidance, with set frequencies."},
+   {q:"You find heavy corrosion on a vessel support. Your MI role is to…", opts:["Paint it","Report it in the work system with clear detail so it gets evaluated and scheduled","Ignore it","Kick it to test strength"], a:1, why:"Operator reporting feeds the MI program — detailed reports get deficiencies corrected."},
+   {q:"A relief valve is past its replacement interval. Acceptable?", opts:["Yes, if it looks fine","No — overdue relief protection is a deficiency to correct","Yes, in winter","Only the tag matters"], a:1, why:"Relief devices are the last line of defense; intervals exist to be met, not stretched."},
+   {q:"What must happen when an inspection finds a deficiency?", opts:["It is corrected or addressed safely before continued operation, and documented","It is noted verbally","It waits for the five-year review","Nothing"], a:0, why:"Deficiencies must be corrected in a safe, timely manner and documented."}]},
+{ id:"p9", title:"Hot Work Permits", mins:4,
+  sections:[
+   {h:"What it requires", p:"Welding, cutting, grinding, and other spark- or flame-producing work near the process requires a permit: the area inspected, combustibles removed or protected, fire watch assigned, and the work authorized for a specific place and time. No permit, no hot work — including 'quick' jobs."},
+   {h:"What it looks like on the floor", p:"Ammonia itself needs a high concentration to burn, but hot work danger in a plant is broader: insulation, packaging, pallets, oil, and dust all burn, and a torch near a flange can heat a gasket or a line you did not plan on. The permit forces the pause: gas test where required, clear the area, post the fire watch, and re-check after the last spark — smoldering fires start after the crew leaves."},
+   {h:"Your part", p:"If you see hot work without a posted permit in your area, stop and ask. If you are the fire watch, be one: eyes on the work, extinguisher in reach, and stay for the full post-work watch period your permit requires."}],
+  watch:["The five-minute grind job with no permit — most hot work incidents start exactly that way.","A fire watch who is also running errands.","Ending the watch the moment the torch shuts off; smoldering takes time."],
+  quiz:[
+   {q:"Hot work near the process requires what before starting?", opts:["A verbal okay","A hot work permit with area prep and fire watch","Only safety glasses","A second welder"], a:1, why:"The permit documents inspection, preparation, authorization, and fire watch for that job."},
+   {q:"Why does the fire watch stay after work ends?", opts:["For overtime","Smoldering materials can flare after the last spark","To clean up tools","They do not need to"], a:1, why:"Post-work watch catches delayed ignition in insulation and debris."},
+   {q:"You spot grinding near the engine room with no permit posted. You should…", opts:["Mind your business","Stop and ask — unpermitted hot work gets halted until it is authorized","Help them finish faster","Report it next week"], a:1, why:"Anyone can and should challenge hot work that lacks a permit."},
+   {q:"A permit is valid for what?", opts:["The whole plant, all week","The specific work, location, and time it was issued for","Any contractor","Forever"], a:1, why:"Permits are job-specific — new location or new shift means re-evaluation."},
+   {q:"Besides ammonia itself, what makes hot work risky in a plant?", opts:["Nothing else burns","Insulation, packaging, oil, and dust can ignite, and heat can damage nearby equipment","The noise","Bright light only"], a:1, why:"Ordinary combustibles and heat damage are the everyday hot work hazards."}]},
+{ id:"p10", title:"Management of Change", mins:4,
+  sections:[
+   {h:"What it requires", p:"Any change to the process — chemicals, technology, equipment, procedures, or facilities — must be reviewed and authorized before it is made. The review considers technical basis, safety impact, procedure updates, training, and duration for temporary changes. Replacement in kind is not a change; almost everything else is."},
+   {h:"What it looks like on the floor", p:"Swapping a valve for a different type, raising a setpoint, jumpering an alarm 'for the weekend,' running a hose where a pipe used to be — each is a change. The classic incident pattern is the temporary fix that became permanent without review: the bypass nobody remembers, the setpoint nobody can explain."},
+   {h:"Your part", p:"Recognize change when you see it, including your own ideas. A better way to run the plant is welcome — through the change process, where its side effects get thought through, procedures get updated, and the next shift is not surprised."}],
+  watch:["Installing a 'temporary' jumper with no expiry date or paperwork.","Assuming a like-for-like part number from a different manufacturer is automatically replacement in kind.","Changing a setpoint because the alarm was annoying."],
+  quiz:[
+   {q:"Which of these is a change requiring review?", opts:["Replacing a valve with the identical specification","Raising an alarm setpoint and using a different valve type","Reading a gauge","Signing a log"], a:1, why:"Different equipment or setpoints are changes; true replacement in kind is not."},
+   {q:"Temporary changes under MOC must have what?", opts:["No paperwork","A defined time limit and the same review as permanent changes","Only a note on the board","A verbal promise"], a:1, why:"Temporary changes get full review and an expiration — otherwise they quietly become permanent."},
+   {q:"Before a change is implemented, what must be updated or addressed?", opts:["Nothing","Affected procedures, training, and safety information","Only the budget","The paint color"], a:1, why:"MOC ties the physical change to updated procedures, training, and PSI before startup."},
+   {q:"You have a smarter way to line up a defrost. Right path?", opts:["Just do it quietly","Propose it through the change process so it is reviewed, documented, and taught","Do it on nights only","Tell one coworker"], a:1, why:"Good ideas survive review and become the new standard — undocumented workarounds become hazards."},
+   {q:"Who must be informed of a change?", opts:["Only the person who made it","Employees and contractors whose jobs are affected","Nobody","Only auditors"], a:1, why:"Affected workers must be informed and trained on changes before startup."}]},
+{ id:"p11", title:"Incident Investigation", mins:4,
+  sections:[
+   {h:"What it requires", p:"Incidents — and near-misses that could have been incidents — must be investigated promptly, by a team that includes people knowledgeable in the process, including an operator for operating incidents. The investigation finds root causes, produces recommendations, and the findings are shared with affected employees. Reports are kept at least five years."},
+   {h:"What it looks like on the floor", p:"A good investigation is not a blame hunt. 'Operator error' is where weak investigations stop; good ones keep asking why the error was possible: Was the valve labeled? Was the procedure right? Was the crew short-staffed and rushed? The answers become fixes — hardware, procedures, training — not just a name in a file."},
+   {h:"Your part", p:"Report incidents and near-misses immediately and honestly, preserve the scene and the data (trends, logs, valve positions), and participate when asked. What you saw in the first minutes is evidence that disappears fast."}],
+  watch:["Cleaning up and resetting everything before anyone documents the scene.","Deciding the cause in the hallway before the team meets.","Keeping a near-miss quiet because 'nothing happened.' Something did — luck."],
+  quiz:[
+   {q:"Which events must be investigated under PSM?", opts:["Only injuries","Incidents and near-misses that resulted in, or could have resulted in, a catastrophic release","Only fires","Only property damage over a set amount"], a:1, why:"Near-misses with catastrophic potential carry the same lessons as real releases."},
+   {q:"How quickly must an investigation begin?", opts:["Within a year","As promptly as possible — no later than 48 hours after the incident","Next quarter","When convenient"], a:1, why:"Investigations start within 48 hours while evidence and memory are fresh."},
+   {q:"A good investigation focuses on what?", opts:["Finding who to blame","Root causes and system fixes","Closing the report fast","Protecting production numbers"], a:1, why:"The goal is causes and corrective actions that prevent recurrence — not blame."},
+   {q:"Your role right after an incident is to…", opts:["Reset everything quickly","Make things safe, report honestly, and preserve evidence like logs and valve positions","Say nothing","Leave early"], a:1, why:"Stabilize, report, and preserve the facts the investigation will need."},
+   {q:"Investigation findings are shared with whom?", opts:["Nobody","Affected employees and contractors","Only lawyers","Only the night shift"], a:1, why:"Findings and recommendations are communicated to everyone whose work they affect."}]},
+{ id:"p12", title:"Emergency Planning and Response", mins:4,
+  sections:[
+   {h:"What it requires", p:"The plant must have an emergency action plan: how alarms are raised, who does what, evacuation routes and accounting, and how employees who respond to releases are trained and equipped. For ammonia, planning also means knowing release behavior, isolation points, and coordination with outside responders."},
+   {h:"What it looks like on the floor", p:"It looks like drills that actually happen, alarm points you can find in the dark, wind socks you glance at out of habit, and a muster count that works on a Tuesday night with the B crew. A plan that only exists in a binder fails its first real test; a plan the crew has practiced becomes reflex."},
+   {h:"Your part", p:"Know your role cold: your alarm, your route, your muster point, and whether your job in a release is to isolate from a safe location or to get out. Never improvise a heroic entry. The plan only works if everyone does their assigned part."}],
+  watch:["Skipping drills because 'we did one last year.'","Blocking an eyewash, exit route, or alarm pull with staged material.","Assuming the fire department knows your plant — pre-plans and tours exist for a reason."],
+  quiz:[
+   {q:"What is the heart of this element?", opts:["A written, practiced emergency action plan with defined roles","A bigger alarm bell","More signage","A new parking lot"], a:0, why:"Planning means roles, routes, alarms, and practice — before the emergency, not during it."},
+   {q:"During a release, your movement should be…", opts:["Downwind to see better","Crosswind, then upwind to your muster point","Into the engine room","Wherever is closest"], a:1, why:"Crosswind then upwind keeps you out of the drifting vapor; muster allows accountability."},
+   {q:"Why are drills essential?", opts:["They fill the calendar","Practiced actions become reflex; untested plans fail under stress","Auditors enjoy them","They use up old PPE"], a:1, why:"People perform what they have rehearsed — drills expose broken routes, alarms, and counts."},
+   {q:"An employee discovers a significant leak. First actions per the plan?", opts:["Attempt a solo repair in the cloud","Raise the alarm, alert others, and act only within your training and the plan","Wait for the smell to fade","Call the vendor"], a:1, why:"Alarm and notification come first; response actions stay within training and the plan."},
+   {q:"Who must be accounted for after evacuation?", opts:["Only operators","Everyone — employees, contractors, and visitors","Only supervisors","Nobody"], a:1, why:"Accountability covers every person on site, which is why entry control matters daily."}]},
+{ id:"p13", title:"Compliance Audits", mins:4,
+  sections:[
+   {h:"What it requires", p:"At least every three years, the plant must audit its process safety program: are the procedures being followed, is the documentation real, does the program on paper match the plant in steel? The audit is done by people knowledgeable in the process, findings get responses, and the two most recent audit reports are retained."},
+   {h:"What it looks like on the floor", p:"Auditors walk your world: they pull a procedure and ask you to show them the step, check a training record against a face, look at whether the gauge glass valves are really open. An audit is not an ambush — it is the program checking its own homework before an incident or an inspector does it less kindly."},
+   {h:"Your part", p:"Answer honestly and show your real practice, not a performance. If the auditor finds that a procedure cannot be followed as written, that finding is a gift — it forces the fix. Hiding gaps protects nobody; it just postpones them to a worse day."}],
+  watch:["Staging the plant for audit day instead of running it right every day.","Coaching answers — auditors can tell, and it undermines everything.","Treating findings as personal criticism rather than program repairs."],
+  quiz:[
+   {q:"Compliance audits of the PSM program are required at least how often?", opts:["Every year","Every three years","Every ten years","Only after incidents"], a:1, why:"The program must be audited at least every three years."},
+   {q:"What does an audit compare?", opts:["Production vs. plan","The written program against actual practice in the plant","This plant vs. competitors","Old vs. new logos"], a:1, why:"Audits verify the program as practiced, not just as documented."},
+   {q:"An auditor asks you to walk through a procedure step. Best approach?", opts:["Recite the manual from memory","Show how you actually do it, honestly","Refuse","Ask a coworker to answer"], a:1, why:"Honest demonstration is what makes audits useful — gaps found are gaps fixed."},
+   {q:"What must the plant do with audit findings?", opts:["File them away","Respond to them, correct deficiencies, and document the actions","Dispute all of them","Publish them in the newspaper"], a:1, why:"Findings require documented responses and prompt correction of deficiencies."},
+   {q:"Who performs the audit?", opts:["Anyone available","At least one person knowledgeable in the process, evaluating compliance","Only outside lawyers","Only new hires"], a:1, why:"Audits are conducted by knowledgeable people who understand the process being audited."}]},
+{ id:"p14", title:"Trade Secrets", mins:3,
+  sections:[
+   {h:"What it requires", p:"Plants may protect genuine trade secret information, but that protection has a hard limit: nothing about process safety can be withheld from the people who need it. Employees and their representatives must have access to all information required under the standard — hazard analyses, safety data, investigations — regardless of trade secret claims."},
+   {h:"What it looks like on the floor", p:"In an ammonia plant this element rarely bites — the process is standard and the hazards are well known. Where it matters: a proprietary blend, a vendor's formulation, a special process detail. The plant can guard the recipe; it cannot guard what the recipe does to people or how to respond when it gets out."},
+   {h:"Your part", p:"Know that 'proprietary' is never a valid answer to a safety question. If you need hazard or response information to do your job safely, you are entitled to it — ask through your participation channels until you get it."}],
+  watch:["Accepting 'that's confidential' as the answer to a hazard question.","Sharing genuinely protected business information carelessly — the element cuts both ways.","Assuming trade secret claims can delay emergency information for responders. They cannot."],
+  quiz:[
+   {q:"What is the core rule of the Trade Secrets element?", opts:["Everything is secret","Trade secrets may be protected, but safety information can never be withheld from those who need it","Operators get no information","Only managers see safety data"], a:1, why:"Confidentiality stops where safety begins — required safety information must be available."},
+   {q:"Who must have access to PHA and other required information?", opts:["Only the plant manager","Employees and their designated representatives","Only auditors","Only the vendor"], a:1, why:"Employee access to safety information is guaranteed regardless of trade secret status."},
+   {q:"During an emergency, can hazard information be withheld from responders as a trade secret?", opts:["Yes","No — information needed to respond must be disclosed","Only on weekends","Only if legal approves first"], a:1, why:"Emergency response information cannot be blocked by confidentiality claims."},
+   {q:"In a typical ammonia plant, this element most often concerns…", opts:["The refrigeration cycle","Proprietary formulations or vendor details — while ammonia hazards themselves are fully documented","Shift schedules","Uniform colors"], a:1, why:"Standard ammonia hazards are public knowledge; secrets, where they exist, are in formulations and special details."},
+   {q:"You are told a chemical's hazards are 'proprietary' and cannot be shared. Correct response?", opts:["Accept it","Escalate — hazard information needed for your safety must be provided","Guess the hazards","Refuse all work forever"], a:1, why:"Use participation and safety channels; the information is required to be available."}]}
+  ]
+},
+{ id:"deepdive", title:"Deep Dive Training", tag:"Go deeper",
+  desc:"Working-operator skills with real numbers: P-T chart fluency, pump-down, oil return, defrost, superheat, floating head pressure, and energy.",
+  lessons:[
+{ id:"d1", title:"Reading the P-T Chart with Real Numbers", mins:6,
+  sections:[
+   {h:"One fact the whole chart hangs on", p:"When liquid and vapor ammonia sit together in a closed space, pressure and temperature are locked: pick one and the other is fixed. That pair is called saturation. The P-T chart is just a list of those pairs. Memorize anchor points and you can read any gauge in the plant: -28°F at 0 psig (atmospheric), 0°F at about 16 psig, 32°F at about 48 psig, 95°F at about 166 psig."},
+   {h:"Working the suction side", p:"Your freezer is at -20°F and the suction gauge reads 20 psig. Saturation at 20 psig is about +2°F. But wait — if the coil is boiling at +2°F it cannot make a -20°F room. Something is off: that 20 psig is at the compressor, and the long suction line or a partly closed valve is eating pressure, or the gauge lies. Real numbers turn a gauge from decoration into diagnosis."},
+   {h:"Working the discharge side", p:"Head pressure reads 182 psig on a summer afternoon. Saturation at 182 psig is about 100°F — that is your condensing temperature. Wet bulb outside is 76°F, so your evaporative condenser is running a 24°F approach: too wide. A clean, well-sprayed condenser should run closer to 10–15°F over wet bulb. You just found lost capacity and wasted compressor power with one subtraction."},
+   {h:"Pressure drop is temperature theft", p:"Every psi lost between the coil and the compressor is evaporating temperature you paid for and did not get. At low temperatures the penalty is brutal: 2 psi of drop near -20°F costs roughly 4–5°F of saturation. That is why suction lines are fat, valves get checked for full opening, and a strainer full of scale shows up as a warm room."}],
+  watch:["Reading gauges without asking 'what should saturation be here?'","Forgetting gauges read psig while ratios and some charts want psia — add 14.7.","Trusting one gauge against the chart without considering a bad gauge — verify with a second point."],
+  quiz:[
+   {q:"Ammonia at 0 psig (atmospheric pressure) boils at about what temperature?", opts:["32°F","0°F","-28°F","-60°F"], a:2, why:"Ammonia's atmospheric boiling point is about -28°F — the anchor point of the whole chart."},
+   {q:"Suction gauge reads 48 psig at a vessel where liquid and vapor sit together. The ammonia temperature is about…", opts:["0°F","32°F","60°F","95°F"], a:1, why:"At saturation, 48 psig pairs with about 32°F — pressure and temperature are locked together."},
+   {q:"Head pressure is 182 psig. Your condensing temperature is about…", opts:["80°F","90°F","100°F","120°F"], a:2, why:"182 psig saturates at about 100°F — that is the temperature the condenser is working at."},
+   {q:"Wet bulb is 76°F and condensing is 100°F. What does the 24°F gap suggest?", opts:["Excellent condenser performance","A wide approach — likely scale, spray, or airflow problems costing capacity and power","Low charge for sure","The compressor is oversized"], a:1, why:"A healthy evaporative condenser runs a much tighter approach; 24°F says heat transfer is suffering."},
+   {q:"Why does suction pressure drop hurt more at -20°F than at 40°F?", opts:["It does not","Each psi lost near -20°F costs several degrees of saturation temperature","Gauges read lower when cold","Oil gets thicker"], a:1, why:"The P-T curve is steep at low temperature — small pressure losses steal big temperature differences."}]},
+{ id:"d2", title:"Pump-Down", mins:5,
+  sections:[
+   {h:"What pump-down is and why we do it", p:"Pumping down means using the compressor to pull ammonia out of a section of the system and store it in the receiver (or another vessel), so that section can be opened for service safely. You isolate the section's liquid feed, let the compressor draw the vapor down, and recover the charge instead of venting it or trapping it."},
+   {h:"The sequence that keeps you safe", p:"Follow your plant's written procedure — the shape is: confirm where the ammonia will go and that the receiving vessel has room (remember the 90 percent rule), close the liquid feed to the section, run the compressor to pull suction down to the procedure's target, then isolate the section. Watch receiver level the whole time: pumping down a big coil into a nearly full receiver just moves the hazard."},
+   {h:"What can go wrong", p:"Pulling too deep into vacuum invites air and moisture in through any leak — and air becomes tomorrow's head-pressure problem. Trapping liquid between two closed valves after a sloppy pump-down creates the hydrostatic rupture risk. And a compressor left pulling against a closed suction will let you know, loudly. Pump-down is a procedure, not an improvisation."},
+   {h:"Proving the section is clear", p:"Before anyone breaks a flange, verify: pressure at the procedure's target and holding, isolation valves closed and tagged per your lockout process, and a final check at the work point. If pressure creeps back up, liquid is still in there or a valve is passing — find out which before steel comes apart."}],
+  watch:["Pumping down without checking the receiving vessel has room for the charge.","Leaving a section in deep vacuum and walking away — leaks pull air in.","Breaking a flange on faith instead of verified pressure and isolation."],
+  quiz:[
+   {q:"What is the purpose of a pump-down?", opts:["To raise head pressure","To move ammonia out of a section into storage so the section can be serviced safely","To defrost a coil","To remove oil"], a:1, why:"Pump-down recovers the charge into a vessel, leaving the work section clear and isolated."},
+   {q:"Before starting, the most important check is…", opts:["That the receiving vessel has room for the charge within fill limits","That the radio works","That it is almost shift change","That the compressor is the newest one"], a:0, why:"Moving ammonia into a vessel without room trades one hazard for a worse one."},
+   {q:"Pulling a section into a deep vacuum risks what?", opts:["Nothing","Drawing air and moisture in through leaks","Freezing the oil","Overfilling the receiver"], a:1, why:"Below atmospheric pressure, leaks pull inward — air becomes non-condensable trouble later."},
+   {q:"Pressure in an isolated section creeps back up after pump-down. That means…", opts:["The gauge is happy","Liquid remains or an isolation valve is passing — investigate before opening","It is safe to open","Defrost is starting"], a:1, why:"Rising pressure is evidence the section is not clear or not isolated."},
+   {q:"Pump-down steps should come from where?", opts:["Memory","Your plant's written procedure for that system","The vendor's brochure","The last operator's habit"], a:1, why:"Sequence, targets, and isolation points are procedure-specific — follow the written steps."}]},
+{ id:"d3", title:"Oil Return", mins:5,
+  sections:[
+   {h:"Why oil does not come home by itself", p:"In ammonia systems, oil and refrigerant refuse to mix. Oil leaves the compressor as a fine carryover in the discharge gas, gets separated as well as the separator can manage, and whatever escapes settles in low, cold places. Unlike the systems some techs learn on, there is no suction-line ride home — ammonia vapor does not carry oil back in any useful amount."},
+   {h:"Oil return systems on separators", p:"Most screw and larger recip packages use an oil separator on the discharge, with a return line — often through a float or a timed/solenoid arrangement, sometimes using an eductor driven by discharge gas — that sends collected oil back to the compressor. When return fails, the pattern is classic: crankcase level falls while system low points fill up. Check the return line for a closed valve, a plugged strainer, or a failed float before blaming the compressor."},
+   {h:"The manual half of the system", p:"The rest of oil management is you: scheduled draining of low points — surge drums, coils, receivers, suction accumulators — into the oil pot, logged by location and amount. Trending matters. A drain point that normally gives a cup a week and suddenly gives a gallon is reporting a separator or return problem upstream."},
+   {h:"Symptoms of oil where it should not be", p:"Oil-logged evaporators show up as lost capacity with normal-looking pressures at first, then sagging suction. Oil in a surge drum fools level controls. Oil starvation at the compressor shows up as falling crankcase level, then noise and heat. Oil return is not housekeeping — it is capacity and compressor life."}],
+  watch:["Adding oil to the compressor for weeks without checking the separator return line.","Draining low points without logging amounts — you lose the trend that warns you.","Assuming a warm return line means oil is flowing; verify by level behavior."],
+  quiz:[
+   {q:"Why does oil fail to return naturally in ammonia systems?", opts:["Oil evaporates","Ammonia and oil do not mix, so oil settles out instead of riding the vapor home","Suction lines are too short","Oil is magnetic"], a:1, why:"Immiscibility is the whole problem — oil must be separated and drained deliberately."},
+   {q:"Crankcase level falls while low points keep yielding more oil. First suspects?", opts:["The condenser fans","The oil separator and its return line — closed valve, plugged strainer, failed float","The expansion valve","The room thermostat"], a:1, why:"That pattern is failed separation or return, not a thirsty compressor."},
+   {q:"What does an eductor-style return use to move oil?", opts:["A hand pump","Discharge gas pressure to draw oil back to the compressor","Gravity only","A magnet"], a:1, why:"Eductors use high-pressure gas to entrain oil and push it back to suction."},
+   {q:"Why log oil drained by location?", opts:["For billing","Trends reveal separator or return failures early","It is not useful","To fill the logbook"], a:1, why:"A sudden change in drained volume at a point is diagnostic information."},
+   {q:"Oil-logged evaporator symptoms include…", opts:["Higher capacity","Lost capacity and sagging suction pressure","Lower head pressure","Faster pull-down"], a:1, why:"Oil film insulates the coil — the plant loses capacity and suction suffers."}]},
+{ id:"d4", title:"Defrost", mins:6,
+  sections:[
+   {h:"Why coils grow frost", p:"Room moisture freezes onto any coil surface below freezing. Frost insulates and chokes airflow, so every low-temperature coil must defrost on a schedule matched to its load and humidity. The art is defrosting often enough to keep capacity, but not so often or so long that you cook product and waste energy melting ice you did not need to make."},
+   {h:"Hot gas defrost, step by step", p:"The common industrial method: the coil's liquid feed and suction stop, fans shut off, and hot discharge gas is admitted to the coil. Frost melts from the inside out. Condensed ammonia in the coil drains through a defrost relief/return path to the suction side — that path must be open and correctly regulated, or pressures in the coil spike. After melting, the coil equalizes, drains, and only then do fans restart — restart them too early and you blow water droplets all over the product."},
+   {h:"The pressures are real", p:"During defrost a coil becomes a small condenser. If its outlet is blocked or the relief path is shut, hot gas can push coil pressure toward discharge pressure fast. This is why defrost sequences, soft gas valves, and bleed procedures are engineered, and why hand-defrosting a coil by cracking valves from memory is one of the most dangerous improvisations in the industry."},
+   {h:"Judging a good defrost", p:"A good defrost ends with a clean coil, a dry pan, and minimal room temperature rise. Watch termination: time-only defrosts waste energy on clean coils and quit early on dirty ones; temperature-terminated defrosts end when the coil is actually clear. After defrost, expect a suction surge as the warm coil pulls down — a healthy system rides it without floodback."}],
+  watch:["Restarting fans immediately at defrost end and raining water on product.","Forcing a coil back into refrigeration while it is still pressurized with hot gas.","Ignoring a coil that needs manual attention every cycle — its sequence or relief path has a problem."],
+  quiz:[
+   {q:"In hot gas defrost, the coil temporarily acts as what?", opts:["A compressor","A condenser — hot gas gives up heat and liquefies as frost melts","An oil separator","A receiver"], a:1, why:"Hot gas condenses inside the frosted coil, releasing the heat that melts the ice."},
+   {q:"Why must the coil's defrost return/relief path be open?", opts:["To save time","So condensed liquid and pressure can escape — a blocked coil can spike toward discharge pressure","To drain oil","It does not matter"], a:1, why:"A sealed coil full of hot gas is a pressure hazard; the relief path is engineered protection."},
+   {q:"Fans restart immediately at the end of defrost. What happens?", opts:["Nothing","Water droplets blow off the wet coil onto product and floor","The coil freezes instantly","Head pressure drops"], a:1, why:"A short drip/delay period lets water drain before airflow resumes."},
+   {q:"Temperature-terminated defrost beats time-only because…", opts:["It is cheaper to install","It ends when the coil is actually clear — no wasted heat, no early quit","It runs longer always","It needs no sensors"], a:1, why:"Terminating on coil temperature matches defrost length to actual frost load."},
+   {q:"Right after defrost, the system should expect…", opts:["A suction surge as the warm coil pulls down","Zero load for an hour","A head pressure crash","Oil foaming"], a:0, why:"The warm coil boils hard at restart; controls and accumulators must handle the surge without floodback."}]},
+{ id:"d5", title:"Receivers and Surge Drums — The Deeper Cut", mins:6,
+  sections:[
+   {h:"Level is a process variable, not a gauge reading", p:"Beginners read levels; operators manage them. Receiver level should move predictably with load: charge migrates to the cold side as more evaporators come online, and returns as they shut down. Learn your plant's normal band for each season and load, and any level outside its story is a question: where did the ammonia go, or where did it come from?"},
+   {h:"Surge drum level control under the microscope", p:"In a recirculated system the drum level is held by a feed control — float, level column with probes, or a modulating valve. Hunting levels (swinging high-low) point to oversized feed, flashing in the feed line from lost subcooling, or a control tuned wrong. A drum that runs high during defrost termination is absorbing the returning slug by design — know the difference between a designed swing and a control failure."},
+   {h:"Carryover: the failure this vessel exists to prevent", p:"Liquid carryover from a surge drum happens when level runs too high, when a sudden load drop boils the drum violently (flashing lifts liquid), or when the return stream's velocity entrains droplets the drum cannot separate. Defenses: correct level, a drum sized with separation room, baffles/demisters in good shape, and suction accumulators as the last catch before the compressor. A compressor that has slugged once has told you the drum story was already wrong."},
+   {h:"Vessel safety details that matter", p:"Every vessel needs its relief protection in date and its discharge path unobstructed, liquid level indication you can trust, and isolation valves that actually close. Dual relief arrangements with a changeover valve must never isolate both valves at once. When you do rounds on vessels, you are checking: level believable, frost patterns normal, no valve stem leaks, relief tags current."}],
+  watch:["Normalizing a surge drum level that 'just runs high' — that is carryover waiting for a trigger.","Trusting level probes that have never been tested against a real glass.","Isolating a relief valve for service and forgetting the changeover position."],
+  quiz:[
+   {q:"Receiver level dropping as more evaporators load up is usually…", opts:["A leak, always","Normal charge migration to the cold side — level should follow a predictable story","A gauge failure","Overcharge"], a:1, why:"Charge shifts with load; the skill is knowing the normal pattern so abnormal stands out."},
+   {q:"A hunting (swinging) surge drum level often points to…", opts:["Perfect control","Oversized feed, flashing feed liquid, or poor control tuning","Low head pressure","A dirty condenser"], a:1, why:"Level oscillation is a control or feed problem, not a personality trait of the drum."},
+   {q:"A sudden load drop can cause carryover because…", opts:["The compressor speeds up","Pressure falls, liquid in the drum flashes and boils violently, lifting liquid toward suction","Oil foams","Fans stop"], a:1, why:"Flashing on pressure drop can entrain liquid — level and separation margin are the defenses."},
+   {q:"On a dual relief valve changeover arrangement, the rule is…", opts:["Close both for service","Never isolate both relief valves at the same time","Remove one permanently","It has no rule"], a:1, why:"One relief path must always protect the vessel — the changeover valve guarantees it if used correctly."},
+   {q:"Which is the last line of defense against liquid reaching the compressor?", opts:["The receiver","The suction accumulator","The condenser","The oil pot"], a:1, why:"The accumulator catches what the drum missed before vapor reaches the machine."}]},
+{ id:"d6", title:"Superheat and Subcooling", mins:6,
+  sections:[
+   {h:"Definitions with numbers attached", p:"Superheat: vapor temperature minus saturation temperature at the same pressure. Suction vapor at 10 psig measures 10°F with a thermometer: saturation at 10 psig is about -7°F, so superheat is 17°F — plenty dry. Subcooling: saturation temperature minus liquid temperature. Liquid at 166 psig (saturation 95°F) measuring 88°F has 7°F of subcooling — solid liquid, no flash gas."},
+   {h:"Where each one matters", p:"Superheat is the DX coil's control signal and the compressor's safety margin. Flooded and recirculated systems run near-zero superheat at the coil by design and rely on vessels, not superheat, for protection — do not chase DX numbers on a flooded coil. Subcooling matters wherever liquid must travel: long liquid lines, risers, and feeds to high coils all eat pressure, and subcooling is the cushion that keeps the stream liquid until the valve."},
+   {h:"Too much of a good thing", p:"Excess superheat on a DX coil means starved surface: the last part of the coil is just warming gas instead of boiling liquid, capacity falls, and discharge temperature climbs. Excess subcooling is rarely harmful but can hide an overcharge in systems that charge by subcooling. Read both numbers against the system type and the load, never against a universal 'right answer.'"},
+   {h:"Measuring honestly", p:"You need a real pressure and a real surface temperature at the same location, with the probe insulated from room air. A suction line thermometer reading room-influenced temperatures invents superheat that is not there. Clamp tight, insulate, let it settle, and do the subtraction with saturation from the chart — the same chart from the first deep dive lesson."}],
+  watch:["Setting superheat on a flooded coil like it was DX — different system, different rules.","Measuring temperature on a bare line in a warm engine room and trusting the result.","Judging charge by one number at one load; both values move with conditions."],
+  quiz:[
+   {q:"Suction vapor at 10 psig measures 10°F. Saturation at 10 psig is about -7°F. Superheat is…", opts:["3°F","7°F","17°F","-17°F"], a:2, why:"Superheat = actual vapor temp minus saturation temp: 10 - (-7) = 17°F."},
+   {q:"Liquid at 166 psig measures 88°F; saturation is 95°F. Subcooling is…", opts:["7°F","0°F","-7°F","88°F"], a:0, why:"Subcooling = saturation temp minus liquid temp: 95 - 88 = 7°F of solid-liquid cushion."},
+   {q:"Why do flooded systems not use superheat for compressor protection?", opts:["They run near-zero superheat by design and rely on vessels and accumulators","They have no suction lines","Superheat cannot be measured","They never flood back"], a:0, why:"Flooded coils boil to the outlet; separation vessels, not superheat, protect the machine."},
+   {q:"Excess superheat on a DX coil causes what?", opts:["Better capacity","Starved coil surface, lost capacity, and higher discharge temperature","Liquid floodback","Lower head pressure"], a:1, why:"Too much of the coil is warming gas instead of boiling liquid — capacity drops and discharge heats up."},
+   {q:"Subcooling protects liquid lines because…", opts:["It makes liquid heavier","It provides a cushion so pressure drops in the line do not flash liquid to gas before the valve","It raises head pressure","It cools the compressor"], a:1, why:"Flash gas before the expansion device starves the coil; subcooling prevents it."}]},
+{ id:"d7", title:"Floating Head Pressure", mins:5,
+  sections:[
+   {h:"The old habit: pinning head pressure high", p:"For decades, plants held head pressure artificially high year-round — condenser fans staged off, water throttled — because expansion devices and oil systems were assumed to need it. The cost: compressors squeezing vapor to 165+ psig in January when the weather would happily condense at 110 psig. Every extra psi of discharge pressure is power bought for nothing."},
+   {h:"Let it float with the wet bulb", p:"Floating head pressure control lets condensing temperature follow the weather down: fans and pumps run as needed to hold a setpoint tied to wet bulb plus an approach, instead of a fixed pressure. On a 40°F wet-bulb night, condensing near 55–65°F (roughly 80–100 psig) is realistic. The compressor ratio falls, discharge temperature falls, and capacity actually rises."},
+   {h:"The real limits", p:"Floating is not 'as low as possible.' Liquid feed devices need enough pressure difference to push liquid to the coils — hot gas defrost needs real discharge pressure, oil return eductors need differential, and some expansion valves lose control when starved of pressure drop. Every plant has a floor, found by knowing its devices. The skill is floating to the floor, not through it."},
+   {h:"Rough math worth remembering", p:"As a rule of thumb, each 1°F drop in condensing temperature saves roughly 1 to 1.5 percent of compressor energy. A plant that floats from 95°F condensing to 70°F on a cool night can cut compressor power by a quarter or more for those hours. Multiply by thousands of run-hours and floating head pressure becomes the cheapest capacity the plant owns."}],
+  watch:["Holding summer head pressure all winter out of habit.","Floating so low that liquid feed and defrost starve — know your plant's floor.","Judging condenser fans as 'wasting power' when their work saves ten times more at the compressor."],
+  quiz:[
+   {q:"Floating head pressure means…", opts:["Holding head pressure at one high setpoint all year","Letting condensing pressure follow the weather down to save compressor energy","Turning the condenser off","Floating the receiver on water"], a:1, why:"Condensing follows wet bulb instead of a fixed high setpoint — the compressor does less work."},
+   {q:"What sets the lower limit on floating?", opts:["Nothing — lower is always better","The needs of liquid feed devices, defrost, and oil return for pressure difference","The color of the condenser","Operator preference"], a:1, why:"Valves, defrost, and oil systems need differential pressure; every plant has a floor."},
+   {q:"Each 1°F drop in condensing temperature saves roughly how much compressor energy?", opts:["About 0.01 percent","About 1 to 1.5 percent","About 10 percent","Nothing measurable"], a:1, why:"Roughly 1–1.5 percent per degree — small drops across thousands of hours add up fast."},
+   {q:"On a cold night, a floating plant might condense near what pressure range?", opts:["180–200 psig","Roughly 80–100 psig","0 psig","300 psig"], a:1, why:"Cool wet bulb allows condensing near 55–65°F, which pairs with roughly 80–100 psig."},
+   {q:"Why did plants historically hold head pressure high?", opts:["To waste energy","Assumed expansion and oil systems needed the pressure difference — often more than they actually did","Ammonia requires 165 psig","Fans were unreliable"], a:1, why:"The habit came from device requirements that were real but usually set far above the true floor."}]},
+{ id:"d8", title:"System Energy and Efficiency", mins:5,
+  sections:[
+   {h:"Where the power actually goes", p:"Compressors eat 60–80 percent of a refrigeration plant's electric bill. Everything in this lesson is about shrinking their work: the compressor's job is defined by suction pressure (set by your coldest loads) and discharge pressure (set by condensing). Raise suction where the process allows, lower discharge wherever the weather allows, and the bill follows."},
+   {h:"Suction pressure is money", p:"Running a freezer at -25°F evaporating when the product only needs -15°F costs real power every hour — roughly 2–3 percent more energy per degree of unnecessary lift at low temperature. The usual culprits: frosted coils forcing lower suction, setpoints set by habit, and one small hot load dragging a whole suction group down. Sometimes the fix is a defrost schedule, not a bigger compressor."},
+   {h:"The supporting cast", p:"Evaporator fans in a freezer add their motor heat to the room — fan speed control on part load saves the fan power and the refrigeration to remove its heat, twice. Condenser fans and pumps, as covered in floating head pressure, spend a little to save a lot. Door discipline, infiltration, and insulation are unglamorous and enormous: every Btu that leaks in must be pumped back out at compressor rates."},
+   {h:"Measure like an operator", p:"Track kW per ton if your plant meters it, or at minimum trend discharge pressure, suction pressure, and compressor amps against load and weather. Efficiency work is detective work: two identical days with different power draw means something changed — a scaled condenser, a fouled coil, a valve passing. The operator who trends finds it first."}],
+  watch:["Solving a warm room by dropping suction setpoint before checking frost, fans, and doors.","Leaving evaporator fans at full speed in an empty, cold room.","Ignoring infiltration — an open dock door is a refrigeration load nobody ordered."],
+  quiz:[
+   {q:"What consumes most of a refrigeration plant's electricity?", opts:["Lighting","Compressors — typically 60 to 80 percent","Office computers","The water pump alone"], a:1, why:"Compression dominates the bill, so suction and discharge pressures are where efficiency lives."},
+   {q:"Running evaporating temperature lower than the product needs costs roughly…", opts:["Nothing","About 2 to 3 percent more energy per unnecessary degree at low temperature","Half the plant's power per degree","Only oil"], a:1, why:"Extra lift is paid for every run-hour — setpoints and clean coils are energy measures."},
+   {q:"Why do evaporator fan speed controls save twice?", opts:["They do not","Less fan power used, and less fan motor heat for the system to remove","Fans run hotter","They defrost faster"], a:1, why:"Fan motors dump their heat into the cold space — slowing them cuts both costs."},
+   {q:"Two identical-weather days show very different compressor power. Likely meaning?", opts:["The meter is bored","Something changed — scale, frost, a passing valve, or a new load — and it can be found","Power varies randomly","Nothing to investigate"], a:1, why:"Trending against load and weather turns energy into a diagnostic tool."},
+   {q:"Which is an efficiency fix, not a capacity purchase?", opts:["A bigger compressor","Fixing the defrost schedule so coils stop forcing suction down","Lowering every setpoint","Running all condenser fans always"], a:1, why:"Clean, correctly defrosted coils let suction float up — free efficiency with no new iron."}]}
+  ]
+}
+];
+/* ================= FROSTY TIPS ================= */
+var FROSTY_TIPS = [
+ {w:"Week 1", t:"Gauges don't lie, but they do gossip. Always ask what the saturation temperature should be before you believe a pressure."},
+ {w:"Week 2", t:"If you can smell it strong enough to make your eyes water, you're not being tough — you're being exposed. Back out and gear up."},
+ {w:"Week 3", t:"Ninety percent full. That's the line on every vessel, every time. Liquid needs room to grow, and steel doesn't stretch."},
+ {w:"Week 4", t:"A compressor knocking is a compressor screaming. Liquid belongs in coils and vessels, not in cylinders."},
+ {w:"Week 5", t:"Write it in the log like the next operator is a stranger — because at 3 a.m., half-asleep, he basically is."},
+ {w:"Week 6", t:"Frost on a coil is a blanket, not a badge of honor. A coil wearing a parka can't do its job."},
+ {w:"Week 7", t:"Oil goes downhill and stays there. If you never drain the low points, the low points become the oil pan."},
+ {w:"Week 8", t:"Your nose quits on you after a few minutes in a leak. Smell fatigue is real. Trust instruments, not nostrils."},
+ {w:"Week 9", t:"Head pressure high on a cool day? The condenser is telling on itself. Look for scale, dead sprays, and lazy fans."},
+ {w:"Week 10", t:"Never trap liquid between two closed valves. Sun comes out, pressure goes up, and something expensive becomes the relief valve."},
+ {w:"Week 11", t:"Defrost isn't done when the timer says so. It's done when the coil is clean and the pan is drained."},
+ {w:"Week 12", t:"The king valve. Know where it is, know it works, know you can get to it with gloves on. Today, not during the emergency."},
+ {w:"Week 13", t:"A gauge glass that never changes is a gauge glass that's lying. Check the little valves before you trust the big one."},
+ {w:"Week 14", t:"Slow is smooth and smooth is safe. Crack the drain, don't crank it. Oil first, ammonia means stop."},
+ {w:"Week 15", t:"If the procedure and the plant disagree, the answer is paperwork, not freelancing. Redline it and get it fixed."},
+ {w:"Week 16", t:"Suction pressure is your paycheck. Every psi you lose in a strainer or a half-closed valve is money the compressor earns back the hard way."},
+ {w:"Week 17", t:"Rescue rule: two victims help nobody. Sound the alarm and let the geared-up crew make the entry."},
+ {w:"Week 18", t:"Air in the system is a freeloader — it raises head pressure and does zero work. Purge it at the purge points, nowhere else."},
+ {w:"Week 19", t:"New sound, new leak, new trend — report it the shift you find it. Small news travels cheap. Big news travels expensive."},
+ {w:"Week 20", t:"Cold rooms and open doors are enemies. Every minute a dock door hangs open, the compressors pay the bill."},
+ {w:"Week 21", t:"Superheat is a promise that the compressor gets vapor only. Break that promise and the compressor collects — in parts."},
+ {w:"Week 22", t:"Eyewash stations don't move. If you can't walk to one with your eyes shut, practice until you can."},
+ {w:"Week 23", t:"Temporary fixes need expiration dates. A jumper with no end date is just a change nobody reviewed."},
+ {w:"Week 24", t:"Respect the gas, check the oil, read the gauges, write the log. Do those four and you'll outlast every shortcut artist in the plant."}
+];
+/* ================= STATE ================= */
+var LS_KEY = "taf-operator-training-v1";
+var state = { done:{}, best:{} };
+try {
+  var raw = localStorage.getItem(LS_KEY);
+  if (raw) { var parsed = JSON.parse(raw); if (parsed && parsed.done) state = parsed; }
+} catch(e) {}
+function saveState(){ try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch(e){} }
+
+var ALL_LESSONS = [];
+COURSES.forEach(function(c){ c.lessons.forEach(function(l){ ALL_LESSONS.push({course:c, lesson:l}); }); });
+function totalLessons(){ return ALL_LESSONS.length; }
+function doneCount(){ return ALL_LESSONS.filter(function(x){ return state.done[x.lesson.id]; }).length; }
+function courseDone(course){ return course.lessons.filter(function(l){ return state.done[l.id]; }).length; }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+
+/* ================= NAVIGATION ================= */
+var currentTab = "home";
+var currentLesson = null;
+function showTab(tab){
+  currentTab = tab;
+  ["home","courses","quizbank","frosty"].forEach(function(t){
+    document.getElementById("view-"+t).classList.toggle("active", t===tab);
+  });
+  document.getElementById("view-lesson").classList.remove("active");
+  document.querySelectorAll(".tabbar button").forEach(function(b){
+    b.classList.toggle("active", b.getAttribute("data-tab")===tab);
+  });
+  if (tab==="home") renderHome();
+  if (tab==="courses") renderCourses();
+  if (tab==="frosty") renderFrosty();
+  window.scrollTo(0,0);
+}
+document.querySelectorAll(".tabbar button").forEach(function(b){
+  b.addEventListener("click", function(){ showTab(b.getAttribute("data-tab")); });
+});
+document.querySelectorAll("[data-goto]").forEach(function(b){
+  b.addEventListener("click", function(){ showTab(b.getAttribute("data-goto")); });
+});
+
+/* ================= HOME ================= */
+var BADGES = [
+ {id:"first", icon:"\u2605", name:"First Lesson Done", test:function(){ return doneCount()>=1; }},
+ {id:"half", icon:"\u25D5", name:"Halfway There", test:function(){ return doneCount()>=Math.ceil(totalLessons()/2); }},
+ {id:"beg", icon:"\u2713", name:"All Beginner Done", test:function(){ return courseDone(COURSES[0])===COURSES[0].lessons.length; }},
+ {id:"psm", icon:"\u2696", name:"PSM Complete", test:function(){ return courseDone(COURSES[1])===COURSES[1].lessons.length; }},
+ {id:"deep", icon:"\u2699", name:"Deep Dive Complete", test:function(){ return courseDone(COURSES[2])===COURSES[2].lessons.length; }}
+];
+function renderHome(){
+  var total = totalLessons(), done = doneCount();
+  var pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById("ringPct").textContent = pct + "%";
+  document.getElementById("ringFg").style.strokeDashoffset = (314.16 * (1 - done/total)).toFixed(1);
+  document.getElementById("ringText").textContent = done + " of " + total + " lessons passed. A lesson counts when you score 4 out of 5 or better on its quiz.";
+  var next = ALL_LESSONS.filter(function(x){ return !state.done[x.lesson.id]; })[0];
+  var btn = document.getElementById("continueBtn");
+  if (next) { btn.textContent = done===0 ? "Start learning" : "Continue: " + next.lesson.title; btn.disabled = false; }
+  else { btn.textContent = "All lessons passed — nice work"; btn.disabled = true; }
+  btn.onclick = function(){ if (next) openLesson(next.course.id, next.lesson.id); };
+  var br = document.getElementById("badgeRow"); br.innerHTML = "";
+  BADGES.forEach(function(bd){
+    var on = bd.test();
+    var d = document.createElement("div"); d.className = "badge" + (on ? " on" : "");
+    d.innerHTML = "<span class='bic'>" + bd.icon + "</span><b>" + esc(bd.name) + "</b><span>" + (on ? "Earned" : "Locked") + "</span>";
+    br.appendChild(d);
+  });
+  var hc = document.getElementById("homeCourses"); hc.innerHTML = "";
+  COURSES.forEach(function(c){ hc.appendChild(courseCard(c, true)); });
+}
+function courseCard(c, gotoCourses){
+  var d = courseDone(c), t = c.lessons.length, pct = t ? Math.round(d/t*100) : 0;
+  var el = document.createElement("button"); el.className = "coursecard"; el.type = "button";
+  el.innerHTML = "<h3>" + esc(c.title) + "</h3><p>" + esc(c.desc) + "</p>" +
+    "<div class='bar'><i style='width:" + pct + "%'></i></div>" +
+    "<div class='barlabel'>" + d + " of " + t + " lessons passed</div>";
+  el.addEventListener("click", function(){ showTab("courses"); setTimeout(function(){ var a=document.getElementById("course-"+c.id); if(a) a.scrollIntoView({block:"start"}); }, 30); });
+  return el;
+}
+document.getElementById("resetBtn").addEventListener("click", function(){
+  var box = document.getElementById("resetBtn");
+  if (box.getAttribute("data-confirm") === "1") {
+    state = { done:{}, best:{} }; saveState(); box.textContent = "Reset all progress"; box.removeAttribute("data-confirm");
+    renderHome(); startQuizBank();
+  } else {
+    box.setAttribute("data-confirm","1"); box.textContent = "Tap again to confirm reset";
+    setTimeout(function(){ box.textContent = "Reset all progress"; box.removeAttribute("data-confirm"); }, 3500);
+  }
+});
+
+/* ================= COURSES ================= */
+function renderCourses(){
+  var wrap = document.getElementById("courseList"); wrap.innerHTML = "";
+  COURSES.forEach(function(c){
+    var head = document.createElement("div"); head.id = "course-" + c.id;
+    var d = courseDone(c), t = c.lessons.length, pct = t ? Math.round(d/t*100) : 0;
+    head.innerHTML = "<h3 style='font-size:18px;margin:18px 0 3px'>" + esc(c.title) + "</h3>" +
+      "<p style='color:var(--muted);font-size:13.5px;margin:0 0 8px'>" + esc(c.desc) + "</p>" +
+      "<div class='bar'><i style='width:" + pct + "%'></i></div>" +
+      "<div class='barlabel' style='margin-bottom:12px'>" + d + " of " + t + " lessons passed</div>";
+    wrap.appendChild(head);
+    c.lessons.forEach(function(l, i){
+      var done = !!state.done[l.id];
+      var row = document.createElement("button"); row.type = "button";
+      row.className = "lessonrow" + (done ? " done" : "");
+      row.innerHTML = "<span class='num'>" + (done ? "\u2713" : (i+1)) + "</span>" +
+        "<span class='lt'><b>" + esc(l.title) + "</b><span>About " + l.mins + " min read + 5-question quiz" +
+        (state.best[l.id] !== undefined ? " \u00B7 Best score " + state.best[l.id] + "/5" : "") + "</span></span>" +
+        "<span class='chev'>\u203A</span>";
+      row.addEventListener("click", function(){ openLesson(c.id, l.id); });
+      wrap.appendChild(row);
+    });
+  });
+}
+
+/* ================= LESSON PAGE + QUIZ ================= */
+var quizState = null;
+function openLesson(courseId, lessonId){
+  var course = COURSES.filter(function(c){ return c.id===courseId; })[0];
+  var lesson = course.lessons.filter(function(l){ return l.id===lessonId; })[0];
+  currentLesson = { course: course, lesson: lesson };
+  ["home","courses","quizbank","frosty"].forEach(function(t){ document.getElementById("view-"+t).classList.remove("active"); });
+  document.querySelectorAll(".tabbar button").forEach(function(b){ b.classList.toggle("active", b.getAttribute("data-tab")==="courses"); });
+  document.getElementById("view-lesson").classList.add("active");
+  var body = document.getElementById("lessonBody");
+  var html = "<div class='lessontitle'>" + esc(lesson.title) + "</div>" +
+    "<div class='lessonmeta'>" + esc(course.title) + " \u00B7 About " + lesson.mins + " min" +
+    (state.done[lesson.id] ? " \u00B7 \u2713 Passed" : "") + "</div>";
+  lesson.sections.forEach(function(s){
+    html += "<div class='sect'><h3>" + esc(s.h) + "</h3><p>" + esc(s.p) + "</p></div>";
+  });
+  html += "<div class='watchbox'><h3>\u26A0 What to watch for</h3><ul>";
+  lesson.watch.forEach(function(w){ html += "<li>" + esc(w) + "</li>"; });
+  html += "</ul></div>";
+  html += "<div class='quizhead'>Lesson quiz</div><p class='quizsub'>Five questions. Score 4 or 5 to pass — retake as many times as you need. Tap an answer to check it right away.</p>";
+  html += "<div id='quizArea'></div><div id='quizResult'></div>";
+  body.innerHTML = html;
+  quizState = { answers: {}, total: lesson.quiz.length };
+  renderQuizInto(document.getElementById("quizArea"), lesson.quiz, "L", function(){ finishLessonQuiz(lesson); });
+  window.scrollTo(0,0);
+}
+document.getElementById("lessonBack").addEventListener("click", function(){ showTab("courses"); });
+
+function renderQuizInto(container, questions, prefix, onDone){
+  container.innerHTML = "";
+  questions.forEach(function(q, qi){
+    var card = document.createElement("div"); card.className = "qcard";
+    var letters = ["A","B","C","D"];
+    var html = "<div class='qnum'>Question " + (qi+1) + " of " + questions.length + "</div><div class='qq'>" + esc(q.q) + "</div>";
+    q.opts.forEach(function(o, oi){ html += "<button type='button' class='opt' data-q='" + qi + "' data-o='" + oi + "'><span class='ol'>" + letters[oi] + "</span><span>" + esc(o) + "</span></button>"; });
+    html += "<div class='feedback' id='" + prefix + "-fb-" + qi + "'></div>";
+    card.innerHTML = html;
+    container.appendChild(card);
+  });
+  container.querySelectorAll(".opt").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var qi = parseInt(btn.getAttribute("data-q"), 10), oi = parseInt(btn.getAttribute("data-o"), 10);
+      var key = prefix + "-" + qi;
+      if (quizState.answers[key] !== undefined) return;
+      var q = questions[qi];
+      quizState.answers[key] = (oi === q.a);
+      var card = btn.parentElement;
+      card.querySelectorAll(".opt").forEach(function(b){
+        b.disabled = true;
+        var bo = parseInt(b.getAttribute("data-o"), 10);
+        if (bo === q.a) b.classList.add("correct");
+        else if (bo === oi) b.classList.add("wrong");
+      });
+      var fb = document.getElementById(prefix + "-fb-" + qi);
+      fb.className = "feedback show " + (oi === q.a ? "ok" : "no");
+      fb.textContent = (oi === q.a ? "\u2713 Correct. " : "\u2717 Not quite. ") + q.why;
+      var answered = Object.keys(quizState.answers).filter(function(k){ return k.indexOf(prefix + "-") === 0; }).length;
+      if (answered === questions.length) onDone();
+    });
+  });
+}
+function quizScore(prefix, total){
+  var s = 0;
+  for (var i = 0; i < total; i++) if (quizState.answers[prefix + "-" + i]) s++;
+  return s;
+}
+function finishLessonQuiz(lesson){
+  var score = quizScore("L", lesson.quiz.length);
+  var passed = score >= 4;
+  if (state.best[lesson.id] === undefined || score > state.best[lesson.id]) state.best[lesson.id] = score;
+  if (passed) state.done[lesson.id] = true;
+  saveState();
+  var box = document.getElementById("quizResult");
+  box.innerHTML = "<div class='resultbox'><div class='big'>" + score + " / 5</div>" +
+    (passed ? "<p class='passline'>Passed — lesson marked complete. \u2713</p>" : "<p class='failline'>Not yet — you need 4 of 5. Review the lesson and retake the quiz.</p>") +
+    "<p><button class='btn ghost' id='retakeBtn'>Retake quiz</button> &nbsp; <button class='btn' id='backCoursesBtn'>Back to courses</button></p></div>";
+  document.getElementById("retakeBtn").addEventListener("click", function(){ openLesson(currentLesson.course.id, lesson.id); });
+  document.getElementById("backCoursesBtn").addEventListener("click", function(){ showTab("courses"); });
+  box.scrollIntoView({ behavior:"smooth", block:"center" });
+}
+
+/* ================= QUIZ BANK ================= */
+var bankQuestions = [];
+function startQuizBank(){
+  var pool = [];
+  ALL_LESSONS.forEach(function(x){ x.lesson.quiz.forEach(function(q){ pool.push({ q: q, from: x.lesson.title }); }); });
+  for (var i = pool.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = pool[i]; pool[i] = pool[j]; pool[j] = t; }
+  bankQuestions = pool.slice(0, 20);
+  quizState = { answers: {}, total: bankQuestions.length };
+  var body = document.getElementById("quizBankBody");
+  body.innerHTML = "<p style='color:var(--muted);font-size:14px;margin:0 0 14px'>20 questions drawn at random from all 30 lessons. Tap an answer for instant feedback. Your missed questions are listed at the end so you know what to review.</p><div id='bankArea'></div><div id='bankResult'></div>";
+  renderQuizInto(document.getElementById("bankArea"), bankQuestions.map(function(x){ return x.q; }), "B", finishQuizBank);
+}
+function finishQuizBank(){
+  var score = quizScore("B", bankQuestions.length);
+  var missed = [];
+  bankQuestions.forEach(function(x, i){ if (!quizState.answers["B-" + i]) missed.push(x); });
+  var html = "<div class='resultbox'><div class='big'>" + score + " / 20</div><p>" +
+    (score >= 16 ? "<span class='passline'>Strong work — that is exam-room ready.</span>" : score >= 12 ? "Solid. Review the misses below and run it again." : "Good reps. Review the misses below, revisit those lessons, and run it again.") + "</p>" +
+    "<p><button class='btn' id='bankAgain'>New 20 questions</button></p></div>";
+  if (missed.length) {
+    html += "<h3 style='font-size:16px;margin:14px 0 10px'>Questions you missed (" + missed.length + ")</h3>";
+    missed.forEach(function(x){
+      html += "<div class='misseditem'><b>" + esc(x.q.q) + "</b><br><span style='color:var(--muted)'>From: " + esc(x.from) + "</span><br><span class='ca'>Correct answer: " + esc(x.q.opts[x.q.a]) + "</span><br>" + esc(x.q.why) + "</div>";
+    });
+  } else {
+    html += "<p class='passline' style='text-align:center'>Perfect run — nothing missed.</p>";
+  }
+  var box = document.getElementById("bankResult");
+  box.innerHTML = html;
+  document.getElementById("bankAgain").addEventListener("click", function(){ startQuizBank(); window.scrollTo(0,0); });
+  box.scrollIntoView({ behavior:"smooth", block:"start" });
+}
+
+/* ================= FROSTY ================= */
+function renderFrosty(){
+  var wrap = document.getElementById("frostyList"); wrap.innerHTML = "";
+  FROSTY_TIPS.forEach(function(t){
+    var d = document.createElement("div"); d.className = "tipcard";
+    d.innerHTML = "<div class='twhen'>" + esc(t.w) + " \u00B7 Frosty Says</div><p>\u201C" + esc(t.t) + "\u201D</p><div class='sig'>— Frosty, shop mascot</div>";
+    wrap.appendChild(d);
+  });
+}
+
+/* ================= INIT ================= */
+renderHome();
+startQuizBank();
+renderFrosty();
+</script>
+</body>
+</html>
