@@ -593,6 +593,7 @@ document.querySelectorAll(".tabbar button").forEach(function(btn){
 
 /* ---------- export: real Excel workbook (.xlsx), CSV fallback ---------- */
 function downloadBlob(blob, filename){
+  if(window.__plannerNativeDownload){ window.__plannerNativeDownload(blob, filename); return; }
   var a=document.createElement("a");
   a.href=URL.createObjectURL(blob);
   a.download=filename;
@@ -766,6 +767,54 @@ function schedule(){
 window.addEventListener("load", function(){ setTimeout(schedule, 1500); });
 document.addEventListener("visibilitychange", function(){ if(!document.hidden) schedule(); });
 setInterval(schedule, 5*60*1000);
+})();
+
+</script>
+
+<script>
+/* Weekly Planner native export bridge.
+   Injected at packaging time into the native (Capacitor) builds only.
+   In the installed iPhone/Android app a plain <a download> click does
+   nothing, so the app's downloadBlob() hands the file to this hook
+   instead: the file is written to the device's Documents folder and the
+   system share sheet is opened, so it can be saved to Files, emailed,
+   or opened in Excel. No server, no upload, nothing leaves the phone
+   except through the share sheet the user taps.
+   No-ops completely in a plain browser (no window.Capacitor). */
+(function(){
+"use strict";
+function showToast(msg){
+  var t=document.getElementById("toast");
+  if(!t) return;
+  t.textContent=msg; t.classList.add("show");
+  setTimeout(function(){ t.classList.remove("show"); t.textContent="Saved on this phone"; },3000);
+}
+function plugins(){
+  if(!window.Capacitor) return null;
+  var P=window.Capacitor.Plugins||{};
+  if(P.Filesystem&&P.Share) return P;
+  if(window.Capacitor.registerPlugin){
+    try{
+      return {Filesystem:window.Capacitor.registerPlugin("Filesystem"), Share:window.Capacitor.registerPlugin("Share")};
+    }catch(e){ return null; }
+  }
+  return null;
+}
+window.__plannerNativeDownload=function(blob, filename){
+  var P=plugins();
+  if(!P){ showToast("Export is not available in this app yet"); return; }
+  var reader=new FileReader();
+  reader.onload=function(){
+    var dataUrl=reader.result||"";
+    var base64=String(dataUrl).split(",")[1]||"";
+    P.Filesystem.writeFile({path:filename, data:base64, directory:"DOCUMENTS", recursive:true})
+      .then(function(res){ return P.Share.share({title:filename, url:res.uri, dialogTitle:"Save or share "+filename}); })
+      .then(function(){ showToast("Saved — pick where to send it"); })
+      .catch(function(){ showToast("Saved to Files — look in Documents"); });
+  };
+  reader.onerror=function(){ showToast("Could not read the file to save it"); };
+  reader.readAsDataURL(blob);
+};
 })();
 
 </script>
