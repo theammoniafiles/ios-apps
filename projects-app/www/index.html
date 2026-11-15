@@ -147,6 +147,8 @@
       .chip.done{ color:#a9ecc9; background:var(--green-bg); border-color:rgba(67,214,138,.4); }
       .chip.blocked{ color:#ffb3ab; background:var(--red-bg); border-color:rgba(255,107,94,.4); }
       .chip.prog{ color:var(--ice); background:rgba(111,177,232,.14); }
+      .chip.cap{ color:#ffd9a0; background:var(--amber-bg); border-color:rgba(255,182,72,.4); }
+      .chip.exp{ color:var(--ice); background:rgba(111,177,232,.14); }
       .due-overdue{ color:var(--red); font-weight:700; }
       .due-soon{ color:var(--amber); font-weight:600; }
 
@@ -228,6 +230,7 @@
       .forecast-kv{ display:grid; grid-template-columns:1fr 1fr; gap:8px 14px; margin-top:10px; }
       .forecast-kv .k{ font-size:12px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.06em; font-weight:600; }
       .forecast-kv .v{ font-family:"Barlow Mono", monospace; font-size:16.5px; font-weight:600; margin-top:1px; }
+      .forecast-sub{ font-size:12.5px; color:var(--ink-dim); margin-top:2px; font-family:"Barlow", sans-serif; font-weight:400; }
       select.quarter-picker{ min-height:50px; font-size:17px; font-weight:600; }
 
       /* ---------- detail view ---------- */
@@ -337,7 +340,7 @@
         <h2 class="sec">By project <span class="count" id="forecastProjCount"></span></h2>
         <div id="forecastList"></div>
         <button class="btn primary block" id="forecastDownload" style="margin-top:16px;">⬇ Download quarterly forecast report</button>
-        <p class="hint" style="margin-top:12px;">Forecast for the quarter = costs already logged in that quarter plus an equal share of each project's remaining budget for every open task due that quarter. Overdue open tasks count toward the current quarter, and open tasks with no due date count toward the quarter of the project's latest open due date (or the current quarter if none). Projected total at completion is estimated from spend so far versus the share of tasks done, so a project burning budget faster than it finishes tasks projects over budget. Projected completion is the latest due date among open tasks.</p>
+        <p class="hint" style="margin-top:12px;">Forecast for the quarter = costs already logged in that quarter plus an equal share of each project's remaining budget for every open task due that quarter. Overdue open tasks count toward the current quarter, and open tasks with no due date count toward the quarter of the project's latest open due date (or the current quarter if none). Projected total at completion is estimated from spend so far versus the share of tasks done, so a project burning budget faster than it finishes tasks projects over budget. Projected completion is the latest due date among open tasks. Every forecast is split into Capital and Expense, each run from its own budget and logged costs, so a project can be over on one and under on the other.</p>
         <p class="privacy-note">Forecasts are calculated on this device from your projects, tasks, and logged costs. Nothing is uploaded or shared — the report only leaves this phone when you download it yourself.</p>
       </section>
 
@@ -370,6 +373,34 @@
       var raw = localStorage.getItem(KEY);
       if (raw) { var parsed = JSON.parse(raw); if (parsed && Array.isArray(parsed.projects)) state = parsed; }
     } catch (e) { /* start empty */ }
+
+    /* ================= expense vs capital ================= */
+    var CAPITAL_TYPES = ["Capital Project", "Equipment Install", "Remodel"];
+    function isCapitalType(type) { return CAPITAL_TYPES.indexOf(type) !== -1; }
+    function projBudget(p) { return (Number(p.capitalBudget) || 0) + (Number(p.expenseBudget) || 0); }
+    function kindBudget(p, kind) { return kind === "capital" ? (Number(p.capitalBudget) || 0) : (Number(p.expenseBudget) || 0); }
+    function costKind(c, p) {
+      if (c.kind === "capital" || c.kind === "expense") return c.kind;
+      return isCapitalType(p.type) ? "capital" : "expense";
+    }
+    function projSpentByKind(p, kind) {
+      return p.costs.reduce(function (a, c) { return a + (costKind(c, p) === kind ? (Number(c.amount) || 0) : 0); }, 0);
+    }
+    function kindPct(p, kind) {
+      var b = kindBudget(p, kind), s = projSpentByKind(p, kind);
+      return b > 0 ? Math.round(s / b * 100) : (s > 0 ? 100 : 0);
+    }
+    /* one-time migration: projects saved with the old single `budget` get it
+       split by project type. The old `budget` field is left untouched. */
+    state.projects.forEach(function (p) {
+      if (typeof p.capitalBudget !== "number" || typeof p.expenseBudget !== "number") {
+        var oldB = Number(p.budget) || 0;
+        if (isCapitalType(p.type)) { p.capitalBudget = oldB; p.expenseBudget = 0; }
+        else { p.expenseBudget = oldB; p.capitalBudget = 0; }
+      }
+      p.capitalBudget = Number(p.capitalBudget) || 0;
+      p.expenseBudget = Number(p.expenseBudget) || 0;
+    });
 
     function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
     function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
@@ -483,13 +514,17 @@
     }
 
     /* ================= shared bits ================= */
-    function budgetBarHTML(p) {
-      var spent = projSpent(p), total = Number(p.budget) || 0;
-      var pct = total > 0 ? Math.round(spent / total * 100) : (spent > 0 ? 100 : 0);
+    function kindBarHTML(p, kind) {
+      var budget = kindBudget(p, kind), spent = projSpentByKind(p, kind);
+      var pct = kindPct(p, kind);
       var cls = pct > 90 ? "over" : (pct >= 75 ? "warn" : "");
+      var label = kind === "capital" ? "Capital" : "Expense";
       return "<div class='bar'><i class='" + cls + "' style='width:" + Math.min(pct, 100) + "%'></i></div>" +
-        "<div class='bar-label'><span>Spent <b class='money'>" + money(spent) + "</b> of <b class='money'>" + money(total) + "</b></span>" +
+        "<div class='bar-label'><span>" + label + " spent <b class='money'>" + money(spent) + "</b> of <b class='money'>" + money(budget) + "</b></span>" +
         "<span class='pct'>" + pct + "%</span></div>";
+    }
+    function budgetBarHTML(p) {
+      return kindBarHTML(p, "capital") + kindBarHTML(p, "expense");
     }
     function progressBarHTML(p) {
       var pct = projProgress(p);
@@ -594,7 +629,7 @@
     function renderDashboard() {
       var totalBudget = 0, totalSpent = 0, totalOverdue = 0, totalOpen = 0;
       state.projects.forEach(function (p) {
-        totalBudget += Number(p.budget) || 0; totalSpent += projSpent(p);
+        totalBudget += projBudget(p); totalSpent += projSpent(p);
         totalOverdue += overdueTasks(p).length;
         totalOpen += p.tasks.filter(function (t) { return t.status !== "Done"; }).length;
       });
@@ -672,7 +707,7 @@
     /* ================= budget tab ================= */
     function renderBudget() {
       var totalBudget = 0, totalSpent = 0;
-      state.projects.forEach(function (p) { totalBudget += Number(p.budget) || 0; totalSpent += projSpent(p); });
+      state.projects.forEach(function (p) { totalBudget += projBudget(p); totalSpent += projSpent(p); });
       var pct = totalBudget > 0 ? Math.round(totalSpent / totalBudget * 100) : 0;
       $("budgetSummary").innerHTML =
         "<div class='stat-grid'>" +
@@ -727,16 +762,15 @@
       opts.sort();
       return opts;
     }
-    function forecastForProject(p, qv) {
+    function forecastForKind(p, qv, kind) {
       var q = parseQuarterValue(qv);
-      var budget = Number(p.budget) || 0;
-      var spent = projSpent(p);
+      var budget = kindBudget(p, kind);
+      var spent = projSpentByKind(p, kind);
       var remaining = budget - spent;
       var loggedInQ = p.costs.reduce(function (a, c) {
-        return a + (c.date && c.date >= q.start && c.date <= q.end ? (Number(c.amount) || 0) : 0);
+        return a + (costKind(c, p) === kind && c.date && c.date >= q.start && c.date <= q.end ? (Number(c.amount) || 0) : 0);
       }, 0);
       var open = p.tasks.filter(function (t) { return t.status !== "Done"; });
-      /* latest open due date -> projected completion + fallback quarter for undated tasks */
       var latestDue = null;
       open.forEach(function (t) { if (t.due && (!latestDue || t.due > latestDue)) latestDue = t.due; });
       var futureInQ = 0;
@@ -763,18 +797,36 @@
       else if (doneTasks > 0) projectedTotal = budget;
       else projectedTotal = Math.max(budget, spent);
       if (spent > projectedTotal) projectedTotal = spent;
+      var over = budget > 0 ? projectedTotal > budget + 0.005 : projectedTotal > 0.005;
+      return {
+        kind: kind, budget: budget, spent: spent, remaining: remaining,
+        loggedInQ: loggedInQ, futureInQ: futureInQ, forecast: forecast,
+        projectedTotal: projectedTotal,
+        over: over, variance: budget - projectedTotal
+      };
+    }
+    function forecastForProject(p, qv) {
+      var cap = forecastForKind(p, qv, "capital");
+      var exp = forecastForKind(p, qv, "expense");
+      var open = p.tasks.filter(function (t) { return t.status !== "Done"; });
+      /* projected completion is the latest due date among open tasks */
+      var latestDue = null;
+      open.forEach(function (t) { if (t.due && (!latestDue || t.due > latestDue)) latestDue = t.due; });
       var projectedCompletion = latestDue;
       if (!projectedCompletion && !open.length) {
         var allDue = null;
         p.tasks.forEach(function (t) { if (t.due && (!allDue || t.due > allDue)) allDue = t.due; });
         projectedCompletion = allDue || p.target || null;
       }
-      var over = budget > 0 ? projectedTotal > budget + 0.005 : projectedTotal > 0.005;
+      var budget = cap.budget + exp.budget, spent = cap.spent + exp.spent;
+      var projectedTotal = cap.projectedTotal + exp.projectedTotal;
       return {
-        project: p, budget: budget, spent: spent, remaining: remaining,
-        loggedInQ: loggedInQ, futureInQ: futureInQ, forecast: forecast,
+        project: p, capital: cap, expense: exp,
+        budget: budget, spent: spent, remaining: budget - spent,
+        loggedInQ: cap.loggedInQ + exp.loggedInQ, futureInQ: cap.futureInQ + exp.futureInQ,
+        forecast: cap.forecast + exp.forecast,
         projectedTotal: projectedTotal, projectedCompletion: projectedCompletion,
-        over: over, variance: budget - projectedTotal
+        over: cap.over || exp.over, variance: budget - projectedTotal
       };
     }
     function renderForecast() {
@@ -787,18 +839,23 @@
       sel.value = selectedQuarter;
       var q = parseQuarterValue(selectedQuarter);
       var rows = state.projects.map(function (p) { return forecastForProject(p, selectedQuarter); });
-      var tForecast = 0, tBudget = 0, tSpent = 0;
-      rows.forEach(function (r) { tForecast += r.forecast; tBudget += r.budget; tSpent += r.spent; });
+      var tForecast = 0, tBudget = 0, tSpent = 0, tCapForecast = 0, tExpForecast = 0;
+      rows.forEach(function (r) { tForecast += r.forecast; tBudget += r.budget; tSpent += r.spent; tCapForecast += r.capital.forecast; tExpForecast += r.expense.forecast; });
       var overRows = rows.filter(function (r) { return r.over; });
       var html = "<div class='stat-grid'>" +
         "<div class='stat'><div class='v money'>" + money(tForecast) + "</div><div class='k'>Forecast spend — " + esc(q.label) + "</div></div>" +
+        "<div class='stat'><div class='v money'>" + money(tCapForecast) + "</div><div class='k'>Capital forecast — " + esc(q.label) + "</div></div>" +
+        "<div class='stat'><div class='v money'>" + money(tExpForecast) + "</div><div class='k'>Expense forecast — " + esc(q.label) + "</div></div>" +
         "<div class='stat'><div class='v money'>" + money(tBudget) + "</div><div class='k'>Total budget — all projects</div></div>" +
         "<div class='stat'><div class='v money'>" + money(tSpent) + "</div><div class='k'>Total spent to date</div></div>" +
         "<div class='stat'><div class='v money'>" + money(tBudget - tSpent) + "</div><div class='k'>Total remaining</div></div>" +
         "</div>";
       if (overRows.length) {
         html += "<div class='over-flag'>⚠ Projected over budget: " + overRows.map(function (r) {
-          return esc(r.project.name) + " (" + money(r.projectedTotal) + " projected vs " + money(r.budget) + " budget)";
+          var bits = [];
+          if (r.capital.over) bits.push("Capital " + money(r.capital.projectedTotal) + " vs " + money(r.capital.budget));
+          if (r.expense.over) bits.push("Expense " + money(r.expense.projectedTotal) + " vs " + money(r.expense.budget));
+          return esc(r.project.name) + " (" + bits.join(" · ") + ")";
         }).join(" · ") + "</div>";
       }
       $("forecastSummary").innerHTML = html;
@@ -810,16 +867,24 @@
       }
       box.innerHTML = rows.map(function (r) {
         var p = r.project;
+        var overBits = [];
+        if (r.capital.over) overBits.push("Capital by " + money(r.capital.projectedTotal - r.capital.budget));
+        if (r.expense.over) overBits.push("Expense by " + money(r.expense.projectedTotal - r.expense.budget));
         return "<div class='card'><div class='card-head'><span class='card-title'>" + esc(p.name) + "</span><span class='type-tag'>" + esc(p.type) + "</span></div>" +
           "<div class='forecast-kv'>" +
-          "<div><div class='k'>Forecast — " + esc(q.label) + "</div><div class='v'>" + money(r.forecast) + "</div></div>" +
-          "<div><div class='k'>Spent to date</div><div class='v'>" + money(r.spent) + "</div></div>" +
-          "<div><div class='k'>Budget</div><div class='v'>" + money(r.budget) + "</div></div>" +
-          "<div><div class='k'>Remaining budget</div><div class='v" + (r.remaining < 0 ? " over-budget" : "") + "'>" + money(r.remaining) + "</div></div>" +
-          "<div><div class='k'>Projected total at completion</div><div class='v" + (r.over ? " over-budget" : "") + "'>" + money(r.projectedTotal) + "</div></div>" +
+          "<div><div class='k'>Forecast — " + esc(q.label) + "</div><div class='v'>" + money(r.forecast) + "</div>" +
+          "<div class='forecast-sub'>Capital " + money(r.capital.forecast) + " · Expense " + money(r.expense.forecast) + "</div></div>" +
+          "<div><div class='k'>Spent to date</div><div class='v'>" + money(r.spent) + "</div>" +
+          "<div class='forecast-sub'>Capital " + money(r.capital.spent) + " · Expense " + money(r.expense.spent) + "</div></div>" +
+          "<div><div class='k'>Budget</div><div class='v'>" + money(r.budget) + "</div>" +
+          "<div class='forecast-sub'>Capital " + money(r.capital.budget) + " · Expense " + money(r.expense.budget) + "</div></div>" +
+          "<div><div class='k'>Remaining budget</div><div class='v" + (r.remaining < 0 ? " over-budget" : "") + "'>" + money(r.remaining) + "</div>" +
+          "<div class='forecast-sub'>Capital " + money(r.capital.remaining) + " · Expense " + money(r.expense.remaining) + "</div></div>" +
+          "<div><div class='k'>Projected total at completion</div><div class='v" + (r.over ? " over-budget" : "") + "'>" + money(r.projectedTotal) + "</div>" +
+          "<div class='forecast-sub'>Capital " + money(r.capital.projectedTotal) + " · Expense " + money(r.expense.projectedTotal) + "</div></div>" +
           "<div><div class='k'>Projected completion</div><div class='v' style='font-family:Barlow,sans-serif; font-size:15.5px;'>" + (r.projectedCompletion ? fmtDate(r.projectedCompletion) : "—") + "</div></div>" +
           "</div>" +
-          (r.over ? "<div class='over-flag'>⚠ Projected to go over budget by " + money(r.projectedTotal - r.budget) + "</div>" : "") +
+          (r.over ? "<div class='over-flag'>⚠ Projected to go over budget — " + overBits.join(" · ") + "</div>" : "") +
           "</div>";
       }).join("");
     }
@@ -830,23 +895,35 @@
       var q = parseQuarterValue(qv);
       var rows = state.projects.map(function (p) { return forecastForProject(p, qv); });
       var tForecast = 0, tBudget = 0, tSpent = 0, tProjected = 0;
-      rows.forEach(function (r) { tForecast += r.forecast; tBudget += r.budget; tSpent += r.spent; tProjected += r.projectedTotal; });
+      var tCapBudget = 0, tExpBudget = 0, tCapSpent = 0, tExpSpent = 0, tCapForecast = 0, tExpForecast = 0;
+      rows.forEach(function (r) {
+        tForecast += r.forecast; tBudget += r.budget; tSpent += r.spent; tProjected += r.projectedTotal;
+        tCapBudget += r.capital.budget; tExpBudget += r.expense.budget;
+        tCapSpent += r.capital.spent; tExpSpent += r.expense.spent;
+        tCapForecast += r.capital.forecast; tExpForecast += r.expense.forecast;
+      });
       function h(s) { return esc(s); }
       function mny(n) { return money(n); }
+      function kindStatus(k) {
+        return k.over ? "Over by " + mny(k.projectedTotal - k.budget)
+          : (k.budget > 0 ? "Under by " + mny(k.budget - k.projectedTotal) : "—");
+      }
       var bodyRows = rows.length ? rows.map(function (r) {
         var over = r.over;
-        var ou = over ? "<span class='over'>Over by " + mny(r.projectedTotal - r.budget) + "</span>"
-          : (r.budget > 0 ? "Under by " + mny(r.budget - r.projectedTotal) : "—");
-        return "<tr" + (over ? " class='over-row'" : "") + "><td>" + h(r.project.name) + "</td><td class='num'>" + mny(r.budget) + "</td>" +
-          "<td class='num'>" + mny(r.spent) + "</td><td class='num'>" + mny(r.forecast) + "</td>" +
-          "<td class='num'>" + mny(r.remaining) + "</td><td class='num" + (over ? " over" : "") + "'>" + mny(r.projectedTotal) + "</td>" +
+        var ou = "Capital: " + kindStatus(r.capital) + "<br>Expense: " + kindStatus(r.expense);
+        return "<tr" + (over ? " class='over-row'" : "") + "><td>" + h(r.project.name) + "</td>" +
+          "<td class='num'>" + mny(r.capital.budget) + "</td><td class='num'>" + mny(r.expense.budget) + "</td>" +
+          "<td class='num'>" + mny(r.capital.spent) + "</td><td class='num'>" + mny(r.expense.spent) + "</td>" +
+          "<td class='num'>" + mny(r.capital.forecast) + "</td><td class='num'>" + mny(r.expense.forecast) + "</td>" +
+          "<td class='num'>" + mny(r.forecast) + "</td>" +
+          "<td class='num" + (over ? " over" : "") + "'>" + mny(r.projectedTotal) + "</td>" +
           "<td>" + (r.projectedCompletion ? fmtDate(r.projectedCompletion) : "—") + "</td><td>" + ou + "</td></tr>";
-      }).join("") : "<tr><td colspan='8'>No projects recorded.</td></tr>";
+      }).join("") : "<tr><td colspan='11'>No projects recorded.</td></tr>";
       var doc = "<!doctype html><html lang='en'><head><meta charset='utf-8'>" +
         "<title>Quarterly Forecast — " + h(q.label) + "</title>" +
-        "<style>body{font-family:Arial,Helvetica,sans-serif;color:#16222e;max-width:900px;margin:32px auto;padding:0 20px;line-height:1.5;}" +
+        "<style>body{font-family:Arial,Helvetica,sans-serif;color:#16222e;max-width:1100px;margin:32px auto;padding:0 20px;line-height:1.5;}" +
         "h1{font-size:24px;margin:0 0 2px;} .sub{color:#5a7186;} " +
-        "table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:14px;} th,td{border:1px solid #c4d2de;padding:7px 8px;text-align:left;vertical-align:top;}" +
+        "table{width:100%;border-collapse:collapse;font-size:13px;margin-top:14px;} th,td{border:1px solid #c4d2de;padding:7px 8px;text-align:left;vertical-align:top;}" +
         "th{background:#eef4fa;} td.num,th.num{text-align:right;white-space:nowrap;} tfoot td{font-weight:bold;background:#eef4fa;}" +
         ".over{color:#c0392b;font-weight:bold;} tr.over-row td{background:#fdf0ee;}" +
         ".grid{display:flex;gap:24px;flex-wrap:wrap;margin-top:16px;} .kv b{display:block;font-size:18px;} .kv span{color:#5a7186;font-size:12px;text-transform:uppercase;letter-spacing:.05em;}" +
@@ -856,15 +933,17 @@
         "<div class='sub'>Quarter: " + fmtDate(q.start) + " – " + fmtDate(q.end) + " · Report date: " + fmtDate(todayStr()) + "</div>" +
         "<div class='grid'>" +
         "<div class='kv'><b>" + mny(tForecast) + "</b><span>Forecast spend — " + h(q.label) + "</span></div>" +
+        "<div class='kv'><b>" + mny(tCapForecast) + "</b><span>Capital forecast — " + h(q.label) + "</span></div>" +
+        "<div class='kv'><b>" + mny(tExpForecast) + "</b><span>Expense forecast — " + h(q.label) + "</span></div>" +
         "<div class='kv'><b>" + mny(tBudget) + "</b><span>Total budget</span></div>" +
         "<div class='kv'><b>" + mny(tSpent) + "</b><span>Total spent to date</span></div>" +
         "<div class='kv'><b>" + mny(tBudget - tSpent) + "</b><span>Total remaining</span></div>" +
         "</div>" +
-        "<table><thead><tr><th>Project</th><th class='num'>Budget</th><th class='num'>Spent to date</th><th class='num'>Forecast — " + h(q.label) + "</th><th class='num'>Remaining</th><th class='num'>Projected total</th><th>Projected completion</th><th>Over / under budget</th></tr></thead>" +
+        "<table><thead><tr><th>Project</th><th class='num'>Capital budget</th><th class='num'>Expense budget</th><th class='num'>Capital spent</th><th class='num'>Expense spent</th><th class='num'>Capital forecast — " + h(q.label) + "</th><th class='num'>Expense forecast — " + h(q.label) + "</th><th class='num'>Total forecast — " + h(q.label) + "</th><th class='num'>Projected total</th><th>Projected completion</th><th>Over / under budget</th></tr></thead>" +
         "<tbody>" + bodyRows + "</tbody>" +
-        "<tfoot><tr><td>All projects (" + rows.length + ")</td><td class='num'>" + mny(tBudget) + "</td><td class='num'>" + mny(tSpent) + "</td><td class='num'>" + mny(tForecast) + "</td><td class='num'>" + mny(tBudget - tSpent) + "</td><td class='num'>" + mny(tProjected) + "</td><td>—</td><td>" +
+        "<tfoot><tr><td>All projects (" + rows.length + ")</td><td class='num'>" + mny(tCapBudget) + "</td><td class='num'>" + mny(tExpBudget) + "</td><td class='num'>" + mny(tCapSpent) + "</td><td class='num'>" + mny(tExpSpent) + "</td><td class='num'>" + mny(tCapForecast) + "</td><td class='num'>" + mny(tExpForecast) + "</td><td class='num'>" + mny(tForecast) + "</td><td class='num'>" + mny(tProjected) + "</td><td>—</td><td>" +
         (tProjected > tBudget && tBudget > 0 ? "<span class='over'>Over by " + mny(tProjected - tBudget) + "</span>" : (tBudget > 0 ? "Under by " + mny(tBudget - tProjected) : "—")) + "</td></tr></tfoot></table>" +
-        "<p style='font-size:13px;color:#5a7186;'>Forecast method: costs already logged in the quarter plus an equal share of each project's remaining budget for every open task due that quarter (overdue open tasks count toward the current quarter). Projected total at completion is estimated from spend so far versus the share of tasks done. Projected completion is the latest due date among a project's open tasks.</p>" +
+        "<p style='font-size:13px;color:#5a7186;'>Forecast method: costs already logged in the quarter plus an equal share of each project's remaining budget for every open task due that quarter (overdue open tasks count toward the current quarter). Projected total at completion is estimated from spend so far versus the share of tasks done. Projected completion is the latest due date among a project's open tasks. Capital and Expense are forecast separately, each from its own budget and logged costs.</p>" +
         "<footer>Generated " + fmtDate(todayStr()) + " · Prepared on-device from project records.</footer>" +
         "</body></html>";
       download("quarterly-forecast-" + q.label.replace(/\s+/g, "-").toLowerCase() + "-" + todayStr() + ".html", doc, "text/html");
@@ -922,11 +1001,14 @@
         "<div class='add-row'><button class='btn primary block' id='addMsBtn'>＋ Add milestone</button></div>";
 
       /* budget */
-      var spent = projSpent(p), total = Number(p.budget) || 0, bpct = total > 0 ? Math.round(spent / total * 100) : 0;
+      var capPct = kindPct(p, "capital"), expPct = kindPct(p, "expense");
+      var overKinds = [];
+      if (capPct > 90) overKinds.push("Capital");
+      if (expPct > 90) overKinds.push("Expense");
       html += "<div id='sec-budget'></div><h2 class='sec'>Budget <span class='count'>(" + p.costs.length + " costs)</span></h2><div class='card'>" +
         budgetBarHTML(p) +
-        (bpct > 90 ? "<p class='flag-overdue' style='margin:10px 0 0;'>⚠ Over 90% of budget spent.</p>" : "") +
-        "<div class='meta-row'><span>Remaining: <b class='money'>" + money(total - spent) + "</b></span></div></div>" +
+        (overKinds.length ? "<p class='flag-overdue' style='margin:10px 0 0;'>⚠ Over 90% of " + overKinds.join(" and ") + " budget spent.</p>" : "") +
+        "<div class='meta-row'><span>Capital remaining: <b class='money'>" + money(kindBudget(p, "capital") - projSpentByKind(p, "capital")) + "</b></span><span>Expense remaining: <b class='money'>" + money(kindBudget(p, "expense") - projSpentByKind(p, "expense")) + "</b></span></div></div>" +
         "<div id='dCostList'></div>" +
         "<div class='add-row'><button class='btn primary block' id='addCostBtn'>＋ Log cost</button></div>";
 
@@ -1058,9 +1140,11 @@
       if (!p.costs.length) { box.innerHTML = "<div class='empty'><div class='big'>No costs logged yet</div>Log vendor invoices and purchases against the budget as they land.</div>"; return; }
       var sorted = p.costs.slice().sort(function (a, b) { return (a.date || "") < (b.date || "") ? 1 : -1; });
       box.innerHTML = sorted.map(function (c) {
+        var ck = costKind(c, p);
         return "<div class='row'><div class='grow'><div class='row-title'>" + esc(c.description) + "</div>" +
           "<div class='row-sub'>" + fmtDate(c.date) + (c.vendor ? " · " + esc(c.vendor) : "") + "</div></div>" +
           "<div style='text-align:right; flex:0 0 auto;'><div class='money' style='font-weight:700; font-size:17px;'>" + money(c.amount) + "</div>" +
+          "<div style='margin-top:5px;'><span class='chip " + (ck === "capital" ? "cap" : "exp") + "'>" + (ck === "capital" ? "Capital" : "Expense") + "</span></div>" +
           "<div style='display:flex; gap:6px; margin-top:6px; justify-content:flex-end;'>" +
           "<button class='icon-btn' data-edit-cost='" + c.id + "' aria-label='Edit cost'>✎</button>" +
           "<button class='icon-btn' data-del-cost='" + c.id + "' aria-label='Delete cost'>🗑</button></div></div></div>";
@@ -1143,7 +1227,10 @@
         field("Start date", "<input type='date' id='pfStart' value='" + esc(p ? p.start : todayStr()) + "'>") +
         field("Target completion", "<input type='date' id='pfTarget' value='" + esc(p ? p.target : "") + "'>") +
         "</div>" +
-        field("Total budget ($)", "<input type='number' id='pfBudget' inputmode='decimal' min='0' step='any' placeholder='0' value='" + esc(p && p.budget ? p.budget : "") + "'>") +
+        "<div class='f-row'>" +
+        field("Capital budget ($)", "<input type='number' id='pfCapBudget' inputmode='decimal' min='0' step='any' placeholder='0' value='" + esc(p && p.capitalBudget ? p.capitalBudget : "") + "'>") +
+        field("Expense budget ($)", "<input type='number' id='pfExpBudget' inputmode='decimal' min='0' step='any' placeholder='0' value='" + esc(p && p.expenseBudget ? p.expenseBudget : "") + "'>") +
+        "</div>" +
         formBtns(p ? "Save changes" : "Create project"));
       $("fmCancel").onclick = closeSheet;
       $("fmSave").onclick = function () {
@@ -1152,7 +1239,8 @@
         var data = {
           name: name, description: $("pfDesc").value.trim(), type: $("pfType").value,
           start: $("pfStart").value, target: $("pfTarget").value,
-          budget: parseFloat($("pfBudget").value) || 0
+          capitalBudget: parseFloat($("pfCapBudget").value) || 0,
+          expenseBudget: parseFloat($("pfExpBudget").value) || 0
         };
         if (p) { Object.keys(data).forEach(function (k) { p[k] = data[k]; }); }
         else {
@@ -1217,10 +1305,12 @@
     function openCostForm(pid, cid) {
       var p = getProject(pid); if (!p) return;
       var c = cid ? p.costs.filter(function (x) { return x.id === cid; })[0] : null;
+      var defKind = c ? costKind(c, p) : (isCapitalType(p.type) ? "capital" : "expense");
       openSheet("<h3>" + (c ? "Edit cost" : "Log cost") + "</h3>" +
         field("Date", "<input type='date' id='cfDate' value='" + esc(c ? c.date : todayStr()) + "'>") +
         field("Description", "<input type='text' id='cfDesc' placeholder='e.g. PO 4471 — rigging crew' value='" + esc(c ? c.description : "") + "'>") +
         field("Vendor", "<input type='text' id='cfVendor' placeholder='Vendor name' value='" + esc(c ? c.vendor : "") + "'>") +
+        field("Type", "<select id='cfKind'><option value='capital'" + (defKind === "capital" ? " selected" : "") + ">Capital</option><option value='expense'" + (defKind === "expense" ? " selected" : "") + ">Expense</option></select>") +
         field("Amount ($)", "<input type='number' id='cfAmount' inputmode='decimal' min='0' step='any' placeholder='0.00' value='" + esc(c ? c.amount : "") + "'>") +
         formBtns(c ? "Save changes" : "Log cost"));
       $("fmCancel").onclick = closeSheet;
@@ -1229,7 +1319,7 @@
         var amt = parseFloat($("cfAmount").value);
         if (!desc) { toast("Add a description"); $("cfDesc").focus(); return; }
         if (isNaN(amt) || amt < 0) { toast("Enter an amount"); $("cfAmount").focus(); return; }
-        var data = { date: $("cfDate").value, description: desc, vendor: $("cfVendor").value.trim(), amount: amt };
+        var data = { date: $("cfDate").value, description: desc, vendor: $("cfVendor").value.trim(), kind: $("cfKind").value, amount: amt };
         if (c) Object.keys(data).forEach(function (k) { c[k] = data[k]; });
         else p.costs.push(Object.assign({ id: uid() }, data));
         save(); closeSheet(); renderDetail(); toast(c ? "Cost saved" : "Cost logged");
@@ -1291,17 +1381,25 @@
       toast("Tasks CSV downloaded");
     }
     function exportCostsCSV(p) {
-      var rows = [["Project", "Date", "Description", "Vendor", "Amount"]];
-      p.costs.forEach(function (c) { rows.push([p.name, c.date, c.description, c.vendor, c.amount]); });
-      rows.push([p.name, "", "TOTAL", "", projSpent(p).toFixed(2)]);
-      rows.push([p.name, "", "BUDGET", "", (Number(p.budget) || 0).toFixed(2)]);
+      var rows = [["Project", "Date", "Description", "Vendor", "Type", "Amount"]];
+      p.costs.forEach(function (c) { rows.push([p.name, c.date, c.description, c.vendor, costKind(c, p) === "capital" ? "Capital" : "Expense", c.amount]); });
+      rows.push([p.name, "", "TOTAL", "", "", projSpent(p).toFixed(2)]);
+      rows.push([p.name, "", "CAPITAL TOTAL", "", "", projSpentByKind(p, "capital").toFixed(2)]);
+      rows.push([p.name, "", "EXPENSE TOTAL", "", "", projSpentByKind(p, "expense").toFixed(2)]);
+      rows.push([p.name, "", "CAPITAL BUDGET", "", "", (Number(p.capitalBudget) || 0).toFixed(2)]);
+      rows.push([p.name, "", "EXPENSE BUDGET", "", "", (Number(p.expenseBudget) || 0).toFixed(2)]);
       download(slugify(p.name) + "-costs-" + todayStr() + ".csv",
         rows.map(function (r) { return r.map(csvCell).join(","); }).join("\r\n"), "text/csv");
       toast("Costs CSV downloaded");
     }
     function exportReport(p) {
-      var pct = projProgress(p), spent = projSpent(p), total = Number(p.budget) || 0;
+      var pct = projProgress(p), spent = projSpent(p);
+      var capSpent = projSpentByKind(p, "capital"), expSpent = projSpentByKind(p, "expense");
+      var capBudget = Number(p.capitalBudget) || 0, expBudget = Number(p.expenseBudget) || 0;
+      var total = capBudget + expBudget;
       var bpct = total > 0 ? Math.round(spent / total * 100) : 0;
+      var capPct = capBudget > 0 ? Math.round(capSpent / capBudget * 100) : 0;
+      var expPct = expBudget > 0 ? Math.round(expSpent / expBudget * 100) : 0;
       var open = p.tasks.filter(function (t) { return t.status !== "Done"; });
       var done = p.tasks.filter(function (t) { return t.status === "Done"; });
       var ms = p.milestones.slice().sort(function (a, b) { return (a.date || "9999") < (b.date || "9999") ? -1 : 1; });
@@ -1321,13 +1419,19 @@
         "<div class='kv'><b>" + pct + "%</b><span>Complete</span></div>" +
         "<div class='kv'><b>" + fmtDate(p.start) + "</b><span>Start</span></div>" +
         "<div class='kv'><b>" + fmtDate(p.target) + "</b><span>Target completion</span></div>" +
-        "<div class='kv'><b>" + money(spent) + " / " + money(total) + "</b><span>Budget spent (" + bpct + "%)</span></div>" +
+        "<div class='kv'><b>" + money(capSpent) + " / " + money(capBudget) + "</b><span>Capital spent (" + capPct + "%)</span></div>" +
+        "<div class='kv'><b>" + money(expSpent) + " / " + money(expBudget) + "</b><span>Expense spent (" + expPct + "%)</span></div>" +
+        "<div class='kv'><b>" + money(spent) + " / " + money(total) + "</b><span>Total budget spent (" + bpct + "%)</span></div>" +
         "</div>" +
         "<h2>Progress</h2><div class='bar'><i style='width:" + pct + "%'></i></div>" +
         "<p>" + done.length + " of " + p.tasks.length + " tasks done · " + open.length + " open" +
         (overdueTasks(p).length ? " · <span class='overdue'>" + overdueTasks(p).length + " overdue</span>" : "") + "</p>" +
-        "<h2>Budget</h2><div class='bar'><i class='" + (bpct > 90 ? "over" : "") + "' style='width:" + Math.min(bpct, 100) + "%'></i></div>" +
-        "<p>Spent " + money(spent) + " of " + money(total) + " budget · Remaining " + money(total - spent) + "</p>" +
+        "<h2>Budget</h2>" +
+        "<p><b>Capital</b> — Spent " + money(capSpent) + " of " + money(capBudget) + " · Remaining " + money(capBudget - capSpent) + " (" + capPct + "%)</p>" +
+        "<div class='bar'><i class='" + (capPct > 90 ? "over" : "") + "' style='width:" + Math.min(capPct, 100) + "%'></i></div>" +
+        "<p><b>Expense</b> — Spent " + money(expSpent) + " of " + money(expBudget) + " · Remaining " + money(expBudget - expSpent) + " (" + expPct + "%)</p>" +
+        "<div class='bar'><i class='" + (expPct > 90 ? "over" : "") + "' style='width:" + Math.min(expPct, 100) + "%'></i></div>" +
+        "<p>Total — Spent " + money(spent) + " of " + money(total) + " budget · Remaining " + money(total - spent) + "</p>" +
         "<h2>Milestones</h2>" +
         (ms.length ? "<table><tr><th>Milestone</th><th>Target date</th><th>Status</th></tr>" +
           ms.map(function (m) { return "<tr><td>" + h(m.name) + "</td><td>" + fmtDate(m.date) + "</td><td>" + (m.done ? "Done" : "Open") + "</td></tr>"; }).join("") + "</table>"
