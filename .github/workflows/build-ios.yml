@@ -109,14 +109,12 @@ jobs:
             CODE_SIGN_IDENTITY='Apple Distribution' \
             MARKETING_VERSION=1.0.0 \
             CURRENT_PROJECT_VERSION=${{ github.run_number }}
-          # NOTE: no PROVISIONING_PROFILE_SPECIFIER here — a command-line
-          # specifier applies to EVERY target, including the Capacitor
+          # NOTE: no PROVISIONING_PROFILE_SPECIFIER on the command line —
+          # that applies to EVERY target, including the Capacitor
           # framework in Pods, which rejects manual profiles
           # ("Capacitor does not support provisioning profiles").
-          # With the profile installed in ~/Library and manual signing +
-          # team set, xcodebuild matches the profile to the App target
-          # by bundle ID. The export step maps bundle ID -> profile
-          # explicitly in ExportOptions.plist.
+          # The profile is set per-target in the App target's build
+          # settings in project.pbxproj instead (Pods untouched).
 
       - name: Write App Store Connect API key file
         run: |
