@@ -1,0 +1,29 @@
+# Dependencies and build output
+node_modules/
+
+# iOS build output (created by the workflow on the runner)
+tools-app/ios/App/build/
+store-app/ios/App/build/
+tools-app/ios/App/Pods/
+store-app/ios/App/Pods/
+tools-app/build/
+store-app/build/
+*.xcarchive
+*.ipa
+
+# Capacitor sync output is committed (public/ is the app itself), but the
+# generated native noise below is not needed in git:
+tools-app/ios/App/App/public/
+store-app/ios/App/App/public/
+
+# Signing material — NEVER commit
+signing/
+*.p12
+*.p8
+*.mobileprovision
+*.cer
+*.csr
+*.key.pem
+AuthKey_*.p8
+ExportOptions.plist
+.DS_Store
