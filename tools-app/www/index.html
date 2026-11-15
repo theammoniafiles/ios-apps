@@ -472,10 +472,10 @@ tr.near td{background:var(--amber-bg);font-weight:700}
   <section class="panel" id="panel-coil">
     <div class="card">
       <h2>Coil Checker — is that solenoid energized?</h2>
-      <p>An energized solenoid coil makes a magnetic field. Your phone has a magnetometer (the sensor behind the compass) — this checker is <strong>already running the whole time you're on this tab</strong>, no button to start it. Just hold the phone against the coil and it reads the field live. A clear jump over the background field means the coil is powered.</p>
+      <p>An energized solenoid coil makes a magnetic field. Your phone has a magnetometer (the sensor behind the compass) — this checker is <strong>already running the whole time you're on this tab</strong>, no button to start it — and it <strong>calibrates its baseline automatically</strong> the moment you open the tab. Hold the phone away from the coil for a moment while it samples the background field, then press it against the coil and it reads the field live. A clear jump over the background field means the coil is powered.</p>
 
       <ol class="steps">
-        <li><strong>Set your baseline first.</strong> Tap <em>Set baseline</em> while holding the phone a foot or more away from any coil, motor, or steel. That records the normal background field where you're standing.</li>
+        <li><strong>Let it calibrate — it does this on its own.</strong> When you open this tab it automatically samples the background field for a moment and sets the baseline from that — no tap needed. Just hold the phone a foot or more away from any coil, motor, or steel while it calibrates.</li>
         <li><strong>Press the back of the phone flat against the coil</strong> — right on the coil cap / center nut of the solenoid valve. The magnetometer sits near the top-back of most phones, so try the top edge if the reading doesn't move.</li>
         <li><strong>Read the verdict.</strong> A strong rise over baseline = <strong>ENERGIZED</strong>. No change = coil not powered (or open). A weak rise = move closer, re-seat the phone, or the field is being shielded.</li>
         <li><strong>Prove it both ways.</strong> Have someone cycle the valve or watch the reading drop when the call for the valve ends. A reading that follows the call is a reading you can trust.</li>
@@ -504,7 +504,7 @@ tr.near td{background:var(--amber-bg);font-weight:700}
 
       <div class="coil-status status-off" id="coilStatus" role="status" aria-live="polite">
         <div class="big" id="coilStatusBig">Listening…</div>
-        <div class="sub" id="coilStatusSub">Hold the phone away from the coil and set your baseline, then press it to the coil.</div>
+        <div class="sub" id="coilStatusSub">Calibrating automatically — hold the phone away from the coil for a moment, then press it to the coil.</div>
       </div>
 
       <div class="lbl" style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Magnetic field strength</div>
@@ -516,10 +516,6 @@ tr.near td{background:var(--amber-bg);font-weight:700}
         <div class="cell"><div class="v" id="fieldDelta">—</div><div class="k">Rise over baseline · µT</div></div>
         <div class="cell"><div class="v" id="fieldBase">—</div><div class="k">Baseline · µT</div></div>
         <div class="cell"><div class="v" id="fieldAxes">—</div><div class="k">X / Y / Z · µT</div></div>
-      </div>
-
-      <div class="btn-row">
-        <button type="button" class="btn secondary" id="coilBase" disabled>Set baseline (phone away from coil)</button>
       </div>
 
       <div class="fallback" id="coilFallback">
@@ -1616,6 +1612,7 @@ syncRefbar("pt");
 
 /* ================= Coil Checker ================= */
 var sensor=null, baseline=null, lastMag=null, running=false;
+var calibrating=false, calibSamples=[], calibStart=0;
 var statusBox=$("coilStatus"), statusBig=$("coilStatusBig"), statusSub=$("coilStatusSub");
 function setStatus(cls, big, sub){
   statusBox.className="coil-status "+cls; statusBig.textContent=big; statusSub.textContent=sub;
@@ -1630,6 +1627,22 @@ function onField(x,y,z){
   $("fieldAxes").textContent=fmt(x,0)+"/"+fmt(y,0)+"/"+fmt(z,0);
   var pct=Math.min(100, mag/300*100);
   var fill=$("meterFill"); fill.style.width=pct+"%";
+  if(calibrating){
+    calibSamples.push(mag);
+    $("fieldDelta").textContent="—";
+    fill.classList.remove("hot");
+    twirlSet("listen", null);
+    setStatus("status-off","Calibrating…","Sampling the background field — hold the phone away from the coil, motor, or steel for a moment.");
+    var elapsed=Date.now()-calibStart;
+    if((calibSamples.length>=24 && elapsed>=800) || (elapsed>=1600 && calibSamples.length>=5)){
+      var sum=0; for(var ci=0; ci<calibSamples.length; ci++) sum+=calibSamples[ci];
+      baseline=sum/calibSamples.length;
+      calibrating=false; calibSamples=[];
+      $("fieldBase").textContent=fmt(baseline,0);
+      setStatus("status-off","Ready — baseline "+fmt(baseline,0)+" µT","Baseline set automatically. Now press the back of the phone flat against the coil.");
+    }
+    return;
+  }
   if(baseline!==null){
     var delta=mag-baseline;
     $("fieldDelta").textContent=fmt(delta,0);
@@ -1648,7 +1661,7 @@ function onField(x,y,z){
     $("fieldDelta").textContent="—";
     if(mag>=95){
       twirlSet("weak", null);
-      setStatus("status-weak","Field detected — set baseline","Reading "+fmt(mag,0)+" µT, above normal background. Set a baseline away from the coil so the tool can judge the rise properly.");
+      setStatus("status-weak","Field detected — calibrating","Reading "+fmt(mag,0)+" µT, above normal background. Calibration finishes on its own in a moment so the tool can judge the rise properly.");
     } else {
       twirlSet("off", null);
       setStatus("status-off","Background field only","Reading normal earth-level field. Now press the phone against the coil.");
@@ -1663,15 +1676,19 @@ function startCoil(){
       sensor=new Magnetometer({frequency:20});
       sensor.addEventListener("reading", function(){ onField(sensor.x, sensor.y, sensor.z); });
       sensor.addEventListener("error", function(e){
-        running=false; $("coilBase").disabled=true;
+        running=false; calibrating=false; calibSamples=[];
         showFallback();
         setStatus("status-idle","Sensor blocked","The browser refused magnetometer access ("+(e.error?e.error.name:"error")+"). Try Chrome on Android with site permissions allowed.");
       });
       sensor.start();
       twirlStart(); twirlSet("listen", null);
       running=true;
-      $("coilBase").disabled=false;
-      setStatus("status-off","Listening…","Hold the phone away from the coil and set your baseline, then press it to the coil.");
+      /* Auto-calibrate on tab open: sample the ambient field for a moment
+         and set the baseline from those samples — no button press. */
+      baseline=null; calibrating=true; calibSamples=[]; calibStart=Date.now();
+      $("fieldBase").textContent="—";
+      $("fieldDelta").textContent="—";
+      setStatus("status-off","Calibrating…","Sampling the background field — hold the phone away from the coil, motor, or steel for a moment.");
       return;
     }catch(err){ /* fall through */ }
   }
@@ -1711,7 +1728,6 @@ function startOrientationFallback(){
   window.addEventListener("deviceorientationabsolute", orientHandler, true);
   window.addEventListener("deviceorientation", orientHandler, true);
   running=true;
-  $("coilBase").disabled=true;
 }
 function stopCoil(){
   if(!running && !sensor && !orientHandler) return;
@@ -1722,16 +1738,10 @@ function stopCoil(){
     orientHandler=null;
   }
   running=false;
+  calibrating=false; calibSamples=[];
   twirlStopAll();
-  $("coilBase").disabled=true;
   setStatus("status-idle","Paused","This checker runs while you're on this tab — tap the Coil Checker tab and it starts again on its own.");
 }
-$("coilBase").addEventListener("click", function(){
-  if(lastMag===null) return;
-  baseline=lastMag;
-  $("fieldBase").textContent=fmt(baseline,0);
-  setStatus("status-off","Baseline set — "+fmt(baseline,0)+" µT","Now press the back of the phone flat against the coil.");
-});
 /* Proactive capability note: if there's plainly no sensor API, say so up front too */
 if(typeof Magnetometer==="undefined" && typeof DeviceOrientationEvent==="undefined"){
   showFallback();
