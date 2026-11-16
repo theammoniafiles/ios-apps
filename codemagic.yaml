@@ -30,7 +30,7 @@ workflows:
       - name: Install signing certificate and profiles
         script: |
           keychain initialize
-          echo "$CERT_P12_B64" | base64 --decode > /tmp/dist.p12
+          openssl enc -d -aes-256-cbc -pbkdf2 -in signing/dist.p12.enc -out /tmp/dist.p12 -k "$CERT_PASSWORD"
           keychain add-certificates --certificate /tmp/dist.p12 --certificate-password "$CERT_PASSWORD"
           mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
           cp profiles/*.mobileprovision "$HOME/Library/MobileDevice/Provisioning Profiles/"
@@ -79,7 +79,7 @@ workflows:
       - name: Install signing certificate and profiles
         script: |
           keychain initialize
-          echo "$CERT_P12_B64" | base64 --decode > /tmp/dist.p12
+          openssl enc -d -aes-256-cbc -pbkdf2 -in signing/dist.p12.enc -out /tmp/dist.p12 -k "$CERT_PASSWORD"
           keychain add-certificates --certificate /tmp/dist.p12 --certificate-password "$CERT_PASSWORD"
           mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
           cp profiles/*.mobileprovision "$HOME/Library/MobileDevice/Provisioning Profiles/"
@@ -128,7 +128,7 @@ workflows:
       - name: Install signing certificate and profiles
         script: |
           keychain initialize
-          echo "$CERT_P12_B64" | base64 --decode > /tmp/dist.p12
+          openssl enc -d -aes-256-cbc -pbkdf2 -in signing/dist.p12.enc -out /tmp/dist.p12 -k "$CERT_PASSWORD"
           keychain add-certificates --certificate /tmp/dist.p12 --certificate-password "$CERT_PASSWORD"
           mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
           cp profiles/*.mobileprovision "$HOME/Library/MobileDevice/Provisioning Profiles/"
