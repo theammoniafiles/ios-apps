@@ -23,6 +23,15 @@ training-app/build/
 psm-app/build/
 cmrp-app/build/
 projects-app/build/
+mlt-app/ios/App/build/
+mlt-app/ios/App/Pods/
+mlt-app/build/
+boilers-app/ios/App/build/
+boilers-app/ios/App/Pods/
+boilers-app/build/
+rca-app/ios/App/build/
+rca-app/ios/App/Pods/
+rca-app/build/
 *.xcarchive
 *.ipa
 
@@ -35,6 +44,9 @@ training-app/ios/App/App/public/
 psm-app/ios/App/App/public/
 cmrp-app/ios/App/App/public/
 projects-app/ios/App/App/public/
+mlt-app/ios/App/App/public/
+boilers-app/ios/App/App/public/
+rca-app/ios/App/App/public/
 
 # Signing material — NEVER commit
 signing/

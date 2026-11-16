@@ -1,0 +1,1000 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<meta name="description" content="Boiler operator training from The Utility Files: lessons, quizzes, and shop tips. Training and preparation only — this app does not grant any certification." />
+<link rel="icon" href="data:," />
+<title>Boilers Operator Handbook</title>
+<style>
+:root{
+  --bg:#0d141c; --bg2:#111c28; --panel:#162433; --panel2:#1c2f42; --line:#2b4359;
+  --steel:#9db8cc; --ice:#d9ecfa; --accent:#e8862e; --accent2:#f5a94b;
+  --text:#e9f1f7; --muted:#a9bdcc; --good:#3ddc84; --bad:#ff6b6b; --warn:#ffc857;
+  --radius:14px;
+}
+*{box-sizing:border-box}
+html{scrollbar-color:var(--line) var(--bg)}
+body{margin:0;background:linear-gradient(180deg,var(--bg) 0%,#0a1119 100%);color:var(--text);
+  font-family:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;
+  -webkit-tap-highlight-color:transparent;padding-bottom:96px}
+button{font:inherit;cursor:pointer}
+h1,h2,h3{line-height:1.2;margin:0}
+p{line-height:1.55}
+.wrap{max-width:760px;margin:0 auto;padding:16px 16px 8px}
+.tophead{display:flex;align-items:center;gap:14px;padding:10px 2px 4px}
+.emblem{flex:0 0 auto;width:64px;height:64px;border-radius:50%;
+  background:radial-gradient(circle at 50% 78%,#f5a94b 0%,#c85a12 38%,#233a4f 72%);
+  border:2px solid #5b7d99;box-shadow:0 0 0 4px rgba(232,134,46,.16),inset 0 0 18px rgba(245,169,75,.35);
+  display:flex;align-items:center;justify-content:center;text-align:center}
+.emblem b{font-size:22px;color:#fff3e0}
+.emblem small{display:block;font-size:8.5px;color:#ffd9a8;letter-spacing:2px}
+.tophead h1{font-size:21px;font-weight:800}
+.tophead .sub{color:var(--muted);font-size:13.5px;margin-top:3px;line-height:1.45}
+.disclaimer{margin-top:10px;font-size:12.5px;color:var(--warn);background:rgba(255,200,87,.08);
+  border:1px solid rgba(255,200,87,.35);border-radius:10px;padding:9px 12px;line-height:1.45}
+.ringrow{display:flex;gap:18px;align-items:center;background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);padding:16px;margin-top:14px}
+.ringwrap{position:relative;width:118px;height:118px;flex:0 0 auto}
+.ringwrap svg{transform:rotate(-90deg)}
+.ringpct{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ringpct b{font-size:26px}
+.ringpct span{font-size:11px;color:var(--muted);letter-spacing:.4px}
+.ringstats{flex:1;min-width:0}
+.ringstats h2{font-size:16px;margin-bottom:6px}
+.ringstats p{margin:0 0 10px;color:var(--muted);font-size:13.5px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;
+  padding:10px 18px;border-radius:12px;border:1px solid var(--accent);background:var(--accent);
+  color:#2b1400;font-weight:700;font-size:15px;text-decoration:none}
+.btn.ghost{background:transparent;color:var(--accent2)}
+.btn.block{width:100%}
+.btn:disabled{opacity:.45;cursor:default}
+.sectiontitle{font-size:17px;font-weight:800;margin:22px 0 10px}
+.badgerow{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none}
+.badgerow::-webkit-scrollbar{display:none}
+.badge{flex:0 0 auto;width:118px;background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  padding:12px 10px;text-align:center;opacity:.45}
+.badge.on{opacity:1;border-color:var(--warn);box-shadow:0 0 0 1px rgba(255,200,87,.4)}
+.badge .bic{font-size:24px;display:block;margin-bottom:6px}
+.badge b{font-size:12.5px;display:block;line-height:1.3}
+.badge span{font-size:11px;color:var(--muted)}
+.coursecard{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px;margin-bottom:12px;width:100%;text-align:left;color:var(--text);display:block}
+.coursecard h3{font-size:17px;margin-bottom:4px}
+.coursecard p{margin:0 0 10px;color:var(--muted);font-size:13.5px}
+.bar{height:10px;background:#0a141f;border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,#b35c14,var(--accent2));border-radius:99px;transition:width .4s}
+.barlabel{font-size:12.5px;color:var(--steel);margin-top:6px}
+.lessonrow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--panel);
+  border:1px solid var(--line);border-radius:12px;padding:13px 14px;margin-bottom:9px;color:var(--text);min-height:56px}
+.lessonrow .num{flex:0 0 auto;width:34px;height:34px;border-radius:50%;background:var(--panel2);
+  border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--steel)}
+.lessonrow.done .num{background:var(--good);color:#052e16;border-color:var(--good)}
+.lessonrow .lt{flex:1;min-width:0}
+.lessonrow .lt b{font-size:15px;display:block;line-height:1.3}
+.lessonrow .lt span{font-size:12px;color:var(--muted)}
+.lessonrow .chev{color:var(--steel);font-size:20px}
+.backbtn{background:none;border:none;color:var(--accent2);font-size:15px;font-weight:700;min-height:44px;padding:8px 4px}
+.lessontitle{font-size:23px;font-weight:800;margin:4px 0 4px}
+.lessonmeta{color:var(--muted);font-size:13px;margin-bottom:14px}
+.sect{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:15px 16px;margin-bottom:11px}
+.sect h3{font-size:16px;color:var(--ice);margin-bottom:7px}
+.sect p{margin:0;font-size:15px;color:#d9e6f0}
+.watchbox{background:rgba(255,200,87,.07);border:1px solid rgba(255,200,87,.45);border-radius:var(--radius);padding:15px 16px;margin-bottom:14px}
+.watchbox h3{color:var(--warn);font-size:16px;margin-bottom:8px}
+.watchbox ul{margin:0;padding-left:19px}
+.watchbox li{margin-bottom:6px;font-size:14.5px;line-height:1.5;color:#f3e9cf}
+.quizhead{font-size:19px;font-weight:800;margin:20px 0 4px}
+.quizsub{color:var(--muted);font-size:13.5px;margin:0 0 14px}
+.qcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:15px 16px;margin-bottom:12px}
+.qcard .qq{font-size:15.5px;font-weight:700;line-height:1.45;margin-bottom:11px}
+.qcard .qnum{font-size:12px;color:var(--steel);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px}
+.opt{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;background:var(--panel2);
+  border:1px solid var(--line);border-radius:11px;padding:12px 13px;margin-bottom:8px;color:var(--text);
+  font-size:14.5px;line-height:1.45;min-height:48px}
+.opt .ol{flex:0 0 auto;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--steel);
+  display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;color:var(--steel)}
+.opt.correct{border-color:var(--good);background:rgba(61,220,132,.12)}
+.opt.correct .ol{background:var(--good);color:#052e16;border-color:var(--good)}
+.opt.wrong{border-color:var(--bad);background:rgba(255,107,107,.12)}
+.opt.wrong .ol{background:var(--bad);color:#3d0606;border-color:var(--bad)}
+.opt:disabled{cursor:default;opacity:1}
+.feedback{font-size:13.5px;line-height:1.5;border-radius:9px;padding:9px 11px;margin-top:2px;display:none}
+.feedback.show{display:block}
+.feedback.ok{background:rgba(61,220,132,.12);color:#b9f4d2}
+.feedback.no{background:rgba(255,107,107,.12);color:#ffd2d2}
+.resultbox{text-align:center;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:22px 16px;margin:16px 0}
+.resultbox .big{font-size:40px;font-weight:800}
+.resultbox p{color:var(--muted);font-size:14.5px}
+.passline{color:var(--good);font-weight:700}
+.failline{color:var(--warn);font-weight:700}
+.tiphead{display:flex;gap:14px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px}
+.tipcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:15px 16px;margin-bottom:11px}
+.tipcard .twhen{font-size:11.5px;color:var(--accent2);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.tipcard p{margin:0;font-size:15.5px;line-height:1.55}
+.tabbar{position:fixed;left:0;right:0;bottom:0;background:rgba(11,18,26,.97);border-top:1px solid var(--line);
+  display:flex;z-index:50;padding-bottom:env(safe-area-inset-bottom)}
+.tabbar button{flex:1;background:none;border:none;color:var(--muted);padding:9px 2px 10px;min-height:60px;
+  display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11.5px;font-weight:600}
+.tabbar button .tic{font-size:21px;line-height:1}
+.tabbar button.active{color:var(--accent2)}
+.view{display:none}
+.view.active{display:block}
+.misseditem{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:9px;font-size:14px;line-height:1.5}
+.misseditem b{color:var(--ice)}
+.misseditem .ca{color:var(--good)}
+.resetlink{background:none;border:none;color:var(--muted);text-decoration:underline;font-size:13px;min-height:44px;padding:10px}
+.namefield{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin-top:12px}
+.namefield label{display:block;font-size:14px;font-weight:700;margin-bottom:3px}
+.namefield .hint{color:var(--muted);font-size:13px;margin:0 0 10px;line-height:1.45}
+.namefield input{width:100%;min-height:48px;padding:11px 13px;border-radius:11px;border:1px solid var(--line);background:var(--bg2);color:var(--text);font:inherit;font-size:15px}
+.namefield input::placeholder{color:var(--muted)}
+.namefield input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.certrow{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 14px;margin-bottom:9px}
+.certrow .ct{flex:1;min-width:0}
+.certrow .ct b{font-size:15px;display:block;line-height:1.3}
+.certrow .ct span{font-size:12.5px;color:var(--muted)}
+.certrow .btn{min-height:44px;padding:8px 14px;font-size:14px;flex:0 0 auto}
+.certempty{color:var(--muted);font-size:13.5px;line-height:1.5;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 14px;margin:0}
+.certbtn{margin:0 0 14px;min-height:44px;padding:8px 16px;font-size:14px}
+.cert-overlay{position:fixed;inset:0;z-index:100;background:var(--bg);overflow-y:auto;padding:16px}
+.cert-overlay.active{display:block}
+.cert-actions{max-width:760px;margin:0 auto;display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.cert-paper{max-width:760px;margin:18px auto;background:#f7f3ea;color:#1c2a38;border:3px solid #b35c14;outline:1px solid #b35c14;outline-offset:6px;border-radius:6px;padding:40px 28px 34px;text-align:center}
+.cert-paper .cert-kicker{font-size:12px;letter-spacing:2.5px;text-transform:uppercase;color:#8a5a1e;margin:0 0 10px;font-weight:700}
+.cert-paper h2{font-family:Georgia,"Times New Roman",serif;font-size:32px;font-weight:700;color:#162433;margin:0 0 22px;line-height:1.15}
+.cert-paper .certifies{font-size:16px;line-height:1.6;color:#33475c;margin:0 0 6px}
+.cert-paper .cert-name{display:block;font-family:Georgia,"Times New Roman",serif;font-size:26px;font-weight:700;color:#162433;margin:10px auto 4px;min-height:34px}
+.cert-paper .cert-name.blank{border-bottom:2px solid #8a9aab;width:min(340px,80%);height:34px}
+.cert-paper .cert-course{font-size:19px;font-weight:700;color:#9a4d0d}
+.cert-paper .cert-lessons{font-size:15px;color:#33475c;margin:18px 0 4px}
+.cert-paper .cert-date{font-size:15px;color:#33475c;margin:0 0 22px}
+.cert-paper .cert-rule{width:64px;height:2px;background:#b35c14;margin:0 auto 16px}
+.cert-paper .cert-disclaimer{font-size:13px;color:#5b6d7f;line-height:1.55;margin:0 auto;max-width:520px}
+.cert-paper .cert-note{font-size:13px;color:#9a4d0d;background:rgba(232,134,46,.12);border:1px solid rgba(179,92,20,.4);border-radius:9px;padding:9px 12px;margin:16px auto 0;max-width:520px;line-height:1.5}
+@media (min-width:640px){ .wrap{padding:22px 20px 8px} .tophead h1{font-size:25px} .cert-paper h2{font-size:40px} .cert-paper{padding:52px 48px 42px} }
+@media print{
+  body{background:#fff !important;padding-bottom:0 !important}
+  .wrap,.tabbar{display:none !important}
+  .cert-overlay{position:static !important;overflow:visible !important;padding:0 !important;background:#fff !important}
+  .cert-overlay button,.cert-actions{display:none !important}
+  .cert-paper{margin:0 auto !important;max-width:100% !important;box-shadow:none !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HOME -->
+  <section id="view-home" class="view active">
+    <div class="tophead">
+      <div class="emblem"><div><b>&#128293;</b><small>UTILITY</small></div></div>
+      <div>
+        <h1>Boilers Operator<br>Handbook</h1>
+        <div class="sub">From The Utility Files. Plain-language lessons for new and working boiler operators — taught the way a senior operator would teach them on the plant floor.</div>
+      </div>
+    </div>
+    <div class="disclaimer">Training and preparation only — this app does not grant any certification.</div>
+
+    <div class="ringrow">
+      <div class="ringwrap">
+        <svg width="118" height="118" viewBox="0 0 118 118" aria-hidden="true">
+          <circle cx="59" cy="59" r="50" fill="none" stroke="#22374b" stroke-width="11"/>
+          <circle id="ringFg" cx="59" cy="59" r="50" fill="none" stroke="#e8862e" stroke-width="11" stroke-linecap="round" stroke-dasharray="314.16" stroke-dashoffset="314.16"/>
+        </svg>
+        <div class="ringpct"><b id="ringPct">0%</b><span>COMPLETE</span></div>
+      </div>
+      <div class="ringstats">
+        <h2>Your progress</h2>
+        <p id="ringText">0 of 26 lessons passed. A lesson counts when you score 4 out of 5 or better on its quiz.</p>
+        <button class="btn" id="continueBtn">Start learning</button>
+      </div>
+    </div>
+
+    <div class="namefield">
+      <label for="nameInput">Your name</label>
+      <p class="hint">This is the name that prints on your certificate of completion.</p>
+      <input id="nameInput" type="text" autocomplete="name" placeholder="Enter your full name" />
+    </div>
+
+    <h2 class="sectiontitle">Badges</h2>
+    <div class="badgerow" id="badgeRow"></div>
+
+    <h2 class="sectiontitle">Course tracks</h2>
+    <div id="homeCourses"></div>
+
+    <h2 class="sectiontitle">Certificates</h2>
+    <div id="homeCerts"></div>
+
+    <h2 class="sectiontitle">Quick practice</h2>
+    <div class="coursecard">
+      <h3>Quiz Bank</h3>
+      <p>20 mixed questions pulled from every lesson in the app. See your score and review everything you missed.</p>
+      <button class="btn ghost" data-goto="quizbank">Open Quiz Bank</button>
+    </div>
+    <div style="text-align:center;margin-top:8px">
+      <button class="resetlink" id="resetBtn">Reset all progress</button>
+    </div>
+  </section>
+
+  <!-- COURSES -->
+  <section id="view-courses" class="view">
+    <h2 class="sectiontitle" style="margin-top:8px">Courses</h2>
+    <div id="courseList"></div>
+  </section>
+
+  <!-- LESSON -->
+  <section id="view-lesson" class="view">
+    <button class="backbtn" id="lessonBack">&#8592; Back to courses</button>
+    <div id="lessonBody"></div>
+  </section>
+
+  <!-- QUIZ BANK -->
+  <section id="view-quizbank" class="view">
+    <h2 class="sectiontitle" style="margin-top:8px">Quiz Bank</h2>
+    <div id="quizBankBody"></div>
+  </section>
+
+  <!-- SHOP TIPS -->
+  <section id="view-tips" class="view">
+    <h2 class="sectiontitle" style="margin-top:8px">Shop Tips</h2>
+    <div class="tiphead">
+      <div style="font-size:34px" aria-hidden="true">&#128293;</div>
+      <div>
+        <b style="font-size:16px">From the boiler room floor</b>
+        <p style="margin:3px 0 0;color:var(--muted);font-size:13.5px;line-height:1.5">Short, practical boiler tips drawn from the handbook — the small habits that keep pressure up, water where it belongs, and fuel bills down.</p>
+      </div>
+    </div>
+    <div id="tipsList"></div>
+  </section>
+</div>
+
+  <!-- CERTIFICATE -->
+  <section id="view-certificate" class="view cert-overlay" aria-label="Certificate of Completion">
+    <div class="cert-actions">
+      <button class="backbtn" id="certBack">&#8592; Back</button>
+      <button class="btn" id="certPrint">Print / Save as PDF</button>
+    </div>
+    <div class="cert-paper" id="certPaper">
+      <h2>Certificate of Completion</h2>
+      <p class="certifies">This certifies that</p>
+      <span class="cert-name" id="certName"></span>
+      <p class="certifies">completed <span class="cert-course" id="certCourse"></span></p>
+      <p class="cert-lessons" id="certLessons"></p>
+      <p class="cert-date" id="certDateLine"></p>
+      <div class="cert-rule" aria-hidden="true"></div>
+      <p class="cert-disclaimer">Training and preparation only — this app does not grant any certification.</p>
+      <p class="cert-note" id="certNameNote" style="display:none">Enter your name on the Home tab to print it on your certificate.</p>
+    </div>
+  </section>
+
+<nav class="tabbar" aria-label="Main">
+  <button data-tab="home" class="active"><span class="tic">&#8962;</span>Home</button>
+  <button data-tab="courses"><span class="tic">&#9776;</span>Courses</button>
+  <button data-tab="quizbank"><span class="tic">?</span>Quiz Bank</button>
+  <button data-tab="tips"><span class="tic">&#128293;</span>Shop Tips</button>
+</nav>
+
+<script>
+"use strict";
+/* ================= COURSE DATA ================= */
+var COURSES = [
+{ id:"basics", title:"Boiler Basics", tag:"Start here",
+  desc:"The foundations every boiler operator needs: what steam is worth, how boilers are built, fire and water, controls, safety devices, and reading the gauges.",
+  lessons:[
+{ id:"l1", title:"A Book for the Operator on Shift", mins:4,
+  sections:[
+   {h:"Who this training is for", p:"This handbook is for the person standing in the boiler room at 2 a.m., watching a water level that will not sit still and deciding what to do next. It is for the new operator on their first week, the experienced hand training them, and the supervisor who wants the whole crew working from the same understanding of the plant."},
+   {h:"Everything talks to everything", p:"A boiler is not complicated because any single part is hard. It is complicated because the parts all talk to each other: a steam pressure is also a temperature, a feedwater temperature is also a fuel bill, and a water level that drifts is also a safety question waiting for a bad day. The operator's job is to hold all of that in their head at once and notice the small change before it becomes the big one."},
+   {h:"Why steam runs the plant", p:"Steam cooks, heats, cleans, sterilizes, and dries. It runs through cookers, ovens, kettles, pasteurizers, clean-in-place systems, and building heat. When the boiler goes down, production stops — not slowly, and not politely. Steam is not a side utility; it is the thing the whole day depends on."},
+   {h:"What this training is — and is not", p:"This training teaches how the boiler in front of you works, what normal looks like, and what to do when normal changes. It does not replace your site procedures, your equipment manuals, your emergency plans, or the codes that govern your boiler. Where any of those disagree with this app, they win — every time. When in doubt, the conservative answer is the right one, and asking is always better than guessing."}],
+  watch:["Treating pressure, temperature, water level, and fuel use as four separate stories — they are one story.","Skipping ahead to troubleshooting before you know the basics; every later lesson assumes the first ones.","Guessing on a safety question instead of asking. The best operator is not the one who knows the most — it is the one who notices first."],
+  quiz:[
+   {q:"When the boiler goes down in a food plant, what usually happens to production?", opts:["It switches to cold water automatically","It slows a little","It stops — steam cooks, heats, cleans, and sterilizes","Nothing, steam is a side utility"], a:2, why:"Steam is the plant's workhorse; when it stops, production stops with it."},
+   {q:"A drifting water level is best understood as what?", opts:["A gauge problem only","A fuel problem only","Only a level problem","Also a safety question — the boiler's parts all talk to each other"], a:3, why:"Pressure, temperature, level, and fuel use are one story, not four separate ones."},
+   {q:"If this training and your site procedure disagree, which one wins?", opts:["This training","Whichever the operator prefers","Your site procedure — every time","Whichever is newer"], a:2, why:"Site procedures, manuals, emergency plans, and codes always outrank general training."},
+   {q:"Who is the best operator in the building, by this handbook's measure?", opts:["The one who knows the most","The one who notices first","The fastest one","The one with the most seniority"], a:1, why:"Noticing the small change before it becomes the big one is the core operator skill."},
+   {q:"How should an experienced operator use this training?", opts:["As a reference — open it to the problem in front of you","Memorize it word for word","Only for the quizzes","Skip it entirely"], a:0, why:"New operators read in order; experienced operators use it as an on-shift reference."}]},
+{ id:"l2", title:"What a Boiler Does", mins:6,
+  sections:[
+   {h:"Steam versus hot water", p:"A boiler makes either hot water or steam. Hot water carries heat as sensible heat — it gets hotter as you add energy and cooler as it gives energy up. Steam is different: most of its energy is latent heat, released all at once, at one steady temperature, when it condenses. That steady temperature is why steam cooks and sterilizes so evenly."},
+   {h:"The energy in a pound of steam", p:"At 212°F and atmospheric pressure, turning a pound of boiling water into a pound of steam takes about 970 Btu of latent heat — more than five times the heat it took to warm that pound from freezing to boiling. That pound of steam holds about 1,150 Btu total. When it condenses at the point of use, it gives the 970 Btu back. Keep two pocket numbers: about 1,000 Btu per pound of total heat, and about 900 Btu per pound of latent heat for quick estimating."},
+   {h:"Pressure sets temperature", p:"Steam in a boiler is saturated: its temperature is fixed by its pressure. At 0 psig it boils at 212°F; at 100 psig, 338°F; at 150 psig, 366°F. Notice the trade: as pressure rises, saturation temperature climbs but latent heat falls — about 881 Btu per pound at 100 psig. You run higher pressure because you need the higher temperature, not because each pound carries more energy."},
+   {h:"Boiler horsepower", p:"One boiler horsepower (BHP) is the evaporation of 34.5 pounds of water per hour from and at 212°F — about 33,475 Btu per hour of heat output. A 300 BHP boiler is rated at about 10,350 lb/hr at that reference condition. Real output is lower because real feedwater is colder than 212°F: with 200°F feedwater and 100 psig steam, the factor of evaporation is about 1.05, so that 300 BHP boiler actually delivers about 9,860 lb/hr. Do not confuse boiler horsepower with mechanical horsepower (2,545 Btu/hr) — they share a name and nothing else."}],
+  watch:["Using 34.5 lb/hr per BHP as the real plant output — cold feedwater always cuts the actual pounds per hour.","Assuming higher-pressure steam carries much more energy per pound; total heat barely changes, only the temperature does.","Judging a heating problem by pressure alone without asking what saturation temperature that pressure means."],
+  quiz:[
+   {q:"How much latent heat does it take to turn a pound of boiling water into steam at atmospheric pressure?", opts:["About 33,475 Btu","About 970 Btu","About 180 Btu","About 1,190 Btu"], a:1, why:"About 970 Btu per pound at 212°F — more than five times the heat needed to warm the water from freezing to boiling."},
+   {q:"One boiler horsepower equals what?", opts:["34.5 lb/hr of steam from and at 212°F, about 33,475 Btu/hr","1,000 Btu/hr","2,545 Btu/hr","100 lb/hr of steam"], a:0, why:"1 BHP = 34.5 lb/hr from and at 212°F ≈ 33,475 Btu/hr — memorize both numbers."},
+   {q:"Saturated steam at 100 psig is at what temperature?", opts:["250°F","212°F","338°F","406°F"], a:2, why:"At 100 psig, saturation temperature is 338°F — pressure sets temperature for saturated steam."},
+   {q:"Why does a 300 BHP boiler deliver less than its 10,350 lb/hr rating in real service?", opts:["Real feedwater is colder than 212°F, so each pound needs more heat (factor of evaporation)","Steam leaks","The rating is in metric units","The burner is always undersized"], a:0, why:"The rating assumes feedwater at 212°F; colder feedwater raises the heat needed per pound and cuts actual output."},
+   {q:"As steam pressure rises, what happens to latent heat per pound?", opts:["It doubles","It stays exactly the same","It rises sharply","It falls — about 881 Btu/lb at 100 psig versus 970 at atmospheric"], a:3, why:"Latent heat falls as pressure rises; you run pressure for temperature, not for more energy per pound."}]},
+{ id:"l3", title:"Firetube and Watertube Boilers", mins:6,
+  sections:[
+   {h:"Two ways to arrange fire and water", p:"Every boiler answers the same question two ways: where does the fire go, and where does the water go? In a firetube boiler, hot gas travels inside tubes surrounded by water. In a watertube boiler, water travels inside tubes surrounded by hot gas. That single design choice drives the size, pressure, response, and maintenance of the whole machine."},
+   {h:"The firetube: Scotch marine", p:"The classic food-plant boiler is the Scotch marine firetube: a big horizontal steel shell full of water, a furnace tube (the Morrison tube) where the flame burns, and banks of smaller tubes carrying the hot gas through two, three, or four passes before it leaves for the stack. It holds a large volume of water, which makes it forgiving: load swings are absorbed by that stored hot water, and the level moves slowly."},
+   {h:"Firetube strengths and limits", p:"Firetube boilers are simple, rugged, and well suited to the steady loads and moderate pressures of most food plants. Their limits follow from the design: the big shell cannot safely hold very high pressures, capacity tops out well below large watertube units, and all that stored water means a serious energy release if the shell ever fails — which is why water treatment and low-water protection matter so much on a firetube."},
+   {h:"The watertube boiler", p:"A watertube boiler circulates water through tubes heated from outside, collecting steam in a steam drum and water in a mud drum. With far less water stored and tubes instead of a big shell holding the pressure, watertubes run at higher pressures and capacities, steam up faster, and respond quicker to load changes. The trade-offs: they are less forgiving of load swings and poor water quality, cost more, and demand tighter water chemistry because deposits form inside small tubes where you cannot see them."}],
+  watch:["Treating a firetube's slow, forgiving water level as permission to ignore it — low water on a big shell is the most dangerous condition there is.","Feeding a watertube with marginal water quality; scale inside small tubes overheats them fast.","Judging any boiler by heating surface alone — an old rating that does not reliably compare modern designs."],
+  quiz:[
+   {q:"In a firetube boiler, what travels inside the tubes?", opts:["Steam only","Water","Feedwater under pressure","Hot combustion gas, with water surrounding the tubes"], a:3, why:"Firetube: fire inside the tubes, water outside them in the shell."},
+   {q:"Why is a firetube boiler forgiving of load swings?", opts:["Its burner is bigger","It has no water in it","Its large stored water volume absorbs swings and the level moves slowly","It runs at higher pressure"], a:2, why:"The big shell of hot water is a buffer — swings are absorbed instead of shocking the boiler."},
+   {q:"What is a watertube boiler's main advantage?", opts:["Higher pressures and capacities, faster steaming, quicker response","It needs no water treatment","It has no drums","It holds the most water"], a:0, why:"Tubes holding the pressure allow higher pressure and capacity with less stored water."},
+   {q:"Why does a watertube demand tighter water chemistry?", opts:["It uses more fuel","Deposits form inside small tubes where they cannot be seen and overheat the metal","It has no blowdown","Its drums are larger"], a:1, why:"Scale inside a small tube insulates it from the water that cools it — the tube fails by overheating."},
+   {q:"The furnace tube in a Scotch marine firetube is called what?", opts:["The superheater","The economizer","The mud drum","The Morrison tube"], a:3, why:"The large corrugated furnace tube where the flame burns is the Morrison tube."}]},
+{ id:"l4", title:"Other Boiler Types", mins:5,
+  sections:[
+   {h:"Electric boilers", p:"An electric boiler makes steam with resistance elements or electrodes instead of a flame. There is no combustion, no stack, no fuel train — just power in and steam out, quietly and cleanly at the point of use. The catch is cost: electricity is usually the most expensive way to make a Btu, so electric boilers fit small loads, standby duty, and places where a flame or a stack is impractical."},
+   {h:"Cast-iron sectional boilers", p:"A cast-iron sectional boiler is built from hollow cast-iron sections bolted together, with water inside the sections and hot gas passing between them. They are heating boilers — hot water or low-pressure steam for buildings — assembled on site, easy to fit through a doorway, and repaired by replacing a section. Their limits are low pressure and modest capacity, and cracked sections from thermal shock or low water are their classic failure."},
+   {h:"Vertical tubeless boilers", p:"A vertical tubeless boiler stands upright: a vertical shell with the burner firing down (or up) through a single large furnace space, with water jacketing the sides. There are no tubes to leak or replace, the footprint is small, and steam-up from cold is fast. They suit small, intermittent loads. The trade-offs are limited capacity and efficiency compared with a multi-pass firetube, and a smaller water reserve when the load surges."},
+   {h:"Matching type to plant", p:"Choosing a boiler is matching the machine to the load: size and pressure needed, how steady the load is, how fast steam must come up, floor space, fuel and power costs, and how much water-treatment discipline the plant can hold. A big steady process load wants a firetube or watertube; a small spiky load may be happiest with a tubeless or electric unit. The operator's job is to know which type is in the room, because each type fails differently and is read differently."}],
+  watch:["Assuming every boiler in the building behaves like the big firetube — small types have small water reserves and react fast.","Thermal shock on cast iron: cold feedwater into a hot sectional boiler can crack a section.","Expecting electric-boiler operating costs to match gas; per Btu, electricity usually costs far more."],
+  quiz:[
+   {q:"What is the main drawback of an electric boiler for a large process load?", opts:["Electricity is usually the most expensive way to make a Btu of steam","It cannot make steam above 100°F","It requires daily blowdown twice an hour","It needs a tall stack"], a:0, why:"No flame and no stack, but the energy cost per Btu is typically the highest of any type."},
+   {q:"A cast-iron sectional boiler is mainly used for what?", opts:["Superheated steam for turbines","High-pressure process steam","Only marine service","Building heating — hot water or low-pressure steam"], a:3, why:"Sectional cast-iron boilers are heating boilers: low pressure, modest capacity, assembled on site."},
+   {q:"What is the classic failure of a cast-iron sectional boiler?", opts:["Stack fire","Burner explosion","Cracked sections from thermal shock or low water","Tube leaks"], a:2, why:"Cast iron does not forgive sudden temperature change or being fired dry — sections crack."},
+   {q:"A vertical tubeless boiler's main selling points are what?", opts:["Small footprint, no tubes, and fast steam-up for small loads","Highest pressure and capacity","It needs no safety valve","Lowest fuel cost"], a:0, why:"Tubeless verticals trade capacity and efficiency for compact size and quick response."},
+   {q:"When choosing a boiler type, the first thing to match is what?", opts:["The size of the boiler room door only","The load — size, pressure, steadiness, and how fast steam must come up","The brand the last plant used","The paint color"], a:1, why:"Type follows load: capacity, pressure, load pattern, space, and energy cost decide the fit."}]}
+,
+{ id:"l5", title:"Combustion and Air", mins:6,
+  sections:[
+   {h:"Fuel, oxygen, and heat", p:"A flame needs three things: fuel, oxygen, and heat to start it. In most food plants the fuel is natural gas at about 1,000 Btu per cubic foot; dual-fuel burners can switch to No. 2 fuel oil. Complete combustion of gas produces carbon dioxide, water vapor, nitrogen, and a little leftover oxygen. If the flue gas contains significant carbon monoxide, soot, or unburned fuel, combustion is not complete — fuel is wasted and a hazard is being created."},
+   {h:"Stoichiometric and excess air", p:"Stoichiometric air is the exact air that would burn the fuel completely — for natural gas, about 10 cubic feet of air per cubic foot of gas. No burner mixes perfectly, so boilers run with excess air: extra air beyond stoichiometric to make sure every bit of fuel finds oxygen. Too little makes CO and soot; too much heats air that does no work and carries that heat up the stack — air is about 79% nitrogen, and every bit of it must be heated."},
+   {h:"The sweet spot, in numbers", p:"For a well-tuned natural gas burner, the target is typically about 10 to 20% excess air, which shows in the flue gas as about 2 to 4% oxygen on a dry basis. For No. 2 fuel oil, figure about 15 to 25% excess air, or about 3 to 5% oxygen, because oil mixes harder than gas. Each additional 1% of flue-gas oxygen costs roughly 0.5% of efficiency — but never chase the lowest oxygen you can get; the right target is the lowest oxygen where CO stays low and the flame stays stable."},
+   {h:"Carbon monoxide: the warning sign", p:"CO tells you combustion is incomplete. In a well-tuned gas burner, CO should typically stay below 100 ppm, and often well below that; for oil, a common guide is below 200 ppm. If CO climbs while oxygen falls, the burner is running rich — the fix is more air, not more fuel. If CO climbs while oxygen is normal or high, suspect poor mixing, a dirty burner, or a flame impinging on a cold surface. Rising CO means call for a combustion check, not keep running and hope."}],
+  watch:["Judging combustion by flame color alone — gas flames tell you less than an analyser does; measure O2 and CO.","Black smoke at the stack: that is soot and incomplete combustion, never normal on gas.","Chasing minimum oxygen until CO climbs — the optimum is just above where CO starts to rise."],
+  quiz:[
+   {q:"Stoichiometric air for natural gas is roughly how much air per cubic foot of gas?", opts:["About 100 cubic feet","About 10 cubic feet","Air is not needed with gas","About 1 cubic foot"], a:1, why:"About 10 cubic feet of air per cubic foot of natural gas burns it completely in theory."},
+   {q:"A well-tuned gas burner typically runs at what flue-gas oxygen?", opts:["About 10 to 12% O2","About 20% O2","About 2 to 4% O2 (10–20% excess air)","0% O2 exactly"], a:2, why:"Gas targets roughly 2–4% O2; oil runs a little higher at about 3–5%."},
+   {q:"CO is climbing while oxygen is falling. What does that mean?", opts:["The feedwater is too hot","The burner is running rich — too much fuel for the air; it needs more air, not more fuel","The stack is too tall","The burner is running lean"], a:1, why:"Falling O2 with rising CO is a fuel-rich flame starved of air."},
+   {q:"Each extra 1% of flue-gas oxygen costs roughly how much efficiency?", opts:["About 0.5%","About 5%","About 10%","Nothing"], a:0, why:"Roughly half a percent of efficiency per extra percent of oxygen — excess air is not free."},
+   {q:"In a well-tuned gas burner, flue-gas CO should typically be what?", opts:["Around 1,000 ppm","Higher than oxygen","It does not matter","Below 100 ppm"], a:3, why:"Below 100 ppm is the guide for gas (below 200 ppm for oil); rising CO calls for a combustion check."}]},
+{ id:"l6", title:"Burners and Turndown", mins:5,
+  sections:[
+   {h:"What the burner does", p:"The burner mixes fuel and air, lights it safely, and holds a stable flame shaped to the furnace. Draft moves the combustion gas through the boiler: natural draft relies on the chimney effect, forced draft pushes air in with a fan, and induced draft pulls gas out with a fan in the stack, keeping the furnace under slight negative pressure. Draft is measured in inches of water column — 1 in. w.c. is only about 0.036 psi, but those tiny pressures decide whether the burner works."},
+   {h:"Reading the flame", p:"A healthy gas flame is steady, well-shaped, and mostly blue with a defined inner cone. A starved gas flame goes yellow, smoky, and unstable. A flame with far too much air is pale and thin and may lift off the burner or blow out. An oil flame is naturally more luminous — yellow-orange from glowing droplets — but it should still be steady and smoke-free at the stack; a ragged, pulsing, smoky oil flame means poor atomization, wrong air, or cold or dirty oil."},
+   {h:"Turndown and why it matters", p:"Turndown is the ratio of a burner's maximum firing rate to its minimum stable rate. A 5:1 burner can follow the load down to 20% of full fire without shutting off. That matters because every start costs a purge — fresh air blown through the furnace to clear unburned fuel — and that purge air carries heat up the stack. A burner that cycles ten times an hour wastes far more fuel in purges, and wears far more parts, than one that modulates smoothly."},
+   {h:"Modulating burners and oxygen trim", p:"A fully modulating burner varies fuel and air together across its range instead of banging on and off. Add an oxygen sensor trimming the air — O2 trim — and the burner holds excess air tight at every firing rate, with turndown of 5:1 to 10:1 or better on larger, efficiency-focused plants. The operator's part is watching for drift: a burner that used to modulate and now short-cycles is telling you the load, the linkage, or the controls have changed."}],
+  watch:["Flame impingement — a flame licking directly against tubes or refractory overheats the surface and makes CO; flame shape is a safety item, not cosmetics.","A burner that starts cycling far more often than it used to: purge losses and wear climb with every start.","Casing leaks on an induced-draft boiler pull in tramp air and quietly raise excess air."],
+  quiz:[
+   {q:"Turndown of 5:1 means the burner can fire stably down to what?", opts:["95% of full rate","50% of full rate","20% of full rate","5% of full rate"], a:2, why:"5:1 turndown means minimum stable fire is one-fifth — 20% — of maximum."},
+   {q:"Why does frequent burner cycling waste fuel?", opts:["Every start requires a purge that blows heated air up the stack","It does not waste fuel","Cycling cools the feedwater","It uses more gas per start only"], a:0, why:"Each purge clears the furnace with fresh air and carries heat away — ten starts an hour adds up."},
+   {q:"Draft is measured in what unit?", opts:["Psig","Inches of water column (in. w.c.)","Btu per hour","Parts per million"], a:1, why:"Draft pressures are tiny — 1 in. w.c. is about 0.036 psi — and measured in inches of water column."},
+   {q:"A gas flame that lifts off the burner or blows out most likely has what?", opts:["Too much water in the boiler","Too little air","A dirty gauge glass","Far too much air"], a:3, why:"A pale, thin, lifting flame is an over-aired flame losing its anchor at the burner."},
+   {q:"What does O2 trim do on a modulating burner?", opts:["Adds oxygen to the steam","Turns the burner off at high oxygen","An oxygen sensor trims combustion air to hold excess air tight at every firing rate","Trims the feedwater oxygen"], a:2, why:"O2 trim closes the loop on excess air, holding efficiency across the firing range."}]},
+{ id:"l7", title:"Feedwater Systems", mins:6,
+  sections:[
+   {h:"Where feedwater comes from", p:"Boiler feedwater is a mix of returned condensate and makeup water. Condensate is nearly pure, hot, and already treated — the best feedwater there is. Makeup is cold raw water carrying hardness, dissolved solids, and dissolved oxygen; it replaces what the plant loses to process use, blowdown, and leaks. Almost all treatment problems enter with the makeup, which is why the less makeup a plant uses, the easier the boiler is to run."},
+   {h:"The feedwater tank and deaerator", p:"Condensate and makeup mix in the feedwater tank, usually sized to hold 15 to 30 minutes of the boiler's feedwater use, giving the feed pumps a steady supply. A deaerator goes further: it heats the water to its saturation temperature and scrubs it with steam so dissolved oxygen and carbon dioxide are driven out and vented. A well-run deaerator gets dissolved oxygen down below 0.005 cc per litre — about 7 parts per billion. A deaerator running cold is not deaerating; it is just a warm tank."},
+   {h:"Hot feedwater pays twice", p:"Every degree of feedwater temperature recovered is a degree the boiler does not have to add with fuel — and hotter feedwater also drives dissolved gases out before they can corrode the boiler. That is the whole economics of condensate return in one sentence: the same 300 BHP boiler that delivers about 9,860 lb/hr on 200°F feedwater delivers only about 8,625 lb/hr when the feedwater drops to 60°F. Same boiler, same burner — over 1,200 lb/hr of capacity lost to cold feedwater."},
+   {h:"Feed pumps", p:"Feed pumps take water from the tank or deaerator and push it into the boiler against boiler pressure, on demand from the level control. Know your pumps: which is duty and which is standby, how the standby starts, and what a cavitating pump sounds like — gravel in the casing, from a pump starved of suction pressure or fed water too hot for its suction conditions. A feed pump problem becomes a low-water problem faster than any other failure in the room."}],
+  watch:["A deaerator vent that is shut tight or blowing hard — both are wrong; stripped gas must be able to leave steadily.","Falling feedwater temperature over a shift: check condensate return and the deaerator steam supply before blaming the boiler.","Running for weeks on one feed pump with the standby untested. Test the standby before you need it."],
+  quiz:[
+   {q:"Why is returned condensate the best feedwater?", opts:["It is nearly pure, hot, and already treated","It needs no testing","It is cold and fresh","It contains the most oxygen"], a:0, why:"Condensate brings back heat and purity; makeup brings in hardness, solids, and oxygen."},
+   {q:"A well-run deaerator reduces dissolved oxygen to about what?", opts:["About 100 ppm","Zero exactly, always","About 8 ppm","Below 0.005 cc per litre — about 7 parts per billion"], a:3, why:"Deaeration is measured in thousandths of a ppm because even a little oxygen pits hot steel."},
+   {q:"Dropping feedwater from 200°F to 60°F costs a 300 BHP boiler roughly how much output?", opts:["About 10 lb/hr","Over 1,200 lb/hr — from about 9,860 down to about 8,625 lb/hr","Nothing","It doubles the output"], a:1, why:"Cold feedwater raises the heat needed per pound, so the same boiler makes far less steam."},
+   {q:"A feedwater tank is usually sized to hold how much feedwater?", opts:["A full week of use","About 1 minute of use","15 to 30 minutes of the boiler's feedwater use","Exactly one boiler-full"], a:2, why:"The tank buffers 15–30 minutes of demand so the pumps always have a steady supply."},
+   {q:"A feed pump that sounds like it is pumping gravel is most likely doing what?", opts:["Cavitating — starved at the suction or fed water too hot for its suction conditions","Running backwards","Pumping steam","Running perfectly"], a:0, why:"Cavitation noise means vapor bubbles collapsing in the pump — fix the suction conditions fast."}]},
+{ id:"l8", title:"Water Treatment and Chemistry", mins:6,
+  sections:[
+   {h:"Hardness and scale", p:"Hardness is the calcium and magnesium in makeup water, measured in ppm as calcium carbonate (1 grain per gallon is about 17.1 ppm). Heated in the boiler, hardness comes out of solution as scale — a hard, stony layer on the waterside of tubes and shell. Scale insulates: the fire side gets hotter, the water side gets less heat, fuel use climbs, and in the extreme the metal overheats and fails. Prevention is the only real cure: soften the makeup, treat the water, and blow down on schedule."},
+   {h:"Dissolved oxygen and corrosion", p:"Cold makeup water can hold about 8 to 10 ppm of dissolved oxygen, and at boiler temperatures that oxygen attacks steel aggressively, drilling small, deep pits — usually where oxygen first meets hot metal: feedwater lines, the feedwater inlet, and tubes near the water line. Defense comes in layers: mechanical deaeration first, then a chemical oxygen scavenger such as sodium sulfite for what remains. Test the scavenger residual: too little means oxygen is getting through; too much means chemical is being wasted."},
+   {h:"Chemical treatment and TDS", p:"Treatment chemicals keep hardness suspended as a soft sludge that blowdown can remove, protect metal surfaces, and hold boiler-water pH and alkalinity in the target band your water-treatment supplier sets. Meanwhile every pound of steam that leaves takes pure water with it, so dissolved solids (TDS) concentrate in the boiler. Blowdown — surface blowdown for dissolved solids, bottom blowdown for sludge — is how the concentration is controlled. The daily water test is not paperwork; it is the only way you know the chemistry is inside the lines."},
+   {h:"The partnership", p:"Water treatment is a partnership: the operator tests, logs, and blows down on schedule; the treatment supplier sets the targets and the chemical doses; the site procedure ties the two together. Test the water after the softener, not before it — an exhausted softener passes hard water straight through while the gauge still looks fine. When a test comes back out of range, act the same shift: adjust, retest, and log it. Chemistry problems compound quietly and present loudly."}],
+  watch:["Testing softener output before the softener, or skipping the test because yesterday's was fine — resin exhausts on its own schedule.","Low sulfite residual with a cold deaerator: the scavenger is being asked to do the deaerator's whole job.","Letting TDS climb because blowdown 'wastes hot water.' Scale and carryover waste far more."],
+  quiz:[
+   {q:"What does hardness in boiler water become when heated?", opts:["Scale — a hard, insulating deposit on waterside surfaces","Steam","Soft sludge only","Oxygen"], a:0, why:"Calcium and magnesium come out of solution as scale, which insulates tubes and overheats metal."},
+   {q:"How much dissolved oxygen can cold makeup water hold?", opts:["About 0.007 ppm","About 8 to 10 ppm","None — oxygen does not dissolve","About 500 ppm"], a:1, why:"Cold water holds roughly 8–10 ppm of oxygen — the deaerator's job is to strip nearly all of it."},
+   {q:"What does an oxygen scavenger residual test tell you?", opts:["The stack temperature","The water level","The fuel pressure","Too little residual means oxygen is getting through; too much means wasted chemical"], a:3, why:"The residual proves scavenger is present to catch the oxygen the deaerator missed."},
+   {q:"Why does TDS concentrate inside a running boiler?", opts:["Steam leaves as pure water, leaving dissolved solids behind","Condensate adds hardness","The burner adds minerals","Chemicals add solids hourly"], a:0, why:"Only pure water leaves as steam, so solids build up until blowdown removes them."},
+   {q:"Where must the softener test be taken?", opts:["In the condensate tank","Before the softener","On the water after the softener — an exhausted softener passes hard water through","In the boiler drum only"], a:2, why:"Testing after the softener is the only way to catch an exhausted resin bed."}]},
+{ id:"l9", title:"Controls", mins:6,
+  sections:[
+   {h:"Operating pressure controls", p:"The operating pressure control is the boiler's thermostat: it starts, modulates, and stops the burner to hold steam pressure in a set band as load changes. On a modulating system it drives the firing rate up and down; on an on-off system it cycles the burner. It is an operating control — it manages the boiler day to day, and it is allowed to fail in the sense that other devices stand behind it."},
+   {h:"The high-limit pressure control", p:"Behind the operating control sits the high-limit pressure control, set above the operating band. If pressure climbs past the operating control — because it failed, or the load vanished suddenly — the high limit shuts the burner down. On many boilers it is a manual-reset device: it will not let the burner restart until an operator comes, looks, and resets it. That is deliberate. A high-limit trip is a message, not a nuisance."},
+   {h:"Level and feedwater controls", p:"The feedwater level control — float, probe, or transmitter — tells the feed pump or feedwater valve what to do to hold the water level in its normal band. Keep it separate in your mind from the low-water cutoff: the level control is an operating control that manages the level, the cutoff is a safety device that kills the burner when the level falls too far. Confusing a level-control fault with a cutoff fault leads to wrong fixes on the device that matters most."},
+   {h:"Flame safeguard and burner management", p:"The flame safeguard runs the burner's safe sequence: pre-purge, trial for ignition, flame proving, run, and post-purge — and it locks the burner out if the flame fails or fails to light. It proves the flame with a scanner and never lets fuel flow unproven. Never jumper, bypass, or rush it. A burner that locks out repeatedly is reporting a problem — fuel, air, ignition, or scanner — and the answer is diagnosis, not the reset button."}],
+  watch:["Resetting a manual-reset high limit or a flame-safeguard lockout repeatedly without finding the cause.","Treating the operating control's setpoint as the safety limit — the high limit and the safety valve stand above it for a reason.","A pressure band that has quietly crept upward over months. Compare setpoints against the posted values on rounds."],
+  quiz:[
+   {q:"What is the operating pressure control's job?", opts:["To start, modulate, and stop the burner to hold steam pressure in its band","To cut off the burner on low water","To set the safety valve pressure","To vent steam in an emergency"], a:0, why:"It is the boiler's thermostat — an operating control managing pressure day to day."},
+   {q:"Why is the high-limit control often manual-reset?", opts:["No reason","To save electricity","Because automatic ones cost more","So an operator must come, look, and reset it — a high-limit trip is a message"], a:3, why:"Manual reset forces a human to investigate before the burner runs again."},
+   {q:"What is the difference between the level control and the low-water cutoff?", opts:["The level control manages the level; the cutoff is a safety device that kills the burner when level falls too far","There is none","The level control is a safety device","The cutoff manages the level daily"], a:0, why:"Operating control versus safety device — never confuse a fault in one for the other."},
+   {q:"What does the flame safeguard prove before and during firing?", opts:["Water level","Stack temperature","The flame — it sequences purge, ignition trial, and flame proving, and locks out on failure","Feedwater temperature"], a:2, why:"No proven flame, no fuel: the safeguard runs the safe firing sequence and locks out on failure."},
+   {q:"A burner locks out for the third time in a shift. The right response is what?", opts:["Keep resetting it until it stays lit","Diagnose the cause — fuel, air, ignition, or scanner — instead of living on the reset button","Open the fuel valve by hand","Jumper the safeguard to finish the shift"], a:1, why:"Repeated lockouts are a report, not bad luck; bypassing the safeguard is never the answer."}]},
+{ id:"l10", title:"Safety Devices", mins:6,
+  sections:[
+   {h:"The low-water cutoff: the device that matters most", p:"Low water is the most common cause of serious boiler damage, and the low-water cutoff (LWCO) is the device that prevents it. It shuts the burner down when the level falls to the cutoff point — set above the lowest safe water level, so there is a margin. It is not an operating control; it does not manage the level. It is the backstop for the day the feedwater system fails: a tripped pump, a closed valve, a blocked line, a failed controller."},
+   {h:"Float type and probe type", p:"A float-type cutoff rides the water level in a chamber connected to the boiler; as the float falls to the cutoff point it operates a switch that kills the burner. A probe-type cutoff has no moving parts: probes extend into the water, current flows through the water to prove level, and when the level drops below the probe tip the circuit opens and the burner shuts down. Many boilers carry two cutoffs — a primary, and a secondary set a little lower that also locks the burner out until manual reset. Know how many yours has, where each is set, and how each is tested."},
+   {h:"The safety valve: last line against overpressure", p:"If every control fails and pressure keeps rising, the safety valve opens and vents steam, holding pressure below the boiler's maximum allowable working pressure (MAWP). It is purely mechanical — a spring holding a disc shut — needing no electricity, no controls, and no operator. Its set pressure is stamped on the valve and is at or below MAWP. Never adjust it, weight it, prop it, or tie it down, and never cap or valve off its discharge, which must be piped to a safe place. A boiler must never run with its safety valve removed, blocked, or isolated — if the valve is out, the boiler is out of service."},
+   {h:"Testing is the job", p:"Safety devices only protect you if they work on the day they are called, so they are tested on schedule: blow down the water column and cutoff chambers, prove the burner shuts down on a simulated low level, and lift-test safety valves as your procedure and jurisdiction require. Log every test with date, time, result, and your name — a test that is not logged cannot be proven. If a test fails, take the boiler out of service and report it immediately. There is no exception to that rule."}],
+  watch:["A low-water alarm sounding and waiting for the cutoff to handle it — the alarm sounds first precisely so you can act.","A safety valve simmering or weeping at normal pressure: it may be set too close to operating pressure or have a damaged seat. Log it and report it.","Skipping the column blowdown because 'the level looked right.' Sludge in the column can hold a float up while the boiler runs dry."],
+  quiz:[
+   {q:"The low-water cutoff point is set where?", opts:["Below the furnace tubes","Above the lowest safe water level, so there is a margin","At the lowest safe water level exactly","At the top of the gauge glass"], a:1, why:"The cutoff trips before the level reaches the danger point — the margin is the protection."},
+   {q:"How does a probe-type low-water cutoff prove the level?", opts:["Current flows through the water; when level drops below the probe tip, the circuit opens and the burner shuts down","A float rises and falls","It watches the gauge glass","It weighs the boiler"], a:0, why:"Water conducts, steam does not — an uncovered probe opens the circuit and kills the burner."},
+   {q:"The safety valve is set to open at or below what?", opts:["Twice the MAWP","The boiler's maximum allowable working pressure (MAWP)","The operating pressure","Any pressure the operator chooses"], a:1, why:"The stamped set pressure is at or below MAWP — never adjust, weight, or tie down a safety valve."},
+   {q:"A safety device test fails on your shift. What do you do?", opts:["Jumper the device until parts arrive","Reset it and test again next month","Run the boiler and note it for next week","Take the boiler out of service and report it immediately"], a:3, why:"A boiler does not run with a failed safety device — no exceptions."},
+   {q:"Why do many boilers carry two low-water cutoffs?", opts:["To double the alarm volume","Codes require exactly two floats","The secondary, set a little lower, backs up the primary and may lock out the burner until manual reset","One is decorative"], a:2, why:"A second, lower cutoff is cheap insurance against failure of the device that matters most."}]},
+{ id:"l11", title:"Reading the Boiler", mins:6,
+  sections:[
+   {h:"Pressure and temperature: one number, not two", p:"Saturated steam has one story told two ways: pressure and temperature are locked together. At 0 psig the steam is 212°F; at 15 psig, 250°F; at 50 psig, 298°F; at 100 psig, 338°F; at 150 psig, 366°F; at 200 psig, 388°F. Learn that ladder and every gauge becomes a cross-check on the others — a pressure gauge and a temperature gauge that disagree with the saturation table are telling you one of them is wrong, or the steam is not saturated."},
+   {h:"Water level: the reading that matters most", p:"Read the gauge glass properly: know where normal level sits in the glass, watch how the level behaves at your load, and blow the glass down on schedule so you know it is honest. A falling level means the boiler is using water faster than feedwater replaces it — find out why before the low-water alarm answers for you. A rising level risks carryover: water swept out with the steam, wetting the process and hammering the lines. Level is the one reading you check first, last, and most often."},
+   {h:"Stack temperature: the efficiency gauge", p:"Stack temperature tells you how much heat is leaving instead of steaming. A clean, well-tuned boiler without heat recovery typically runs a stack about 100°F to 150°F above steam temperature — on a boiler steaming at about 353°F, expect roughly 450°F to 500°F at the stack. Log stack temperature with the firing rate beside it, because stack temperature rises with load; compared at the same load, a climbing stack means fouled surfaces or too much excess air, and money leaving through the roof."},
+   {h:"What normal looks like", p:"Reading the boiler means knowing your boiler's normal: its pressure band, its level behavior, its feedwater temperature, its stack temperature at low and high fire. Write the numbers down every round, the same way, in the same log. Trends are the early-warning system — a gauge that moved 10 degrees this week and 10 more next week is a work order asking to be written while it is still cheap."}],
+  watch:["Trusting a gauge glass that has not been blown down — a blocked connection can freeze a false level in the glass.","Comparing today's stack temperature at high fire with yesterday's at low fire and calling it a trend.","A pressure gauge that never moves. Gauges fail stuck as well as failed zero; tap, compare, and cross-check against saturation."],
+  quiz:[
+   {q:"Saturated steam at 150 psig is at what temperature?", opts:["366°F","250°F","406°F","298°F"], a:0, why:"The saturation ladder: 0 psig = 212°F, 100 = 338°F, 150 = 366°F, 200 = 388°F."},
+   {q:"A pressure gauge reads 100 psig but the steam temperature reads 280°F. What do you conclude?", opts:["Everything is fine","Temperature does not follow pressure","Something is wrong — at 100 psig saturated steam must be about 338°F, so a gauge is off or the steam is not saturated","The boiler is making cold steam"], a:2, why:"Pressure and saturation temperature are locked together; disagreement means a bad instrument or wet steam."},
+   {q:"On a boiler steaming at about 353°F with no heat recovery, a normal stack temperature is roughly what?", opts:["About 200°F","About 450°F to 500°F — roughly 100–150°F above steam temperature","The same as the steam temperature","About 900°F"], a:1, why:"Stack gas normally leaves about 100–150°F above steam temperature on a boiler without an economizer."},
+   {q:"Why must the firing rate be logged next to the stack temperature?", opts:["It is not necessary","For the fuel bill only","Stack temperature rises with load — comparisons are only valid at the same firing rate","To fill the log sheet"], a:2, why:"Load moves the stack temperature; trend it at like-for-like firing rates or the trend lies."},
+   {q:"A steadily rising water level in the glass puts the plant at risk of what?", opts:["Low-water damage","High oxygen in the flue gas","A cold stack","Carryover — water swept out with the steam, wetting the process and hammering lines"], a:3, why:"Too-high level lets boiler water leave with the steam; too-low level risks overheating. Both directions matter."}]}
+  ]
+},
+{ id:"running", title:"Running the Boiler", tag:"On shift",
+  desc:"The daily work: rounds that catch problems early, safe startup and shutdown, holding level and load, blowdown, and running for efficiency.",
+  lessons:[
+{ id:"l12", title:"Daily Rounds", mins:6,
+  sections:[
+   {h:"Why the same round, every time", p:"A round is not a stroll. It is the same checks, in the same order, every shift, so that nothing depends on memory and any change stands out against a stable routine. Problems in a boiler room announce themselves small — a sound, a smell, a number 10 degrees off — and the round exists to catch them at that size, before they become shutdowns."},
+   {h:"First stops: level and pressure", p:"Start where the danger lives: the water level. Check the gauge glass, confirm the level is in its normal band, and prove the glass is honest per your procedure. Then the pressure and temperature gauges: pressure in its band, and temperature agreeing with saturation for that pressure. Those two stops take a minute and cover the two ways a boiler can hurt someone — too little water and too much pressure."},
+   {h:"Flame, stack, and feedwater", p:"Read the flame like a gauge: steady, well-shaped, the right look for the fuel. Note the stack temperature with the firing rate. Then the feedwater system: deaerator temperature and pressure, tank level, the duty pump running clean, the standby pump ready. A cold deaerator, a falling feedwater temperature, or a pump that sounds wrong is tomorrow's low-water event introducing itself today."},
+   {h:"Blowdown, auxiliaries, and the log", p:"Finish with blowdown valve positions, the day's water tests done and in range, chemical tanks with chemical in them, and the room itself: leaks, unusual noises, fuel smells, housekeeping. Then write it all down. The log is not paperwork for its own sake — it is the trend record the next operator, the inspector, and future-you will read. Write it like the next operator is a stranger, because at 3 a.m., half-asleep, they basically are."}],
+  watch:["Doing the round from the doorway. Gauges get read at the gauge, flames get seen at the sight port, pumps get listened to up close.","Skipping the water test because the last three were fine — chemistry drifts quietly and the test is the only witness.","A log full of identical copied numbers. Real numbers wiggle; copied numbers hide the wiggle that matters."],
+  quiz:[
+   {q:"Why is a round done the same way, in the same order, every shift?", opts:["So it can be done faster","Because the log requires it","It is just tradition","So nothing depends on memory and any change stands out against a stable routine"], a:3, why:"Consistency is the detection system — change is only visible against a stable baseline."},
+   {q:"What are the first two stops on the round, and why?", opts:["Burner and feed pump","Water level and pressure/temperature — they cover the two ways a boiler can hurt someone","Fuel tank and stack","Office and log book"], a:1, why:"Too little water and too much pressure are the lethal pair; check them first, every time."},
+   {q:"A falling feedwater temperature on rounds most likely points first to what?", opts:["A dirty flame scanner","Too much blowdown","Condensate return trouble or a deaerator steam-supply problem","A bad pressure gauge"], a:2, why:"Feedwater temperature is made by condensate return and deaerator steam — check there first."},
+   {q:"What belongs in the log next to the stack temperature?", opts:["The outdoor temperature","The firing rate — stack temperature only trends at the same load","The operator's initials only","The fuel pressure"], a:1, why:"Without the firing rate, stack readings from different loads cannot be compared honestly."},
+   {q:"A log shows exactly the same numbers every shift for a week. What should you suspect?", opts:["Copied numbers — real readings wiggle, and copying hides the trend that matters","A perfectly tuned boiler","A new gauge","Nothing at all"], a:0, why:"Identical numbers are a red flag for pencil-whipped rounds, not proof of a stable plant."}]},
+{ id:"l13", title:"Startup Procedures", mins:6,
+  sections:[
+   {h:"Cold start versus warm start", p:"Know which start you are doing. A cold start begins with a boiler at room temperature and pressure, full of cold water, after an outage or inspection — everything must be verified from zero. A warm start restarts a boiler that is still hot and pressurized after a short stop. The warm start is shorter, but the discipline is the same: verify the water side, the fuel and air side, and the controls before fire, in the order your site procedure gives."},
+   {h:"Before you light off", p:"Pre-start checks cover three areas. Water side: level in the glass at the proper startup level, feedwater available, valves lined up, column and cutoff chambers blown down. Fuel and air side: fuel supply at pressure, valves in their correct positions, damper and fan operation proven. Electrical and controls: power on, alarms clear, safety devices in service — never start a boiler with a safety device bypassed or out of service. Then walk the whole boiler once more with fresh eyes."},
+   {h:"The purge: the step that prevents explosions", p:"Before ignition, the burner management system purges the furnace — blowing fresh air through it for a timed period to clear any unburned fuel that may have leaked in while the boiler sat. A furnace full of fuel vapor lit by a spark is an explosion, and the purge is what stands in the way. Never shorten it, jumper it, or light off around it. If a start fails and locks out, the full purge runs again before the next attempt — that is the system protecting you, not wasting your time."},
+   {h:"Warming up: slow is fast", p:"Bring a cold boiler up slowly. Fire at low rate, let metal temperatures even out, and watch the level: water expands as it heats, so the glass rises without any feedwater being added — do not drain it down to normal and then run short when full temperature is reached. Raise pressure gradually, check for leaks as joints come up to temperature, and bring the boiler on line with the plant only when pressure, level, and water chemistry are all where they belong. A rushed cold start buys an hour and can cost a boiler."}],
+  watch:["Lighting off with the level already high — thermal expansion will push it higher and can carry water over into the steam line.","Treating a failed start as a reason to defeat the purge. The purge after a failed start matters most of all.","Forcing warm-up to meet a production start time. Thermal stress damage is silent and cumulative."],
+  quiz:[
+   {q:"What is the purpose of the pre-ignition purge?", opts:["To test the feed pump","To raise steam pressure","To warm the tubes","To blow fresh air through the furnace and clear any unburned fuel before ignition"], a:3, why:"The purge clears leaked fuel vapor so ignition cannot light a furnace full of fuel."},
+   {q:"During warm-up from cold, the water level in the glass rises even with no feedwater added. Why?", opts:["Steam is condensing in the glass","The feed valve is leaking","Water expands as it heats","The gauge glass is broken"], a:2, why:"Thermal expansion swells the water — do not drain it down, or you will run short at full temperature."},
+   {q:"Which condition must be true before any start?", opts:["The stack is already hot","Safety devices in service — never start with a safety device bypassed or out of service","The boiler is completely empty","Production is waiting"], a:1, why:"No start happens with a safety device defeated; that rule has no schedule exception."},
+   {q:"A cold start differs from a warm start mainly how?", opts:["It uses no fuel","It needs no checks","It skips the purge","It begins cold, at no pressure, after an outage — everything is verified from zero"], a:3, why:"Cold means from room temperature and zero pressure; the full verification discipline applies."},
+   {q:"Why bring a cold boiler up slowly?", opts:["To let metal temperatures even out and avoid thermal stress, watching leaks as joints heat up","Slow starts use less water","To save a little fuel","It is only a courtesy to the night shift"], a:0, why:"Uneven heating stresses shells, tubes, and joints; slow warm-up is cheap insurance."}]},
+{ id:"l14", title:"Shutdown Procedures", mins:5,
+  sections:[
+   {h:"Bringing a boiler off line cleanly", p:"A normal shutdown is a controlled unload, not an off switch. Reduce the load first — let the plant's demand fall or transfer it to another boiler — so the burner comes down through its range instead of tripping from full fire. Then take the boiler off line, shut the burner down through its proper post-purge, and secure the steam outlet so the boiler is isolated from the header in the order your procedure specifies."},
+   {h:"Secure the water side", p:"Decide the level you leave behind. A boiler cooling down contracts: the water shrinks as it cools, so a boiler left at normal level hot will show a lower level cold. Follow your procedure for the layup level, keep feedwater available while the boiler is still hot enough to need it, and never leave a hot, pressurized boiler with its feedwater isolated and forgotten. Then log the shutdown: time, pressures, level, and anything unusual the next start needs to know."},
+   {h:"Securing for the night", p:"An overnight shutdown keeps the boiler warm and ready: burner off or on low standby per procedure, pressure allowed to coast down within limits, water side secured but monitored, and the room left safe — no fuel valves left in odd positions, no alarms defeated. The morning start from a properly secured boiler is a warm start; from a carelessly secured one, it is a troubleshooting session."},
+   {h:"Long layup: wet versus dry", p:"For a long outage, choose the layup deliberately. Wet layup fills the boiler completely with treated water, dosed to protect the metal, and keeps it full so no air reaches the waterside — good for shorter outages and boilers that must return quickly. Dry layup drains the boiler, dries it thoroughly, and keeps it dry, sometimes with desiccant or a nitrogen cap — better for long outages and freezing risk. The enemy in both is the same: oxygen meeting wet steel. A boiler laid up carelessly can corrode faster in a month idle than in a year of running."}],
+  watch:["Tripping the burner from full fire as a routine shutdown — unload first, every time.","Leaving a hot boiler isolated from feedwater with no one watching the level as it cools and contracts.","A 'temporary' wet layup with untreated water and air pockets: that is a corrosion program, not a layup."],
+  quiz:[
+   {q:"What is the first step of a normal shutdown?", opts:["Drain the boiler hot","Shut off the feedwater","Reduce the load first, so the burner unloads through its range instead of tripping from full fire","Close the main steam stop valve at full load"], a:2, why:"Unload, then shut down — a routine trip from full fire stresses the boiler and the plant."},
+   {q:"Why does a cooling boiler's water level fall even with no leak?", opts:["The glass shrinks","Water contracts as it cools, so a level set hot reads lower cold","The feed pump runs backwards","Steam escapes through the safety valve"], a:1, why:"Contraction on cooling is normal physics — set the layup level per procedure with it in mind."},
+   {q:"Wet layup protects the boiler how?", opts:["By painting the shell","By leaving it half full","By draining it completely","By keeping it completely full of treated water so air cannot reach the waterside"], a:3, why:"A full, treated, air-free boiler has no oxygen available to corrode the metal."},
+   {q:"When is dry layup the better choice?", opts:["For long outages or freezing risk — drained, dried, and kept dry","For an overnight stop","When the boiler must restart in an hour","Never"], a:0, why:"Dry layup suits long idle periods; wet layup suits shorter outages needing a quick return."},
+   {q:"What must every shutdown end with?", opts:["Draining the feedwater tank","A water test","A log entry — time, pressures, level, and anything the next start needs to know","Locking the boiler room"], a:2, why:"The next start inherits your shutdown; the log is how it inherits the facts too."}]},
+{ id:"l15", title:"Normal Operation", mins:6,
+  sections:[
+   {h:"Firing rate follows load", p:"In normal operation the deal is simple: the plant draws steam, pressure starts to fall, and the burner fires harder to hold the pressure band; the plant eases off, pressure rises, and the burner comes down. Your job is to watch that conversation stay healthy — pressure steady in its band, level steady in the glass, stack temperature steady for the firing rate — and to notice when the boiler starts working harder to do the same job."},
+   {h:"Cycling versus modulating", p:"An on-off burner answers load swings by cycling: full fire or nothing, with a purge on every start. A modulating burner answers by turning up and down across its range, holding pressure smoothly. Cycling costs fuel in purge losses, wears starters, fans, and valves, and swings pressure and level with every start. If a modulating boiler starts short-cycling, something changed — load pattern, control tuning, or a firing-rate fault — and it is worth a work order, not a shrug."},
+   {h:"Steam quality: dry steam versus wet steam", p:"The plant wants dry saturated steam. Wet steam carries liquid water droplets out with it, and that water steals heat, slows cooking, and hammers piping. Two classic causes: carryover, where boiler water itself is swept out because of high level, high TDS, or foaming chemistry; and priming, a sudden surge of water into the outlet when load jumps abruptly and the pressure drop makes the boiler water swell and foam. Both get worse at high level and high firing rate."},
+   {h:"When demand swings", p:"Big, sudden steam demands — a cooker battery coming on, a clean-in-place cycle starting — are the boiler's hardest moments. Prepare for the ones you can see coming: know the plant's rhythm, have pressure and level in the middle of their bands before the surge, and never meet a surge by overfiring a boiler with a high level and dirty water. After the surge, check what it cost: level behavior, pressure recovery, and whether steam quality suffered, and log anything abnormal."}],
+  watch:["Running with the level at the top of the glass 'for reserve.' High level is carryover waiting for a load surge.","Blaming wet steam on the process before checking level, TDS, and recent load swings.","A pressure band that sags further every week at the same load — the boiler is losing capacity to scale, fouling, or burner drift."],
+  quiz:[
+   {q:"In normal operation, what drives the firing rate?", opts:["Steam load — pressure falls as the plant draws steam, and the burner answers to hold the band","The stack temperature","The clock","The water level only"], a:0, why:"Firing rate follows load through the pressure control: draw steam, pressure dips, burner responds."},
+   {q:"Priming is best described as what?", opts:["The pre-start purge","A sudden surge of boiler water into the steam outlet when load jumps and pressure drop makes the water swell","Painting the boiler","Adding chemical to the feedwater"], a:1, why:"A sudden load pulls pressure down, the water swells and foams, and liquid surges out with the steam."},
+   {q:"Carryover is made worse by which combination?", opts:["Cold feedwater","Low firing rate","High level, high TDS, and foaming water chemistry","Low level and low TDS"], a:2, why:"High level plus concentrated, foaming water is the classic carryover recipe."},
+   {q:"A modulating boiler that starts short-cycling is telling you what?", opts:["It needs a bigger burner","Something changed — load pattern, control tuning, or a firing-rate fault — and it deserves a work order","It is breaking in","Nothing; cycling is free"], a:1, why:"Short-cycling burns purge fuel and wears equipment; a new cycling pattern is a symptom."},
+   {q:"Before a predictable steam surge, the boiler should be sitting how?", opts:["At minimum fire with low pressure","Level at the very top of the glass","With the feedwater isolated","Pressure and level in the middle of their bands, ready for the swing"], a:3, why:"Mid-band pressure and level give the boiler room to absorb the surge in both directions."}]},
+{ id:"l16", title:"Water Level and Blowdown", mins:6,
+  sections:[
+   {h:"Why the level matters so much", p:"The water level is the line between a boiler and a bomb's worth of overheated metal. Too low, and furnace tubes and sheets lose their water cooling, overheat, and can fail in minutes. Too high, and water carries over into the steam system. The level lives in a band, the feedwater control holds it there, the gauge glass shows it, and the low-water cutoff stands behind everything as the last line of defense. Blow down the water column on schedule: sludge can hold a float up and show a fine level in the glass while the boiler itself runs low."},
+   {h:"Surface blowdown versus bottom blowdown", p:"The two blowdowns do different jobs. Surface (continuous) blowdown skims water from near the surface, where dissolved solids concentrate as steam leaves — it controls TDS and runs steadily or on a controller. Bottom (mud) blowdown opens a valve at the boiler's lowest point for a short burst to eject sludge and sediment that settled there. Skipping bottom blowdown lets sludge bake onto hot surfaces; skipping surface blowdown lets TDS climb into carryover territory."},
+   {h:"When and how much", p:"How much blowdown is enough is set by the water tests: conductivity or TDS against the target band your treatment program sets. The arithmetic is simple — the worse the makeup and the lower the condensate return, the more blowdown the boiler needs. Blow down bottom in short bursts per your procedure, with the level watched and the boiler attended, never as an unattended drain. Heat in blowdown water is real money: plants with high blowdown rates recover it with flash tanks and heat exchangers, which is another reason condensate return beats blowdown every time."},
+   {h:"What the water tests tell you", p:"Your daily tests close the loop: boiler-water conductivity or TDS for blowdown control, pH and alkalinity for corrosion and carryover protection, sulfite residual for oxygen protection, and hardness on the softened makeup to prove the softener works. A test out of range is an instruction: adjust blowdown or chemical feed, retest, and log both numbers. Tests that get written down but never acted on are worse than no tests — they prove the plant knew."}],
+  watch:["Blowing the bottom down and walking away mid-blowdown. The valve is open, the level is falling, and your place is at the boiler.","Judging blowdown need by water appearance. Clear water can carry high TDS; only the test knows.","A gauge glass level that never moves when the column is blown down — the connections are blocked and the glass is lying."],
+  quiz:[
+   {q:"Surface blowdown controls what, mainly?", opts:["Water temperature","Dissolved solids (TDS), which concentrate near the surface as steam leaves","Sludge at the bottom","Fuel pressure"], a:1, why:"Continuous surface blowdown holds TDS in band; bottom blowdown handles settled sludge."},
+   {q:"Bottom blowdown is done how?", opts:["In short, attended bursts at the boiler's lowest point to eject sludge","Through the safety valve","Left open continuously","Only at annual inspection"], a:0, why:"Short bursts, operator present, level watched — never an unattended open drain."},
+   {q:"What decides how much blowdown is enough?", opts:["The operator's habit","The weather","The size of the drain pipe","The water tests — conductivity or TDS against the treatment program's target band"], a:3, why:"Blowdown follows the chemistry: worse makeup and less condensate return mean more blowdown."},
+   {q:"Why blow down the water column on schedule?", opts:["To test the drain","It is only for appearance","Sludge in the column can hold a float up and fake a safe level while the boiler runs low","To waste hot water"], a:2, why:"A plugged column lies about the two most important things in the room: level and cutoff."},
+   {q:"Which test protects against oxygen corrosion?", opts:["Sulfite residual — proof the oxygen scavenger is present and working","Fuel pressure","Hardness","Stack temperature"], a:0, why:"Sulfite residual confirms scavenger is available for the oxygen the deaerator missed."}]},
+{ id:"l17", title:"Fuel, Air, and Efficiency", mins:6,
+  sections:[
+   {h:"What efficiency means", p:"Boiler efficiency is the percentage of the fuel's heat that ends up in the steam. Most boilers in food plants run at 75% to 85% — meaning 15 to 25 cents of every fuel dollar goes somewhere useless: up the stack, out the blowdown, through the casing. The operator cannot redesign the boiler, but the operator controls the two biggest levers: how much excess air the burner uses, and how hot the stack gas is."},
+   {h:"The stack losses", p:"The largest loss is hot gas up the stack, in two parts: dry gas loss, typically 5–10%, controlled by excess air and stack temperature; and moisture loss, typically 10–11%, mostly fixed by the fuel itself. Department of Energy combustion guidance for natural gas shows the pattern plainly: at 15% excess air (about 3% O2), combustion efficiency falls from about 84.7% at a 200°F net stack temperature to about 76.7% at 500°F. Stack temperature dominates — fix it first, then excess air."},
+   {h:"Two rules of thumb worth memorizing", p:"Efficiency rises about 1% for each 40°F drop in stack temperature, and about 1% for each 15% reduction in excess air. Run the math on your plant: a boiler burning fuel around the clock that gains 1% efficiency keeps 1% of a very large annual fuel bill. That is what a dirty tube costs, too — scale on the waterside and soot on the fireside both push stack temperature up, and every 40°F of it is a percent of the fuel budget leaving through the roof."},
+   {h:"The other losses the operator controls", p:"Blowdown loss: every gallon blown down is heated, treated water thrown away — control TDS tightly enough to protect the boiler and no tighter. Feedwater temperature: hotter feedwater is efficiency the burner never has to make, which is why condensate return is an efficiency program, not just a water program. And radiation and casing losses grow when insulation is damaged or removed and never replaced. Efficiency is not a tune-up event; it is the sum of daily operator habits."}],
+  watch:["Comparing efficiency or stack temperature at different loads and calling the difference a trend.","Letting excess air creep up because 'the flame looks safer with more air.' It looks paler — and the fuel bill climbs.","Damaged or missing insulation left off after maintenance. Casing losses run all day, every day."],
+  quiz:[
+   {q:"Most food-plant boilers run at roughly what efficiency?", opts:["About 50%","Exactly 100% minus stack loss only","About 98%","75% to 85% — so 15 to 25 cents of every fuel dollar is lost"], a:3, why:"Typical plant boilers convert 75–85% of fuel heat to steam; the rest is recoverable or controllable loss."},
+   {q:"Per the rule of thumb, a 40°F drop in stack temperature is worth about what?", opts:["About 0.1% efficiency","Nothing measurable","About 1% efficiency","About 10% efficiency"], a:2, why:"About 1% per 40°F of stack temperature, and about 1% per 15% cut in excess air."},
+   {q:"At about 3% O2, raising net stack temperature from 200°F to 500°F costs roughly how much combustion efficiency?", opts:["About 1 point","It gains efficiency","Nothing","About 8 points — from roughly 84.7% down to about 76.7%"], a:3, why:"Department of Energy guidance shows stack temperature dominating the loss table."},
+   {q:"Which is the largest single boiler loss?", opts:["Radiation from the casing","Hot gas up the stack — dry gas plus moisture losses","Feed pump power","Blowdown"], a:1, why:"Stack loss is the big one, which is why stack temperature is the operator's efficiency gauge."},
+   {q:"Why is condensate return an efficiency program?", opts:["Hotter feedwater is heat the burner never has to supply","It reduces the need for a safety valve","It is not","It lowers stack temperature directly"], a:0, why:"Every degree returned in the feedwater is a degree of fuel not burned — capacity and efficiency together."}]}
+  ]
+},
+{ id:"alive", title:"Keeping It Alive", tag:"Protect the asset",
+  desc:"Troubleshooting by symptoms, the PM that actually happens, inspections and the law, emergencies, condensate and steam distribution, and the reference tables.",
+  lessons:[
+{ id:"l18", title:"Troubleshooting by the Symptoms", mins:6,
+  sections:[
+   {h:"Start with normal", p:"Troubleshooting is comparison: what is this boiler doing, against what it normally does? That is why the log and the rounds matter — without a normal, every symptom is a mystery. Work from the symptom in a fixed order: confirm the reading is real, compare with the log at the same load, check the simple causes first, and change one thing at a time so you know what fixed it."},
+   {h:"The flame is wrong", p:"A yellow, smoky gas flame is starved of air or dirty — check air supply, then call for a combustion check if CO is suspected. A flame that lifts off or blows out has too much air or a fuel-pressure problem. A flame impinging on tubes or refractory — licking a surface it should stand clear of — overheats that surface and makes CO; flame shape is corrected by burner adjustment, not by running it anyway. On oil, a ragged, pulsing, smoky flame points to atomization: cold oil, dirty nozzle, or wrong air."},
+   {h:"The stack runs hot and the level swings", p:"A stack temperature climbing at the same load means heat is not getting into the water: soot on the fireside, scale on the waterside, or excess air creeping up — check the oxygen reading to split the causes. A swinging water level points to load swings, a hunting feedwater control, foaming water from high TDS or chemistry, or a passing blowdown valve. Each symptom has a short list of likely causes; work the list in order instead of shotgunning parts."},
+   {h:"Short-cycling and wet steam", p:"A burner that short-cycles is answering a control or load problem: an oversized burner on a small load, a pressure band set too tight, or a control hunting. Wet steam sends you to level, TDS, and load swings first, as the normal-operation lesson covered. The discipline is the same everywhere: symptom, likely causes in order, check first things first, escalate when the list runs out or safety is involved."}],
+  watch:["Adjusting two things at once and never learning which one fixed it — or made it worse.","Believing the first gauge you read. Confirm a wild reading with a second instrument or a saturation cross-check.","Running a smoky burner 'until maintenance can look at it Monday.' Smoke means incomplete combustion, and incomplete combustion can fill a furnace with fuel."],
+  quiz:[
+   {q:"Troubleshooting starts with what comparison?", opts:["Against normal — this boiler's logged behavior at the same load","Against the nameplate only","Against last year's inspection","Against the boiler next door"], a:0, why:"No normal, no diagnosis: symptoms only mean something against the baseline in the log."},
+   {q:"Stack temperature is up at the same load and oxygen is also up. First suspect?", opts:["Scale on the waterside","Low water","A bad stack thermometer for sure","Excess air creeping up — the burner has drifted and needs tuning"], a:3, why:"Stack up together with O2 up points at air; stack up with O2 normal points at fouled surfaces."},
+   {q:"Flame impingement is dangerous because it does what?", opts:["It overheats the surface it touches and produces carbon monoxide","It lowers stack temperature","It raises feedwater temperature","It looks untidy"], a:0, why:"A flame licking tubes or refractory cooks the surface and quenches combustion into CO."},
+   {q:"A swinging water level's likely causes include which set?", opts:["Stack temperature","Fuel pressure only","Load swings, hunting feed control, foaming water from high TDS, or a passing blowdown valve","Only a broken gauge glass, always"], a:2, why:"Work the short list in order: load, control, chemistry, and leaking blowdown are the usual suspects."},
+   {q:"When you make an adjustment while troubleshooting, how many things should you change at once?", opts:["It does not matter","One — so you know what fixed it, or made it worse","As many as possible","Two minimum"], a:1, why:"One change at a time is what turns troubleshooting into knowledge instead of luck."}]},
+{ id:"l19", title:"Preventive Maintenance", mins:6,
+  sections:[
+   {h:"Why PM pays, and what 'done' means", p:"Preventive maintenance is the work done on schedule, while the boiler is healthy, so it stays that way. A PM is not done when the box is ticked; it is done when the task was actually performed, the result recorded, and any defect found turned into a work order. The daily round is the first layer of PM — most scheduled tasks exist to go deeper than a round can."},
+   {h:"Burner, controls, and safety devices", p:"Burner PM covers cleaning and inspecting the burner, checking linkages and cams for wear and slop, proving the fan and dampers, and periodic combustion analysis to confirm oxygen and CO are where they belong. Controls and burner management get function tests: operating control, high limit, flame safeguard sequence. Safety devices get their own proving schedule — low-water cutoffs blown down and trip-tested, safety valves lift-tested as procedure and jurisdiction require — each with a log entry an inspector can read."},
+   {h:"Feedwater system and water side", p:"Feedwater PM keeps the chemistry honest: softener regeneration and hardness tests, deaerator inspection, chemical pump and tank checks, feed pump inspection and standby-pump runs. The water side is managed through the treatment program and proven at internal inspection: tubes and shell examined for scale, pitting, and corrosion, with findings trended year over year. A thin layer of scale found at inspection is a treatment-program report card, not a surprise."},
+   {h:"Refractory, tubes, and the fireside", p:"Refractory and furnace work includes inspecting brick and castable for cracks and spalling, checking the flame's target area, and repairing damage before hot spots reach the steel. Fireside tube cleaning removes soot that insulates and raises stack temperature. The thread tying all of it together is the record: PM schedules by component, results logged, defects escalated. The PM that actually happens is the one that is scheduled, assigned, verified, and written down."}],
+  watch:["Pencil-whipped PM: a signed card for a safety-device test nobody performed is worse than an honest miss.","Cleaning the fireside but never asking why soot built up — soot is a combustion symptom, not just dirt.","A standby feed pump that is never run. Standby equipment that is never exercised is failed equipment you have not met yet."],
+  quiz:[
+   {q:"A PM task counts as done when what?", opts:["The box is ticked","The shift ended","The task was performed, the result recorded, and any defect found became a work order","The supervisor was told verbally"], a:2, why:"Performed, recorded, and escalated — a ticked box alone proves nothing."},
+   {q:"What is the first layer of preventive maintenance?", opts:["The daily round","The annual inspection","The overhaul","The combustion analysis"], a:0, why:"Rounds catch the small changes; scheduled PM goes deeper than a round can."},
+   {q:"Scale found at internal inspection is best read as what?", opts:["A reason to fire the operator on the spot","Bad luck","Normal and unimportant","A report card on the water-treatment program"], a:3, why:"Waterside condition at inspection grades months of chemistry discipline."},
+   {q:"Why must standby equipment be exercised on schedule?", opts:["To wear it evenly","Standby equipment that is never run fails silently — you find out during the emergency","To use spare fuel","It is not necessary"], a:1, why:"An untested standby pump is a hope, not a backup."},
+   {q:"Soot building up on the fireside should trigger what question?", opts:["Nothing — soot is normal on gas","Who cleans it?","How fast can it be washed?","Why is combustion making soot — it is a symptom, not just dirt"], a:3, why:"Soot means incomplete combustion; cleaning without diagnosing invites it back, worse."}]},
+{ id:"l20", title:"Inspections", mins:5,
+  sections:[
+   {h:"Internal and external inspections", p:"Boilers are inspected on a cycle set by the jurisdiction. An external inspection looks at the boiler running or ready: controls, safety devices, piping, and paperwork. An internal inspection takes the boiler off line, opened and cleaned, so the inspector can examine tubes, shell, and waterside surfaces for scale, pitting, cracking, and corrosion — the conditions that decide whether the boiler is fit to keep running."},
+   {h:"Preparing for inspection", p:"Preparation is operator work: cool and drain or fill per instructions, open and clean the waterside, brush the fireside, remove manway and handhole covers, and have the records ready — logs, water-treatment results, repair history, and safety-device test records. A boiler presented dirty hides its own condition; a boiler presented clean with honest records gets a fair, fast inspection and findings you can act on."},
+   {h:"The insurance inspector and the records", p:"Many plant boilers are also inspected by the insurer's inspector, whose findings carry the weight of the insurance policy behind them. Either way, the currency is records: a plant that can show rounds, tests, treatment results, and completed repairs is a plant whose boiler story checks out. Keep records like someone will audit them, because someone will."},
+   {h:"Findings are a work list, not a verdict", p:"Inspection findings — a thinning tube, a weeping fitting, a safety valve due for test — become dated, owned work items. Some findings stop the boiler until repaired; most become scheduled work. What never works is arguing with physics: metal loss does not negotiate. The operator's part is honesty before, during, and after: report the leak you found, log the test that failed, and close findings with repairs, not paperwork."}],
+  watch:["Presenting a boiler for internal inspection still dirty — scale and sludge hide exactly the damage the inspector needs to see.","Treating a failed safety-device test found during inspection prep as a surprise to hide rather than a repair to make.","Letting inspection findings age without owners or dates. A finding without a plan is a future incident report."],
+  quiz:[
+   {q:"An internal inspection requires the boiler to be what?", opts:["Painted","Running at full load","Pressurized to MAWP","Off line, opened, and cleaned so waterside surfaces can be examined"], a:3, why:"The inspector must see the metal: scale, pitting, cracking, and corrosion are internal findings."},
+   {q:"What records should be ready for inspection?", opts:["Fuel invoices only","Logs, water-treatment results, repair history, and safety-device test records","Nothing — inspectors bring their own","Only the last log sheet"], a:1, why:"Records are the boiler's story; a plant that can show them gets a fair, fast inspection."},
+   {q:"Why clean the boiler before internal inspection?", opts:["It is not needed","To raise efficiency","For appearance","Dirt, scale, and sludge hide the damage the inspection exists to find"], a:3, why:"A dirty boiler conceals its own condition from the one examination that matters most."},
+   {q:"An inspection finding should become what?", opts:["A dated, owned work item — repaired on schedule, or the boiler stays out if the finding requires it","A note in a drawer","Next year's problem","An argument"], a:0, why:"Findings are a work list: owned, dated, and closed with repairs."},
+   {q:"Who else commonly inspects plant boilers besides the jurisdiction?", opts:["The fuel supplier","No one else ever","The insurer's inspector, whose findings carry the policy's weight","The water-treatment salesman only"], a:2, why:"Insurance inspections are standard on plant boilers and their findings must be answered."}]},
+{ id:"l21", title:"Codes and the Law", mins:5,
+  sections:[
+   {h:"The code system in plain language", p:"Boilers are built, installed, operated, and repaired inside a system of codes and rules. The ASME Boiler and Pressure Vessel Code is the construction standard: Section I covers power boilers, Section IV covers heating boilers, and Sections VI and VII give recommended rules for the care of heating and power boilers. The National Board Inspection Code (NBIC) governs in-service inspection and repairs. Your jurisdiction — state or local boiler rules — adopts and enforces its version, sets inspection intervals, and licenses operators where it requires them."},
+   {h:"NFPA 85 and the firing side", p:"NFPA 85 covers boiler and combustion-system hazards: the purge, ignition, flame-proving, and interlock logic that burner management systems implement. When your flame safeguard insists on a full purge before a relight, that behavior comes from this world of standards. Codes are written from accident history — nearly every rule in them is a lesson some plant learned the hard way, which is why 'the code requires it' ends arguments in a boiler room."},
+   {h:"What the law asks of the operator", p:"The operator's legal duties are practical: run the boiler within its limits and its permit, keep required records, test safety devices on schedule, report defects, and never operate a boiler that has been condemned or whose inspection has lapsed where the jurisdiction forbids it. Lockout and energy-control rules govern how the boiler is isolated for maintenance. Where your jurisdiction requires a licensed or qualified operator, that requirement is personal: the credential and the responsibility sit with the person on shift."},
+   {h:"Codes are floors, not ceilings", p:"A code states the minimum. Your plant's procedures, the manufacturer's manual, and your own judgment may all demand more — and when they do, the stricter rule governs your shift. Nothing in this training reproduces the codes or replaces them; it points at them so you know where the authority lives. When a question is really a code question, the answer comes from the code book, the inspector, or your supervisor — in that world, not from memory or habit."}],
+  watch:["Treating 'we have always run it this way' as authority. Habit is not a code section.","Assuming a repair is minor enough to skip the code path — pressure-boundary repairs follow the NBIC and jurisdiction rules.","Running a boiler past a lapsed inspection because production needs it. That decision is not the operator's to make."],
+  quiz:[
+   {q:"ASME Section I and Section IV cover what, respectively?", opts:["Fuel storage","Only nuclear vessels","Power boilers and heating boilers","Piping and valves"], a:2, why:"Section I is power boilers; Section IV is heating boilers; Sections VI and VII cover their care."},
+   {q:"What does the NBIC govern?", opts:["New boiler design only","Operator pay scales","Fuel quality","In-service inspection and repairs of boilers and pressure vessels"], a:3, why:"The National Board Inspection Code is the in-service and repair rulebook."},
+   {q:"NFPA 85 is concerned with what?", opts:["Boiler and combustion-system hazards — purge, ignition, flame proving, and interlocks","Water chemistry","Steam table values","Building exits only"], a:0, why:"The purge and flame-safeguard logic on your burner comes from this standard's world."},
+   {q:"Who sets inspection intervals and operator licensing for your boiler?", opts:["The manufacturer alone","This app","Your jurisdiction — the state or local boiler authority","The fuel supplier"], a:2, why:"Jurisdictions adopt the codes, set intervals, and license operators where required."},
+   {q:"A code requirement is best understood as what?", opts:["Optional for experienced operators","A minimum — plant procedures or the manual may demand more, and the stricter rule governs","A suggestion","A maximum you should stay under"], a:1, why:"Codes are floors written from accident history, not ceilings and not suggestions."}]},
+{ id:"l22", title:"Emergencies", mins:6,
+  sections:[
+   {h:"The three rules that come first", p:"Every boiler emergency in this lesson follows the same three rules. One: protect people first — production and equipment come after. Two: kill the fire — a boiler emergency with the burner still firing is still getting worse. Three: follow your site emergency plan and raise the alarm early; help that arrives late helps less. Nothing here replaces your site-specific emergency plan — it teaches the shape of a right response so the plan makes sense under pressure."},
+   {h:"Low water: the most dangerous emergency", p:"If the water level is lost — glass empty, low-water alarm, cutoff tripped — the sequence is: shut the burner down, do not add feedwater to a boiler that may have run dry, and let it cool on its own. Cold feedwater onto overheated metal can flash to steam violently and crack or rupture hot steel. A boiler that has run dry, or may have, is inspected before it is filled or fired again — that decision belongs to qualified people after examination, not to the operator who wants to restart. If you cannot see water and cannot prove the boiler never ran dry, treat it as if it did."},
+   {h:"Overpressure", p:"If pressure keeps climbing past the controls — operating control failed, high limit failed — shut the burner down and reduce pressure by the means your procedure provides. The safety valve is the automatic last line: it should lift at its set pressure and hold the boiler at or below MAWP. If pressure climbs through a lifted safety valve, or the valve fails to lift, get people clear and treat it as a full emergency. After any overpressure event, the boiler and its safety valve are examined before return to service."},
+   {h:"Tube failure and getting out", p:"A tube failure announces itself: a roar at the boiler, steam and water blasting, pressure falling, feedwater unable to hold level. Shut the burner down, secure the boiler per procedure if it can be done safely, and keep people out of the steam path. And know the limit of every emergency response: fire in the boiler room, a major steam or fuel release, or any condition you cannot control means evacuate, account for people, and let equipped responders work. There is no boiler in the world worth a person."}],
+  watch:["Adding feedwater to a boiler that may have run dry — the single most dangerous reflex in boiler operation.","Silencing alarms and resetting trips during an event before the condition is understood.","Re-entering a boiler room after an evacuation on your own judgment. Re-entry happens when the incident is cleared, by the people in charge of it."],
+  quiz:[
+   {q:"On a suspected dry-fired boiler, why must you NOT add feedwater?", opts:["It wastes treated water","Cold water on overheated metal can flash to steam violently and crack or rupture the steel","It raises the level too fast","The feed pump cannot run"], a:1, why:"Kill the fire, add no water, let it cool, and have it inspected before it is filled or fired again."},
+   {q:"What are the first three rules of any boiler emergency?", opts:["Run, hide, wait","Call the fuel supplier, open vents, drain the boiler","Log it, reset it, restart it","Protect people, kill the fire, follow the site plan and raise the alarm early"], a:3, why:"People first, fire out, plan followed — in that order, every time."},
+   {q:"A boiler that may have run dry can return to service when?", opts:["Only after inspection by qualified people","After one successful restart","As soon as it cools and is refilled","The next shift decides"], a:0, why:"Possible dry-fire damage is an inspection decision, not an operator restart decision."},
+   {q:"Pressure climbs through a safety valve that has lifted and keeps rising. Your move?", opts:["Open the blowdown and stay at the boiler","Hold the valve shut","Get people clear and treat it as a full emergency under the site plan","Add feedwater quickly"], a:2, why:"A lifting valve that cannot hold pressure means the event is beyond operator control — clear the area."},
+   {q:"A tube failure usually announces itself how?", opts:["Silently, over weeks","A roar, steam and water blasting, falling pressure, and feedwater unable to hold the level","A slightly warm stack","A low oxygen reading"], a:1, why:"Tube failures are loud and immediate: kill the burner, secure if safe, keep people out of the steam path."}]},
+{ id:"l23", title:"Condensate Return and Steam Distribution", mins:6,
+  sections:[
+   {h:"Why condensate is worth money", p:"Condensate is distilled water that has already been heated, treated, and paid for. Condensate at 100 psig carries about 309 Btu per pound of sensible heat; returned to the feedwater system, that heat displaces fuel. Dump it, and the plant pays three times: cold makeup to replace it, fuel to reheat it, and chemicals to treat it. Plants track condensate return percentage the way they track fuel — because it is fuel."},
+   {h:"Steam traps: what they do and how they fail", p:"A steam trap is an automatic valve that passes condensate and air but holds steam back — it drains the water without wasting the vapor. Traps fail two ways: failed open, blowing live steam into the return system, wasting energy and pressurizing returns; or failed closed, backing condensate up into the equipment, waterlogging coils, slowing process heating, and setting up water hammer. A plant with many traps has some failed traps right now; testing them on a cycle is how they get found."},
+   {h:"Flash steam and the flash tank", p:"Drop hot condensate from high pressure to low and part of it flashes back to steam. Condensate at 100 psig holds about 309 Btu per pound; at atmospheric pressure water can only hold about 180. The excess, about 129 Btu per pound, flashes — divided by the 970 Btu per pound latent heat at atmospheric pressure, roughly 13% of the condensate becomes flash steam. For every 1,000 lb/hr of 100 psig condensate dropped to atmosphere, about 130 lb/hr is flash steam. A flash tank captures that steam for low-pressure uses instead of venting it at the receiver."},
+   {h:"Water hammer and distribution discipline", p:"Water hammer is condensate slugs driven by steam through piping until they hit an elbow, valve, or end of line — the impact can crack fittings and has killed people. It is prevented by drainage: traps that work, lines pitched to drain, drip legs at low points and before risers, and warming lines slowly so condensate formed during warm-up is drained instead of launched. Distribution discipline is unglamorous — insulation kept up, traps tested, vents working — and it is where a large share of a steam plant's energy quietly lives or dies."}],
+  watch:["A failed-open trap near the boiler room raising return-line temperature and pressure for the whole system.","Warming a cold steam main fast to save ten minutes — the condensate you make faster than it can drain becomes the hammer.","Treating flash steam venting from a receiver vent as 'just vapor.' That is 13% of your condensate leaving as a plume."],
+  quiz:[
+   {q:"Condensate at 100 psig carries about how much sensible heat per pound?", opts:["About 1,190 Btu/lb","About 309 Btu/lb","About 970 Btu/lb","About 180 Btu/lb"], a:1, why:"From the steam table: hf at 100 psig is about 309 Btu/lb — heat that return saves and dumping wastes."},
+   {q:"About what fraction of 100 psig condensate flashes to steam when dropped to atmosphere?", opts:["About 50%","About 1%","About 13% — roughly 130 lb/hr per 1,000 lb/hr","None of it"], a:2, why:"(309 − 180) ÷ 970 ≈ 0.13 — about 13% flashes, which a flash tank recovers for low-pressure use."},
+   {q:"A steam trap's job is to do what?", opts:["Make steam","Raise steam pressure","Trap dirt only","Pass condensate and air while holding steam back"], a:3, why:"Drain the water, keep the vapor — that separation is the trap's whole purpose."},
+   {q:"A trap failed closed causes what?", opts:["Condensate backing up, waterlogged equipment, slow heating, and water-hammer risk","Live steam in the returns","Higher boiler efficiency","Nothing at all"], a:0, why:"Failed closed floods the equipment side; failed open wastes live steam into the returns."},
+   {q:"Water hammer is best prevented by what?", opts:["Bigger pipes only","Opening valves faster","Drainage — working traps, pitched lines, drip legs, and warming lines slowly","Higher steam pressure"], a:2, why:"Hammer is condensate slugs on the move; drainage and slow warm-up keep slugs from forming."}]},
+{ id:"l24", title:"Troubleshooting Playbook, Part 1", mins:6,
+  sections:[
+   {h:"How to use the playbook", p:"Each playbook entry follows the same shape: the symptom, the likely causes in order, what to check first, and when to escalate. Work it in order — the first causes listed are the most common, and the checks start with what you can see, hear, and read on the gauges before anyone opens anything up. Part 1 covers low-water alarms that keep coming back, a burner that will not light, and high stack temperature."},
+   {h:"Low-water alarms that keep coming back", p:"Likely causes, in order: the level control or feed pump is genuinely failing to keep up; the gauge or column is lying because of sludge or a blocked connection; the boiler is losing water somewhere — a passing blowdown valve, a leaking fitting, a failed trap returning nothing; or demand is exceeding feed capacity. Check first: prove the level with a column blowdown, watch the feed pump actually deliver, and look for the loss. Escalate when the level cannot be held — a repeating low-water alarm is a shutdown conversation, not a silencing exercise."},
+   {h:"Burner won't light", p:"Likely causes, in order: no fuel at pressure — a closed valve, an empty supply, a tripped fuel safety shutoff; no ignition — spark or pilot fault; a safeguard lockout holding a real fault, such as a failed flame scanner or an open interlock; or no air — fan or damper fault. Check first: the lockout message and the fuel pressure at the burner, then work the safeguard's own sequence. Escalate after you have confirmed fuel, air, and ignition basics — and never defeat an interlock to make it light."},
+   {h:"High stack temperature", p:"Likely causes, in order: fouled heat-transfer surfaces — soot outside, scale inside; excess air drifted high; or a load change fooling your comparison. Check first: stack temperature against the log at the same firing rate, plus the flue-gas oxygen. Oxygen up means burner tuning; oxygen normal means cleaning and water treatment. Escalate when cleaning and tuning do not bring it back — a stack that stays hot after both is telling you about the boiler's insides."}],
+  watch:["Silencing a repeating low-water alarm without proving the level by blowing down the column.","Resetting a burner lockout repeatedly and calling each failed start bad luck.","Diagnosing stack temperature from a single reading at an unknown firing rate."],
+  quiz:[
+   {q:"The playbook lists causes in what order?", opts:["Most likely first, with checks starting from gauges and senses before opening anything","Alphabetical","Random","Most expensive first"], a:0, why:"Likelihood order plus least-invasive checks first is what makes a playbook fast and safe."},
+   {q:"A low-water alarm keeps returning. The first physical check is what?", opts:["Raise the pressure","Add chemical","Replace the cutoff","Prove the level — blow down the column and confirm the glass is honest, then watch the feed pump deliver"], a:3, why:"Rule out a lying column first, then prove the feedwater system is actually keeping up."},
+   {q:"A burner will not light and the safeguard shows a lockout. The right approach is what?", opts:["Jumper the interlock to test","Read the lockout, confirm fuel at pressure, air, and ignition basics — never defeat an interlock to make it light","Keep resetting until it lights","Open the manual fuel valve"], a:1, why:"The lockout is holding a real fault message; work it, do not bypass it."},
+   {q:"Stack temperature is high and flue-gas oxygen is normal. The cause is most likely what?", opts:["A fuel problem","Low water","Fouled heat-transfer surfaces — soot on the fireside or scale on the waterside","Excess air"], a:2, why:"Oxygen splits the diagnosis: O2 up means tuning, O2 normal means the surfaces cannot pass the heat."},
+   {q:"When does a repeating low-water alarm become an escalation?", opts:["After a week","After the third shift change","Never — alarms repeat normally","When the level cannot be held — it is a shutdown conversation, not a silencing exercise"], a:3, why:"A level the plant cannot hold is the most dangerous trend in the room; escalate early."}]},
+{ id:"l25", title:"Troubleshooting Playbook, Part 2", mins:6,
+  sections:[
+   {h:"Fluctuating water level and wet steam", p:"A level that swings hunts through its causes: load swinging faster than the feed control can follow; the feed control itself hunting — worn linkage, sticky valve, or tuning; foaming from high TDS or chemistry upset; or a passing blowdown or leak stealing water in pulses. Wet steam shares half that list — level too high, TDS high and foaming, load surging — plus a flooded or failed trap situation backing water into the distribution side. Check level and water tests first on both; they are cheap checks that decide most cases."},
+   {h:"Surging", p:"Surging is pressure and level oscillating together, often with the burner chasing its own tail: fire up, pressure overshoots, fire off, pressure crashes. Likely causes: a pressure control band set too tight or a failing control; an oversized burner on a small, steady load; or water-side foaming making the level — and the feed control — chase foam instead of water. Check the control settings against the posted values and watch one full cycle before touching anything."},
+   {h:"Fuel smell and unusual noises", p:"Fuel smell in the boiler room is a stop-and-investigate symptom: a leak in the fuel train, a failed ignition leaving unburned fuel, or a venting problem. Ventilate per procedure, find the source, and do not light anything until it is explained — an unexplained fuel smell and a light-off attempt are how furnace explosions are scheduled. Unusual noises each have an address: hammer in the steam lines is condensate; a feed pump growling is cavitation; rumbling at the burner is combustion instability; a safety valve simmering is a seat or setpoint problem. New noise is a report, the same shift it starts."},
+   {h:"The escalation rule", p:"Every playbook entry ends the same way: escalate when the checks run out, when the symptom involves a safety device, when the same fault returns after a fix, or whenever you are unsure. Escalation is not failure — it is the system working. The operator who escalates a strange boiler keeps the plant; the one who freelances past their knowledge borrows trouble at high interest."}],
+  watch:["Chasing a foaming level with the feed control for hours instead of testing the water — foam is chemistry, not a level problem.","Lighting a burner in a room with an unexplained fuel smell. Stop, ventilate, investigate — in that order.","Writing off a new noise as 'that old boiler.' Boilers do not develop new normal sounds; they develop faults with soundtracks."],
+  quiz:[
+   {q:"Fluctuating level plus wet steam together most often share which cause?", opts:["Cold makeup water","High TDS and foaming boiler water, or a level running too high","A tall stack","A new pressure gauge"], a:1, why:"Foam and high level both swing the glass and carry water out with the steam — test the water."},
+   {q:"Surging — pressure and level oscillating together — is often caused by what?", opts:["A pressure band set too tight, a failing control, or an oversized burner on a small load","Low stack temperature","A clean fireside","Too much condensate return"], a:0, why:"The control and burner chase each other; check settings against posted values and watch a full cycle."},
+   {q:"There is an unexplained fuel smell in the boiler room. Before any light-off, you must do what?", opts:["Ignore it if it is faint","Stop, ventilate per procedure, and find the source — no ignition until it is explained","Open the feedwater valve","Light off quickly to burn it away"], a:1, why:"Unburned fuel plus an ignition source is the explosion recipe; the smell gets explained first."},
+   {q:"A feed pump starts growling. The sound most likely means what?", opts:["The burner is misfiring","The stack damper is shut","Cavitation — suction starvation or feedwater too hot for the suction conditions","It is running dry of oil only"], a:2, why:"Match the noise to the address: pump growl is cavitation until proven otherwise."},
+   {q:"The escalation rule says to escalate when?", opts:["Only during inspections","Only after a failure","Never — operators handle everything","When checks run out, a safety device is involved, the fault returns after a fix, or you are unsure"], a:3, why:"Escalation is the system working; uncertainty is itself a valid reason."}]},
+{ id:"l26", title:"Reference: Steam Tables, Logs, and Checklists", mins:6,
+  sections:[
+   {h:"Reading the saturated steam table", p:"The steam table is the operator's reference card. Columns: pressure in psig and psia (add 14.7 to convert gauge to absolute), saturation temperature, hf — the sensible heat in a pound of saturated liquid; hfg — the latent heat; hg — the total heat in a pound of dry saturated steam; and vg — the volume of a pound of steam in cubic feet. Key rows: 0 psig, 212°F, hf 180, hfg 970, hg 1,150, vg 26.8. At 100 psig: 338°F, 309, 881, 1,190, and 3.89. At 250 psig: 406°F, 382, 821, 1,202, and 1.74."},
+   {h:"What the table teaches at a glance", p:"Three patterns do daily work. Total heat hg barely changes with pressure — about 1,150 Btu/lb at atmospheric and about 1,202 at 250 psig — while the split shifts from latent toward sensible. Latent heat falls as pressure rises, so high-pressure steam heats with temperature, not with more energy per pound. And volume collapses with pressure: a pound of steam needs about 26.8 cubic feet at atmospheric pressure but only about 3.9 at 100 psig — which is why low-pressure steam needs big pipes, and why pressure loss in a line costs capacity."},
+   {h:"Logs and checklists: the paperwork that works", p:"The reference set closes with the tools that hold a plant together: a daily log sheet capturing pressures, temperatures, levels, firing rate, stack temperature, feedwater temperature, fuel readings, and water tests; a daily rounds checklist so the round is the same every shift; startup and shutdown checklists so the sequences are followed in order; and a blowdown log tying blowdown to the water tests that justify it. Checklists are not distrust — they are how a plant makes its best operator's habits into every operator's habits."},
+   {h:"Acronyms you will meet", p:"BHP — boiler horsepower, 34.5 lb/hr from and at 212°F. MAWP — maximum allowable working pressure, the ceiling the safety valve protects. LWCO — low-water cutoff. TDS — total dissolved solids, controlled by surface blowdown. ppm — parts per million, the unit of water chemistry. in. w.c. — inches of water column, the unit of draft. Keep the steam table where you do rounds; every number in this training traces back to it."}],
+  watch:["Reading psig as psia in the table — the 14.7 psi difference is a whole row of error at low pressure.","Quoting latent heat at the wrong pressure: 970 belongs to atmospheric steam; at 100 psig it is 881.","A checklist completed from memory at the desk. The checklist works at the boiler, in order, pencil in hand."],
+  quiz:[
+   {q:"At 100 psig, the steam table gives saturation temperature and latent heat of about what?", opts:["338°F and 881 Btu/lb","250°F and 946 Btu/lb","212°F and 970 Btu/lb","366°F and 857 Btu/lb"], a:0, why:"100 psig: 338°F, hf 309, hfg 881, hg 1,190 — the most-used row in a food plant."},
+   {q:"How do you convert psig to psia?", opts:["Multiply by 2","Add 14.7 psi","They are the same","Subtract 14.7"], a:1, why:"Absolute pressure is gauge pressure plus atmospheric pressure, about 14.7 psi."},
+   {q:"A pound of saturated steam occupies about how much volume at atmospheric pressure versus at 100 psig?", opts:["3.9 cu ft versus 26.8","About 1 cu ft at both","About 26.8 cu ft versus about 3.9 cu ft","The same at both"], a:2, why:"Volume collapses as pressure rises — why low-pressure steam needs much bigger piping."},
+   {q:"What does hg in the steam table represent?", opts:["The latent heat only","The total heat in a pound of dry saturated steam","The heat in a pound of liquid","The heat lost up the stack"], a:1, why:"hg is total heat; hf is liquid (sensible) heat and hfg is latent heat — hg = hf + hfg."},
+   {q:"The daily log's stack-temperature entry is only meaningful with what beside it?", opts:["The operator's badge number","The outdoor humidity","The fuel price","The firing rate"], a:3, why:"Stack temperature trends only at like-for-like load — the firing rate makes the reading honest."}]}
+  ]
+}
+];
+/* ================= SHOP TIPS ================= */
+var SHOP_TIPS = [
+ {w:"Tip 1", t:"Pressure is temperature. Before you believe a steam temperature, ask what the saturation table says for the pressure on the gauge — 100 psig means 338°F, every time."},
+ {w:"Tip 2", t:"The gauge glass is the most important instrument in the room. Blow the column down on schedule, or the level you are trusting may be sludge holding up a lie."},
+ {w:"Tip 3", t:"Never add feedwater to a boiler that may have run dry. Kill the fire, let it cool, and let qualified people inspect it before it is filled or fired again."},
+ {w:"Tip 4", t:"A safety valve that simmers at normal pressure is talking to you. Log it and report it — do not gag it, weight it, or learn to ignore it."},
+ {w:"Tip 5", t:"Stack temperature is the fuel bill's early warning. Log it with the firing rate, and chase every unexplained 40°F — that is roughly 1% of your efficiency."},
+ {w:"Tip 6", t:"Excess air is not free. Each extra 1% of oxygen in the flue gas costs roughly half a percent of efficiency — but never tune air down until CO starts to climb."},
+ {w:"Tip 7", t:"Gas wants about 2 to 4% oxygen in the flue gas; oil wants about 3 to 5%. If you do not know today's number, you do not know how your burner is running."},
+ {w:"Tip 8", t:"Condensate is money already spent: hot, pure, treated. Every percent of condensate return you lose is makeup you buy, heat you re-buy, and chemicals you re-dose."},
+ {w:"Tip 9", t:"A deaerator running cold is just a warm tank. If feedwater temperature falls or sulfite use climbs, check the deaerator's steam supply and vent first."},
+ {w:"Tip 10", t:"Test the softened water after the softener, never before it. An exhausted resin bed passes hard water straight through while everything looks fine."},
+ {w:"Tip 11", t:"Surface blowdown controls TDS; bottom blowdown moves sludge. They are different jobs — skipping either one sends the bill to a different part of the boiler."},
+ {w:"Tip 12", t:"Bottom blowdown is an attended job. Short bursts, eyes on the level, hand on the valve — never open it and walk away."},
+ {w:"Tip 13", t:"High level is not a safety reserve. It is carryover waiting for a load surge. Run the level in its band."},
+ {w:"Tip 14", t:"Every burner start costs a purge. A burner cycling ten times an hour is burning fuel to heat the sky — find out why it cannot modulate."},
+ {w:"Tip 15", t:"The purge is not dead time. It is the step standing between a furnace full of leaked fuel and an explosion. Never shorten it, never jumper it."},
+ {w:"Tip 16", t:"Warm a cold boiler slowly and a cold steam main slower. Fast warm-ups buy thermal stress and water hammer, and both send invoices later."},
+ {w:"Tip 17", t:"A trap failed open wastes steam you cannot see; a trap failed closed floods equipment you can. Test traps on a cycle or the failures pick their own schedule."},
+ {w:"Tip 18", t:"Flash steam venting off a receiver is about 13% of your high-pressure condensate leaving as a plume. A flash tank turns it back into useful low-pressure steam."},
+ {w:"Tip 19", t:"Write the log like the next operator is a stranger at 3 a.m. Real numbers, real times, and anything odd — because half-asleep, that stranger is who reads it."},
+ {w:"Tip 20", t:"New noise, new smell, new trend: report it the shift you find it. Small news travels cheap; big news travels expensive."},
+ {w:"Tip 21", t:"Never reset a lockout or a high-limit trip on a loop. One reset with your eyes open is diagnosis; the third reset is gambling."},
+ {w:"Tip 22", t:"Wet layup means completely full of treated water with no air pockets. Half-full and untreated is not a layup — it is a corrosion program."},
+ {w:"Tip 23", t:"Run the standby feed pump on schedule. Standby equipment that is never exercised is failed equipment you have not met yet."},
+ {w:"Tip 24", t:"Know your three numbers cold: 970 Btu in a pound of latent heat at atmospheric pressure, 34.5 pounds per hour per boiler horsepower, and your own boiler's normal for everything else."}
+];
+/* ================= STATE ================= */
+var LS_KEY = "boilers-operator-handbook-v1";
+var state = { done:{}, best:{}, name:"", certDate:{} };
+try {
+  var raw = localStorage.getItem(LS_KEY);
+  if (raw) { var parsed = JSON.parse(raw); if (parsed && parsed.done) state = parsed; }
+} catch(e) {}
+if (!state.done) state.done = {};
+if (!state.best) state.best = {};
+if (typeof state.name !== "string") state.name = "";
+if (!state.certDate || typeof state.certDate !== "object") state.certDate = {};
+function saveState(){ try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch(e){} }
+function todayISO(){
+  var d = new Date();
+  var m = String(d.getMonth()+1); if (m.length<2) m = "0"+m;
+  var day = String(d.getDate()); if (day.length<2) day = "0"+day;
+  return d.getFullYear() + "-" + m + "-" + day;
+}
+function formatCertDate(iso){
+  var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  var parts = String(iso||"").split("-");
+  if (parts.length===3) {
+    var y = parseInt(parts[0],10), mo = parseInt(parts[1],10), da = parseInt(parts[2],10);
+    if (y && mo>=1 && mo<=12 && da) return months[mo-1] + " " + da + ", " + y;
+  }
+  var d2 = new Date(iso);
+  if (!isNaN(d2.getTime())) return months[d2.getMonth()] + " " + d2.getDate() + ", " + d2.getFullYear();
+  return String(iso||"");
+}
+function ensureCertDate(course){
+  if (!state.certDate) state.certDate = {};
+  if (!state.certDate[course.id]) { state.certDate[course.id] = todayISO(); saveState(); }
+  return state.certDate[course.id];
+}
+
+var ALL_LESSONS = [];
+COURSES.forEach(function(c){ c.lessons.forEach(function(l){ ALL_LESSONS.push({course:c, lesson:l}); }); });
+function totalLessons(){ return ALL_LESSONS.length; }
+function doneCount(){ return ALL_LESSONS.filter(function(x){ return state.done[x.lesson.id]; }).length; }
+function courseDone(course){ return course.lessons.filter(function(l){ return state.done[l.id]; }).length; }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+
+/* ================= NAVIGATION ================= */
+var currentTab = "home";
+var currentLesson = null;
+function showTab(tab){
+  currentTab = tab;
+  ["home","courses","quizbank","tips"].forEach(function(t){
+    document.getElementById("view-"+t).classList.toggle("active", t===tab);
+  });
+  document.getElementById("view-lesson").classList.remove("active");
+  document.getElementById("view-certificate").classList.remove("active");
+  document.querySelectorAll(".tabbar button").forEach(function(b){
+    b.classList.toggle("active", b.getAttribute("data-tab")===tab);
+  });
+  if (tab==="home") renderHome();
+  if (tab==="courses") renderCourses();
+  if (tab==="tips") renderTips();
+  window.scrollTo(0,0);
+}
+document.querySelectorAll(".tabbar button").forEach(function(b){
+  b.addEventListener("click", function(){ showTab(b.getAttribute("data-tab")); });
+});
+document.querySelectorAll("[data-goto]").forEach(function(b){
+  b.addEventListener("click", function(){ showTab(b.getAttribute("data-goto")); });
+});
+
+/* ================= HOME ================= */
+var BADGES = [
+ {id:"first", icon:"\u2605", name:"First Lesson Done", test:function(){ return doneCount()>=1; }},
+ {id:"half", icon:"\u25D5", name:"Halfway There", test:function(){ return doneCount()>=13; }},
+ {id:"basics", icon:"\u2713", name:"Boiler Basics Complete", test:function(){ return courseDone(COURSES[0])===COURSES[0].lessons.length; }},
+ {id:"running", icon:"\u2699", name:"Running the Boiler Complete", test:function(){ return courseDone(COURSES[1])===COURSES[1].lessons.length; }},
+ {id:"alive", icon:"\uD83D\uDD25", name:"Keeping It Alive Complete", test:function(){ return courseDone(COURSES[2])===COURSES[2].lessons.length; }}
+];
+function renderHome(){
+  var total = totalLessons(), done = doneCount();
+  var pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById("ringPct").textContent = pct + "%";
+  document.getElementById("ringFg").style.strokeDashoffset = (314.16 * (1 - done/total)).toFixed(1);
+  document.getElementById("ringText").textContent = done + " of " + total + " lessons passed. A lesson counts when you score 4 out of 5 or better on its quiz.";
+  var next = ALL_LESSONS.filter(function(x){ return !state.done[x.lesson.id]; })[0];
+  var btn = document.getElementById("continueBtn");
+  if (next) { btn.textContent = done===0 ? "Start learning" : "Continue: " + next.lesson.title; btn.disabled = false; }
+  else { btn.textContent = "All lessons passed — nice work"; btn.disabled = true; }
+  btn.onclick = function(){ if (next) openLesson(next.course.id, next.lesson.id); };
+  var br = document.getElementById("badgeRow"); br.innerHTML = "";
+  BADGES.forEach(function(bd){
+    var on = bd.test();
+    var d = document.createElement("div"); d.className = "badge" + (on ? " on" : "");
+    d.innerHTML = "<span class='bic'>" + bd.icon + "</span><b>" + esc(bd.name) + "</b><span>" + (on ? "Earned" : "Locked") + "</span>";
+    br.appendChild(d);
+  });
+  var hc = document.getElementById("homeCourses"); hc.innerHTML = "";
+  COURSES.forEach(function(c){ hc.appendChild(courseCard(c, true)); });
+  var nameEl = document.getElementById("nameInput");
+  if (nameEl && document.activeElement !== nameEl) nameEl.value = state.name || "";
+  var certsEl = document.getElementById("homeCerts"); certsEl.innerHTML = "";
+  var completed = COURSES.filter(function(c){ return courseDone(c)===c.lessons.length; });
+  if (!completed.length) {
+    var empty = document.createElement("p"); empty.className = "certempty";
+    empty.textContent = "Finish every lesson in a course track to earn its certificate.";
+    certsEl.appendChild(empty);
+  } else {
+    completed.forEach(function(c){
+      var row = document.createElement("div"); row.className = "certrow";
+      var txt = document.createElement("span"); txt.className = "ct";
+      txt.innerHTML = "<b>" + esc(c.title) + "</b><span>" + c.lessons.length + " lessons completed</span>";
+      var vb = document.createElement("button"); vb.type = "button"; vb.className = "btn ghost"; vb.textContent = "View Certificate";
+      vb.addEventListener("click", function(){ openCertificate(c.id, "home"); });
+      row.appendChild(txt); row.appendChild(vb);
+      certsEl.appendChild(row);
+    });
+  }
+}
+function courseCard(c, gotoCourses){
+  var d = courseDone(c), t = c.lessons.length, pct = t ? Math.round(d/t*100) : 0;
+  var el = document.createElement("button"); el.className = "coursecard"; el.type = "button";
+  el.innerHTML = "<h3>" + esc(c.title) + "</h3><p>" + esc(c.desc) + "</p>" +
+    "<div class='bar'><i style='width:" + pct + "%'></i></div>" +
+    "<div class='barlabel'>" + d + " of " + t + " lessons passed</div>";
+  el.addEventListener("click", function(){ showTab("courses"); setTimeout(function(){ var a=document.getElementById("course-"+c.id); if(a) a.scrollIntoView({block:"start"}); }, 30); });
+  return el;
+}
+document.getElementById("nameInput").addEventListener("input", function(e){
+  state.name = e.target.value; saveState();
+});
+document.getElementById("resetBtn").addEventListener("click", function(){
+  var box = document.getElementById("resetBtn");
+  if (box.getAttribute("data-confirm") === "1") {
+    state.done = {}; state.best = {}; saveState(); box.textContent = "Reset all progress"; box.removeAttribute("data-confirm");
+    renderHome(); startQuizBank();
+  } else {
+    box.setAttribute("data-confirm","1"); box.textContent = "Tap again to confirm reset";
+    setTimeout(function(){ box.textContent = "Reset all progress"; box.removeAttribute("data-confirm"); }, 3500);
+  }
+});
+
+/* ================= COURSES ================= */
+function renderCourses(){
+  var wrap = document.getElementById("courseList"); wrap.innerHTML = "";
+  COURSES.forEach(function(c){
+    var head = document.createElement("div"); head.id = "course-" + c.id;
+    var d = courseDone(c), t = c.lessons.length, pct = t ? Math.round(d/t*100) : 0;
+    head.innerHTML = "<h3 style='font-size:18px;margin:18px 0 3px'>" + esc(c.title) + "</h3>" +
+      "<p style='color:var(--muted);font-size:13.5px;margin:0 0 8px'>" + esc(c.desc) + "</p>" +
+      "<div class='bar'><i style='width:" + pct + "%'></i></div>" +
+      "<div class='barlabel' style='margin-bottom:12px'>" + d + " of " + t + " lessons passed</div>";
+    if (d===t) {
+      var cb = document.createElement("button"); cb.type = "button"; cb.className = "btn ghost certbtn"; cb.textContent = "View Certificate";
+      cb.addEventListener("click", function(){ openCertificate(c.id, "courses"); });
+      head.appendChild(cb);
+    }
+    wrap.appendChild(head);
+    c.lessons.forEach(function(l, i){
+      var done = !!state.done[l.id];
+      var globalNum = ALL_LESSONS.filter(function(x){ return x.lesson.id===l.id; }).length ? (ALL_LESSONS.findIndex(function(x){ return x.lesson.id===l.id; }) + 1) : (i+1);
+      var row = document.createElement("button"); row.type = "button";
+      row.className = "lessonrow" + (done ? " done" : "");
+      row.innerHTML = "<span class='num'>" + (done ? "\u2713" : globalNum) + "</span>" +
+        "<span class='lt'><b>" + esc(l.title) + "</b><span>About " + l.mins + " min read + 5-question quiz" +
+        (state.best[l.id] !== undefined ? " \u00B7 Best score " + state.best[l.id] + "/5" : "") + "</span></span>" +
+        "<span class='chev'>\u203A</span>";
+      row.addEventListener("click", function(){ openLesson(c.id, l.id); });
+      wrap.appendChild(row);
+    });
+  });
+}
+
+/* ================= CERTIFICATE ================= */
+var certReturnTab = "home";
+function openCertificate(courseId, fromTab){
+  var course = COURSES.filter(function(c){ return c.id===courseId; })[0];
+  if (!course) return;
+  if (courseDone(course) !== course.lessons.length) return;
+  certReturnTab = (fromTab === "courses" || fromTab === "home") ? fromTab : (currentTab || "home");
+  var iso = ensureCertDate(course);
+  var name = (state.name || "").trim();
+  var nameEl = document.getElementById("certName");
+  nameEl.textContent = name;
+  nameEl.classList.toggle("blank", !name);
+  document.getElementById("certNameNote").style.display = name ? "none" : "block";
+  document.getElementById("certCourse").textContent = course.title;
+  document.getElementById("certLessons").textContent = course.lessons.length + " lessons completed";
+  document.getElementById("certDateLine").textContent = "Date completed: " + formatCertDate(iso);
+  ["home","courses","quizbank","tips"].forEach(function(t){ document.getElementById("view-"+t).classList.remove("active"); });
+  document.getElementById("view-lesson").classList.remove("active");
+  document.getElementById("view-certificate").classList.add("active");
+  window.scrollTo(0,0);
+  document.getElementById("view-certificate").scrollTop = 0;
+}
+document.getElementById("certBack").addEventListener("click", function(){ showTab(certReturnTab || "home"); });
+document.getElementById("certPrint").addEventListener("click", function(){ window.print(); });
+
+/* ================= LESSON PAGE + QUIZ ================= */
+var quizState = null;
+function openLesson(courseId, lessonId){
+  var course = COURSES.filter(function(c){ return c.id===courseId; })[0];
+  var lesson = course.lessons.filter(function(l){ return l.id===lessonId; })[0];
+  currentLesson = { course: course, lesson: lesson };
+  ["home","courses","quizbank","tips"].forEach(function(t){ document.getElementById("view-"+t).classList.remove("active"); });
+  document.getElementById("view-certificate").classList.remove("active");
+  document.querySelectorAll(".tabbar button").forEach(function(b){ b.classList.toggle("active", b.getAttribute("data-tab")==="courses"); });
+  document.getElementById("view-lesson").classList.add("active");
+  var body = document.getElementById("lessonBody");
+  var html = "<div class='lessontitle'>" + esc(lesson.title) + "</div>" +
+    "<div class='lessonmeta'>" + esc(course.title) + " \u00B7 About " + lesson.mins + " min" +
+    (state.done[lesson.id] ? " \u00B7 \u2713 Passed" : "") + "</div>";
+  lesson.sections.forEach(function(s){
+    html += "<div class='sect'><h3>" + esc(s.h) + "</h3><p>" + esc(s.p) + "</p></div>";
+  });
+  html += "<div class='watchbox'><h3>\u26A0 What to watch for</h3><ul>";
+  lesson.watch.forEach(function(w){ html += "<li>" + esc(w) + "</li>"; });
+  html += "</ul></div>";
+  html += "<div class='quizhead'>Lesson quiz</div><p class='quizsub'>Five questions. Score 4 or 5 to pass — retake as many times as you need. Tap an answer to check it right away.</p>";
+  html += "<div id='quizArea'></div><div id='quizResult'></div>";
+  body.innerHTML = html;
+  quizState = { answers: {}, total: lesson.quiz.length };
+  renderQuizInto(document.getElementById("quizArea"), lesson.quiz, "L", function(){ finishLessonQuiz(lesson); });
+  window.scrollTo(0,0);
+}
+document.getElementById("lessonBack").addEventListener("click", function(){ showTab("courses"); });
+
+function renderQuizInto(container, questions, prefix, onDone){
+  container.innerHTML = "";
+  questions.forEach(function(q, qi){
+    var card = document.createElement("div"); card.className = "qcard";
+    var letters = ["A","B","C","D"];
+    var html = "<div class='qnum'>Question " + (qi+1) + " of " + questions.length + "</div><div class='qq'>" + esc(q.q) + "</div>";
+    q.opts.forEach(function(o, oi){ html += "<button type='button' class='opt' data-q='" + qi + "' data-o='" + oi + "'><span class='ol'>" + letters[oi] + "</span><span>" + esc(o) + "</span></button>"; });
+    html += "<div class='feedback' id='" + prefix + "-fb-" + qi + "'></div>";
+    card.innerHTML = html;
+    container.appendChild(card);
+  });
+  container.querySelectorAll(".opt").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var qi = parseInt(btn.getAttribute("data-q"), 10), oi = parseInt(btn.getAttribute("data-o"), 10);
+      var key = prefix + "-" + qi;
+      if (quizState.answers[key] !== undefined) return;
+      var q = questions[qi];
+      quizState.answers[key] = (oi === q.a);
+      var card = btn.parentElement;
+      card.querySelectorAll(".opt").forEach(function(b){
+        b.disabled = true;
+        var bo = parseInt(b.getAttribute("data-o"), 10);
+        if (bo === q.a) b.classList.add("correct");
+        else if (bo === oi) b.classList.add("wrong");
+      });
+      var fb = document.getElementById(prefix + "-fb-" + qi);
+      fb.className = "feedback show " + (oi === q.a ? "ok" : "no");
+      fb.textContent = (oi === q.a ? "\u2713 Correct. " : "\u2717 Not quite. ") + q.why;
+      var answered = Object.keys(quizState.answers).filter(function(k){ return k.indexOf(prefix + "-") === 0; }).length;
+      if (answered === questions.length) onDone();
+    });
+  });
+}
+function quizScore(prefix, total){
+  var s = 0;
+  for (var i = 0; i < total; i++) if (quizState.answers[prefix + "-" + i]) s++;
+  return s;
+}
+function finishLessonQuiz(lesson){
+  var score = quizScore("L", lesson.quiz.length);
+  var passed = score >= 4;
+  if (state.best[lesson.id] === undefined || score > state.best[lesson.id]) state.best[lesson.id] = score;
+  if (passed) state.done[lesson.id] = true;
+  if (passed) {
+    var ccourse = (currentLesson && currentLesson.lesson && currentLesson.lesson.id===lesson.id) ? currentLesson.course : null;
+    if (!ccourse) {
+      for (var ci=0; ci<COURSES.length; ci++) { if (COURSES[ci].lessons.filter(function(l){ return l.id===lesson.id; }).length) { ccourse = COURSES[ci]; break; } }
+    }
+    if (ccourse && courseDone(ccourse)===ccourse.lessons.length) {
+      if (!state.certDate) state.certDate = {};
+      if (!state.certDate[ccourse.id]) state.certDate[ccourse.id] = todayISO();
+    }
+  }
+  saveState();
+  var box = document.getElementById("quizResult");
+  box.innerHTML = "<div class='resultbox'><div class='big'>" + score + " / 5</div>" +
+    (passed ? "<p class='passline'>Passed — lesson marked complete. \u2713</p>" : "<p class='failline'>Not yet — you need 4 of 5. Review the lesson and retake the quiz.</p>") +
+    "<p><button class='btn ghost' id='retakeBtn'>Retake quiz</button> &nbsp; <button class='btn' id='backCoursesBtn'>Back to courses</button></p></div>";
+  document.getElementById("retakeBtn").addEventListener("click", function(){ openLesson(currentLesson.course.id, lesson.id); });
+  document.getElementById("backCoursesBtn").addEventListener("click", function(){ showTab("courses"); });
+  box.scrollIntoView({ behavior:"smooth", block:"center" });
+}
+
+/* ================= QUIZ BANK ================= */
+var bankQuestions = [];
+function startQuizBank(){
+  var pool = [];
+  ALL_LESSONS.forEach(function(x){ x.lesson.quiz.forEach(function(q){ pool.push({ q: q, from: x.lesson.title }); }); });
+  for (var i = pool.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = pool[i]; pool[i] = pool[j]; pool[j] = t; }
+  bankQuestions = pool.slice(0, 20);
+  quizState = { answers: {}, total: bankQuestions.length };
+  var body = document.getElementById("quizBankBody");
+  body.innerHTML = "<p style='color:var(--muted);font-size:14px;margin:0 0 14px'>20 questions drawn at random from all 26 lessons. Tap an answer for instant feedback. Your missed questions are listed at the end so you know what to review.</p><div id='bankArea'></div><div id='bankResult'></div>";
+  renderQuizInto(document.getElementById("bankArea"), bankQuestions.map(function(x){ return x.q; }), "B", finishQuizBank);
+}
+function finishQuizBank(){
+  var score = quizScore("B", bankQuestions.length);
+  var missed = [];
+  bankQuestions.forEach(function(x, i){ if (!quizState.answers["B-" + i]) missed.push(x); });
+  var html = "<div class='resultbox'><div class='big'>" + score + " / 20</div><p>" +
+    (score >= 16 ? "<span class='passline'>Strong work — that is a solid command of the boiler room.</span>" : score >= 12 ? "Solid. Review the misses below and run it again." : "Good reps. Review the misses below, revisit those lessons, and run it again.") + "</p>" +
+    "<p><button class='btn' id='bankAgain'>New 20 questions</button></p></div>";
+  if (missed.length) {
+    html += "<h3 style='font-size:16px;margin:14px 0 10px'>Questions you missed (" + missed.length + ")</h3>";
+    missed.forEach(function(x){
+      html += "<div class='misseditem'><b>" + esc(x.q.q) + "</b><br><span style='color:var(--muted)'>From: " + esc(x.from) + "</span><br><span class='ca'>Correct answer: " + esc(x.q.opts[x.q.a]) + "</span><br>" + esc(x.q.why) + "</div>";
+    });
+  } else {
+    html += "<p class='passline' style='text-align:center'>Perfect run — nothing missed.</p>";
+  }
+  var box = document.getElementById("bankResult");
+  box.innerHTML = html;
+  document.getElementById("bankAgain").addEventListener("click", function(){ startQuizBank(); window.scrollTo(0,0); });
+  box.scrollIntoView({ behavior:"smooth", block:"start" });
+}
+
+/* ================= SHOP TIPS ================= */
+function renderTips(){
+  var wrap = document.getElementById("tipsList"); wrap.innerHTML = "";
+  SHOP_TIPS.forEach(function(t){
+    var d = document.createElement("div"); d.className = "tipcard";
+    d.innerHTML = "<div class='twhen'>" + esc(t.w) + " \u00B7 Shop Tip</div><p>" + esc(t.t) + "</p>";
+    wrap.appendChild(d);
+  });
+}
+
+/* ================= INIT ================= */
+renderHome();
+startQuizBank();
+renderTips();
+</script>
+</body>
+</html>

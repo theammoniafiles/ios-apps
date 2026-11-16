@@ -1,0 +1,849 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<link rel="icon" href="data:," />
+<title>MLT I Training</title>
+<style>
+  :root{
+    --bg:#0c1626; --bg2:#101f36; --card:#14273f; --card2:#182e4a;
+    --line:#27405f; --ink:#e8eef6; --muted:#9db2c9; --faint:#6f87a3;
+    --accent:#4da3ff; --accent2:#2f7fd6; --amber:#f5b942; --amber-bg:#2b2110;
+    --good:#3ecf7a; --good-bg:#0f2e1e; --bad:#ff6b6b; --bad-bg:#33161a;
+    --steel:#8fa9c4;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    font-size:16px;line-height:1.5;padding-bottom:86px}
+  button,[role="button"],select,summary,input:not([type="checkbox"],[type="radio"]){min-height:2.25rem}
+  button{font:inherit;cursor:pointer}
+  .wrap{max-width:760px;margin:0 auto;padding:0 16px}
+  /* header */
+  .topbar{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,#0e1c31,#0c1626);
+    border-bottom:1px solid var(--line)}
+  .topbar-in{max-width:760px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:10px}
+  .gear{flex:0 0 auto;color:var(--accent)}
+  .topbar h1{font-size:19px;margin:0;letter-spacing:.2px}
+  .topbar .sub{font-size:12.5px;color:var(--muted);margin:0}
+  /* home hero */
+  .hero{background:linear-gradient(160deg,var(--bg2),#0d1a2c);border:1px solid var(--line);
+    border-radius:14px;padding:18px;margin:16px 0;display:flex;gap:18px;align-items:center}
+  .ring-wrap{position:relative;width:118px;height:118px;flex:0 0 auto}
+  .ring-wrap svg{transform:rotate(-90deg)}
+  .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .ring-center .pct{font-size:26px;font-weight:800;line-height:1}
+  .ring-center .lbl{font-size:11px;color:var(--muted);margin-top:3px}
+  .hero-txt h2{margin:0 0 6px;font-size:19px}
+  .hero-txt p{margin:0 0 12px;color:var(--muted);font-size:14px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:10px;
+    background:var(--accent2);color:#fff;font-weight:700;padding:11px 18px;min-height:44px;font-size:15px;text-decoration:none}
+  .btn:active{filter:brightness(1.15)}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+  .btn.block{width:100%}
+  .disclaimer{font-size:12.5px;color:var(--faint);margin:10px 2px 0}
+  /* sections */
+  h2.sec{font-size:16px;margin:22px 0 10px;color:var(--steel);text-transform:uppercase;letter-spacing:.8px}
+  .course-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+  .course-card .row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .course-card h3{margin:0;font-size:16.5px}
+  .course-card .cnt{font-size:13px;color:var(--muted);white-space:nowrap}
+  .bar{height:9px;background:#0a1322;border-radius:99px;overflow:hidden;margin-top:10px;border:1px solid var(--line)}
+  .bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:99px}
+  /* badges */
+  .badges{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .badge{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;gap:10px;align-items:center}
+  .badge .ic{font-size:22px;line-height:1}
+  .badge b{font-size:14px;display:block}
+  .badge span{font-size:12px;color:var(--muted)}
+  .badge.locked{opacity:.45}
+  .badge.earned{border-color:#3d6ea5}
+  /* lesson list */
+  .lesson-row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);
+    border:1px solid var(--line);border-radius:12px;padding:13px 14px;margin-bottom:10px;color:var(--ink)}
+  .lesson-row:active{background:var(--card2)}
+  .lesson-row .num{flex:0 0 auto;width:34px;height:34px;border-radius:50%;background:#0a1322;border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--steel)}
+  .lesson-row.done .num{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+  .lesson-row .t{flex:1;min-width:0}
+  .lesson-row .t b{display:block;font-size:15.5px}
+  .lesson-row .t span{font-size:12.5px;color:var(--muted)}
+  .lesson-row .chev{color:var(--faint);font-size:18px}
+  .backlink{background:none;border:0;color:var(--accent);font-weight:600;padding:10px 0;min-height:44px;font-size:15px}
+  /* lesson page */
+  .lesson-head{margin:14px 0 4px}
+  .lesson-head h2{font-size:23px;margin:0 0 4px;line-height:1.25}
+  .meta{color:var(--muted);font-size:13.5px;margin:0 0 8px}
+  .teach{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:12px 0}
+  .teach h3{margin:0 0 6px;font-size:16.5px;color:var(--accent)}
+  .teach p{margin:0;color:#d5e0ee;font-size:15.5px}
+  .teach p + p{margin-top:8px}
+  .watch{background:var(--amber-bg);border:1px solid #6b5316;border-radius:12px;padding:14px 16px;margin:14px 0}
+  .watch h3{margin:0 0 8px;font-size:15.5px;color:var(--amber)}
+  .watch ul{margin:0;padding-left:20px}
+  .watch li{margin:5px 0;font-size:15px}
+  /* quiz */
+  .quiz-title{font-size:19px;margin:22px 0 4px}
+  .quiz-sub{color:var(--muted);font-size:13.5px;margin:0 0 12px}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+  .q p.qq{margin:0 0 10px;font-weight:600;font-size:15.5px}
+  .opt{display:block;width:100%;text-align:left;background:#0d1a2c;border:1px solid var(--line);color:var(--ink);
+    border-radius:9px;padding:11px 13px;margin:8px 0;font-size:15px;min-height:44px}
+  .opt:active{border-color:var(--accent)}
+  .opt.correct{background:var(--good-bg);border-color:var(--good);color:#c9f5da}
+  .opt.wrong{background:var(--bad-bg);border-color:var(--bad);color:#ffd7d7}
+  .opt.dim{opacity:.55}
+  .opt[disabled]{cursor:default}
+  .why{display:none;margin:10px 0 0;font-size:14px;color:var(--muted);border-top:1px dashed var(--line);padding-top:9px}
+  .why.show{display:block}
+  .why b{color:var(--ink)}
+  .result{border-radius:12px;padding:16px;margin:16px 0;border:1px solid var(--line);background:var(--card)}
+  .result.pass{border-color:var(--good);background:var(--good-bg)}
+  .result.fail{border-color:#6b5316;background:var(--amber-bg)}
+  .result h3{margin:0 0 6px;font-size:18px}
+  .result p{margin:0 0 12px;color:#d5e0ee;font-size:14.5px}
+  .result .rowbtns{display:flex;gap:10px;flex-wrap:wrap}
+  .missed{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 16px;margin-bottom:10px}
+  .missed .src{font-size:12px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+  .missed p{margin:6px 0;font-size:14.5px}
+  .missed .ca{color:var(--good);font-weight:600}
+  /* tips */
+  .tip{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;gap:13px}
+  .tip .wk{flex:0 0 auto;background:#0a1322;border:1px solid var(--line);color:var(--amber);font-weight:800;
+    border-radius:9px;padding:6px 9px;font-size:12.5px;height:fit-content;white-space:nowrap}
+  .tip p{margin:2px 0 0;font-size:15px}
+  /* reset */
+  .reset-zone{margin:26px 0 8px;text-align:center}
+  .reset-link{background:none;border:0;color:var(--faint);font-size:13.5px;text-decoration:underline;padding:10px;min-height:44px}
+  .reset-link.armed{color:var(--bad);font-weight:700}
+  /* bottom nav */
+  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#0a1424;border-top:1px solid var(--line);
+    padding-bottom:env(safe-area-inset-bottom)}
+  .tabbar-in{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+  .tab{background:none;border:0;color:var(--muted);padding:9px 2px 10px;font-size:11.5px;display:flex;flex-direction:column;
+    align-items:center;gap:3px;min-height:56px}
+  .tab .ti{font-size:21px;line-height:1}
+  .tab.on{color:var(--accent)}
+  .hidden{display:none}
+  @media (min-width:560px){ .badges{grid-template-columns:1fr 1fr 1fr} }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-in">
+    <svg class="gear" width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+    <div>
+      <h1>MLT I Training</h1>
+      <p class="sub">Machine Lubrication Technician Level I — exam prep</p>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="view-home"></section>
+  <section id="view-courses" class="hidden"></section>
+  <section id="view-lesson" class="hidden"></section>
+  <section id="view-quizbank" class="hidden"></section>
+  <section id="view-tips" class="hidden"></section>
+</main>
+
+<nav class="tabbar" aria-label="Main">
+  <div class="tabbar-in">
+    <button class="tab on" data-tab="home"><span class="ti">⌂</span>Home</button>
+    <button class="tab" data-tab="courses"><span class="ti">▦</span>Courses</button>
+    <button class="tab" data-tab="quizbank"><span class="ti">?</span>Quiz Bank</button>
+    <button class="tab" data-tab="tips"><span class="ti">✦</span>Lube Tips</button>
+  </div>
+</nav>
+
+<script>
+"use strict";
+/* ===================== DATA ===================== */
+var COURSES = [
+{ id:"c1", title:"Lubricant Fundamentals", lessons:[
+{ id:"c1l1", title:"What Lubricants Do", mins:4,
+  sections:[
+    {h:"Separate, cool, protect", p:"A lubricant's main job is to keep two moving metal surfaces apart so they slide instead of grind. That thin film also carries heat away from the contact, seals gaps, and washes wear debris out to where a filter can catch it."},
+    {h:"Friction is the bill you pay", p:"Every contact that runs dry or nearly dry turns motion into heat and wear. Good lubrication cuts friction dramatically, which means less energy burned, cooler running parts, and components that reach their design life instead of failing early."},
+    {h:"More than just slippery", p:"Lubricants also protect against rust and corrosion, cushion shock loads, and — in hydraulic and circulating systems — transmit power. When a machine fails, the lubricant is rarely the whole story, but it is almost always part of the story."}],
+  watch:["A machine that suddenly runs hotter than normal — heat is often the first visible sign the film is failing.","Metal particles or a burnt smell in the oil — both say wear or overheating is already happening.","Oil level dropping between checks — find where it is going before you just keep topping up."],
+  quiz:[
+    {q:"What is the primary job of a lubricant?", o:["Increase friction so parts grip","Cool the motor windings directly","Keep moving surfaces separated by a film","Make the machine run faster"], a:2, why:"The film keeps metal surfaces apart so they slide instead of wearing against each other."},
+    {q:"Besides separating surfaces, a lubricant also…", o:["Carries heat away and moves debris to the filter","Makes seals swell shut","Removes the need for filters","Only adds weight to the machine"], a:0, why:"Oil in motion transports heat and carries wear particles to filtration."},
+    {q:"When surfaces run nearly dry, friction turns motion into…", o:["Extra torque","Lower temperatures","Heat and wear","Better sealing"], a:2, why:"Dry or near-dry contact converts energy into heat and removes metal as wear."},
+    {q:"A sudden rise in a machine's running temperature often signals…", o:["A healthy break-in","The lubricant film is failing","Too much filtration","The oil is too clean"], a:1, why:"Heat is one of the earliest visible warnings that the lubricating film is breaking down."},
+    {q:"Lubricants protect metal surfaces from…", o:["Paint damage","Vibration only","Sunlight","Rust and corrosion"], a:3, why:"Lubricants coat surfaces and include rust and corrosion protection as a core function."}]},
+{ id:"c1l2", title:"Base Oils and API Groups I–V", mins:5,
+  sections:[
+    {h:"The base oil is most of the product", p:"Base oil makes up the bulk of any lubricant — often 70 to 99 percent of the finished oil. Additives fine-tune performance, but the base oil sets the foundation: how it flows when cold, how it holds up to heat, and how long it lasts."},
+    {h:"Groups I, II and III — mineral oils", p:"Group I oils are solvent-refined and the least processed. Group II oils are hydroprocessed, giving better oxidation stability and lower sulfur. Group III oils are severely hydrocracked — highly refined mineral oils that perform close to synthetics in many applications."},
+    {h:"Groups IV and V — synthetics and the rest", p:"Group IV is PAO (polyalphaolefin), a true synthetic with excellent cold flow and thermal stability. Group V is everything else — esters, polyalkylene glycols (PAGs) and others — often used for special jobs or blended in to help additives dissolve and seals behave."}],
+  watch:["A spec sheet that just says 'synthetic' — ask which group; Group III and Group IV behave differently.","Switching base oil types in a system — some Group V fluids like PAGs do not mix with mineral oils.","Assuming a higher group is always better — match the base oil to the job and the maker's spec."],
+  quiz:[
+    {q:"Roughly how much of a finished lubricant is base oil?", o:["Exactly 50 percent","About 30 percent","70 to 99 percent","About 10 percent"], a:2, why:"Base oil is the bulk of the product; additives are the smaller, fine-tuning share."},
+    {q:"Which API group is PAO, a true synthetic?", o:["Group II","Group IV","Group III","Group I"], a:1, why:"Group IV base oils are polyalphaolefins (PAOs), built synthetically rather than refined from crude."},
+    {q:"Group II oils are produced mainly by…", o:["Distillation of vegetable oil","Fermentation","Solvent refining only","Hydroprocessing"], a:3, why:"Group II base oils are hydroprocessed, which improves oxidation stability and lowers sulfur versus Group I."},
+    {q:"Group V includes which of these?", o:["Grease thickeners","Only PAO","Esters and PAGs","Only Group I leftovers"], a:2, why:"Group V is the catch-all group: esters, polyalkylene glycols, and other specialty base fluids."},
+    {q:"Why does base oil choice matter if additives do the fine-tuning?", o:["It sets cold flow, heat resistance, and service life","It doesn't — additives do everything","It only changes the oil's color","It only affects the price"], a:0, why:"The base oil is the foundation — flow, thermal stability, and life all start there."}]},
+{ id:"c1l3", title:"Additives and What They Do", mins:5,
+  sections:[
+    {h:"Small dose, big jobs", p:"Additives are chemicals blended into the base oil, usually a few percent of the total, each with a specific job. The package is balanced — adding more of one on your own can upset the whole formula, which is why you never dose extra additives into a finished oil."},
+    {h:"The protection crew", p:"Anti-wear (AW) and extreme-pressure (EP) additives form protective films on metal when the oil film gets thin. Antioxidants slow the oil's reaction with oxygen. Rust and corrosion inhibitors protect surfaces, and detergents and dispersants keep deposits from forming and hold soot and sludge in suspension until the oil is drained or filtered."},
+    {h:"The performance crew", p:"Viscosity index improvers help oil resist thinning as it heats up. Pour point depressants improve cold flow. Foam inhibitors collapse air bubbles at the surface, and demulsifiers help water separate out so it can be drained. Each additive is consumed or degraded in service — one reason oil has a finite life."}],
+  watch:["Aftermarket additive bottles promising miracles — they can unbalance a finished oil's chemistry.","Foam sitting on the oil surface in a sight glass — the foam control may be depleted or the oil contaminated.","Dark oil alone doesn't prove the additives are dead — test, don't guess."],
+  quiz:[
+    {q:"What do anti-wear (AW) additives do?", o:["Form a protective film on metal when the oil film is thin","Separate water from oil","Thicken the oil at high temperature","Stop foam on the surface"], a:0, why:"AW additives react with metal surfaces to build a sacrificial film that protects under thin-film conditions."},
+    {q:"Which additive family keeps soot and sludge suspended so they drain out with the oil?", o:["Demulsifiers","Pour point depressants","Foam inhibitors","Detergents and dispersants"], a:3, why:"Dispersants hold contaminants in suspension; detergents help keep surfaces clean."},
+    {q:"Why should you not pour extra aftermarket additives into a finished oil?", o:["It always voids the machine paint warranty","It can unbalance the oil's carefully formulated chemistry","It makes the oil too slippery","Additives are illegal in most plants"], a:1, why:"A finished oil is a balanced package; extra chemistry can clash with what's already there."},
+    {q:"Foam inhibitors work by…", o:["Helping air bubbles collapse at the surface","Making the oil thicker","Neutralizing acids","Removing water"], a:0, why:"Foam control additives weaken bubble walls so foam breaks down quickly at the surface."},
+    {q:"Why does oil have a finite service life even if it looks clean?", o:["Oil evaporates completely in a month","Metal absorbs the oil","Additives are consumed and degrade in service","Filters remove the base oil"], a:2, why:"Antioxidants and other additives are used up over time, so protection fades even when oil looks fine."}]},
+{ id:"c1l4", title:"Grease vs Oil", mins:4,
+  sections:[
+    {h:"Grease is oil with a sponge in it", p:"Grease is base oil held in a thickener structure — think of oil soaked into a sponge. The thickener keeps the oil in place; under load and motion, the oil bleeds out slowly to lubricate, then is reabsorbed when things rest."},
+    {h:"When grease wins", p:"Grease stays put. It suits bearings and points that can't hold an oil bath, places that are relubricated only occasionally, and spots where grease itself helps seal out dirt and water. It doesn't need pumps, sumps, or circulation systems."},
+    {h:"When oil wins", p:"Oil flows, so it cools and cleans as it circulates — grease does neither well. High-speed or high-heat applications, gearboxes with filtration, and anything needing contaminant removal generally belong on oil. Grease also can't be filtered once it's in the machine."}],
+  watch:["Grease packed solid around a high-speed bearing — it will churn, overheat, and starve the contact.","Oil specified where it can't be retained — it will leak away and the part runs dry.","Assuming grease is 'install and forget' — it ages, hardens, and needs scheduled relubrication."],
+  quiz:[
+    {q:"Grease is best described as…", o:["Solid wax","Oil that has gone bad","Oil with all the additives removed","Base oil held in a thickener structure"], a:3, why:"Grease is oil suspended in a thickener 'sponge' that releases oil to the contact as needed."},
+    {q:"Which is a key advantage of grease?", o:["It never needs replacing","It cools better than oil","It stays in place and helps seal out contaminants","It can be filtered in place"], a:2, why:"Grease remains where it's put and forms a physical barrier against dirt and water entry."},
+    {q:"Why is oil preferred for high-heat, circulating applications?", o:["Grease melts instantly at any heat","Oil never oxidizes","Oil is cheaper per litre","Oil flows, so it carries heat away and can be filtered"], a:3, why:"Circulating oil removes heat and transports contaminants to filters — grease does neither well."},
+    {q:"What happens when grease sits still after working?", o:["It becomes an oil bath","Bled oil is partly reabsorbed by the thickener","The thickener turns to metal","The oil permanently separates and is lost"], a:1, why:"At rest, the thickener reabsorbs some of the oil it released under motion."},
+    {q:"A limitation of grease compared with oil is that grease…", o:["Cannot be filtered once applied","Cannot contain additives","Evaporates faster","Must be changed daily"], a:0, why:"Once in the machine, grease can't be circulated through a filter to remove contaminants."}]},
+{ id:"c1l5", title:"Grease Thickeners", mins:5,
+  sections:[
+    {h:"The thickener is the personality", p:"The thickener gives a grease its character — its temperature limits, water resistance, and compatibility. Common types include lithium, lithium complex, calcium, calcium sulfonate, aluminum complex, and polyurea. The base oil does the lubricating; the thickener decides where and how that oil is delivered."},
+    {h:"Reading the differences", p:"Lithium and lithium complex are the long-standing general-purpose workhorses. Calcium sulfonate handles water and load very well. Polyurea is common in electric motor bearings and sealed-for-life applications. No single thickener is best at everything — each trades something off."},
+    {h:"Why thickener type matters most at changeover", p:"Mix two greases with different thickeners and the blend can soften, harden, or bleed oil badly — the bearing then starves or leaks. Always identify the thickener in the machine and the thickener in the gun before you pump. When in doubt, purge old grease out thoroughly or follow a compatibility chart."}],
+  watch:["A grease gun loaded 'with whatever was on the shelf' — thickener unknown means compatibility unknown.","Mixed grease weeping oil at the fitting or turning runny in the housing.","Assuming color tells you the thickener — color is dye, not chemistry."],
+  quiz:[
+    {q:"What does the thickener in grease mainly determine?", o:["The color only","Temperature limits, water resistance, and compatibility","The price of the grease","The oil's viscosity grade only"], a:1, why:"Thickener chemistry drives the grease's working character and how it mixes with other greases."},
+    {q:"Which thickener is well known for excellent water resistance and load handling?", o:["Chalk","Plain soap from the washroom","Calcium sulfonate","No thickener at all"], a:2, why:"Calcium sulfonate greases are noted for water resistance and strong load-carrying performance."},
+    {q:"Polyurea grease is commonly found in…", o:["Open gears only","Electric motor bearings and sealed-for-life applications","Hydraulic systems","Steam turbines"], a:1, why:"Polyurea is a frequent choice for electric motor and sealed bearing service."},
+    {q:"What can happen when incompatible thickeners are mixed?", o:["The blend can soften, harden, or bleed oil and starve the bearing","The grease turns back into base oil permanently","The bearing runs cooler","Nothing — all greases mix safely"], a:0, why:"Incompatible thickener blends lose structure, leaking oil or hardening so oil can't reach the contact."},
+    {q:"Can you identify a grease's thickener by its color?", o:["Only for NLGI 2 greases","Yes — red always means lithium","Yes — blue always means polyurea","No — color is just dye and varies by maker"], a:3, why:"Makers dye greases freely; only the product data sheet identifies the thickener."}]},
+{ id:"c1l6", title:"Viscosity and ISO VG Grades", mins:5,
+  sections:[
+    {h:"Viscosity is resistance to flow", p:"Viscosity is simply how thick or thin an oil is — its internal resistance to flowing. Too thin and the film collapses under load; too thick and the oil wastes energy, runs hot, and may not reach tight contacts at startup. Getting viscosity right is the single most important selection decision."},
+    {h:"The ISO VG system", p:"ISO viscosity grades are defined by kinematic viscosity in centistokes (cSt) at 40 °C. The grade number is the midpoint of the grade's range, and each grade allows a band of ±10 percent around that midpoint. So ISO VG 46 is an oil measuring about 46 cSt at 40 °C — anywhere in the 41.4 to 50.6 cSt window qualifies."},
+    {h:"Grades you'll see every week", p:"Common industrial grades run 32, 46, 68, 100, 150, 220, 320, and 460. Light grades serve hydraulics and high-speed spindles; heavy grades serve big slow gearboxes and worm gears. The grade says nothing about quality or additive type — two VG 46 oils can be built for completely different jobs."}],
+  watch:["Substituting VG 68 for VG 46 'because it's close' — that's roughly 50 percent thicker, not a small step.","Two drums both marked VG 46 but different oil types — grade alone doesn't make them interchangeable.","Viscosity quoted without a temperature — a viscosity number means nothing until you know the temperature it was measured at."],
+  quiz:[
+    {q:"ISO VG grades are based on viscosity measured at what temperature?", o:["0 °C","40 °C","Room temperature, whatever it is","100 °C"], a:1, why:"ISO VG is defined by kinematic viscosity in cSt at 40 °C."},
+    {q:"An oil labeled ISO VG 46 measures about…", o:["46 cSt at 40 °C, within a ±10% band","460 cSt at 40 °C","46 cSt at 100 °C","46 mm of penetration"], a:0, why:"The grade number is the midpoint viscosity at 40 °C, with a ±10 percent tolerance band."},
+    {q:"What is viscosity?", o:["The weight of one litre of oil","How slippery an oil feels","How fast oil evaporates","A fluid's internal resistance to flow"], a:3, why:"Viscosity measures resistance to flow — the property that lets an oil build and hold a film."},
+    {q:"Which list contains only common ISO VG grades?", o:["32, 46, 68, 100, 150, 220, 320, 460","15W-40 and 5W-30","10, 20, 30, 40","NLGI 0, 1, 2, 3"], a:0, why:"Those are the standard industrial ISO VG grades used across hydraulics, gears, and bearings."},
+    {q:"Two oils are both ISO VG 46. Are they automatically interchangeable?", o:["Only if they're the same color","Yes, always","No — grade says nothing about oil type or additives","Only in gearboxes"], a:2, why:"VG grade covers viscosity only; base oil type and additive package can differ completely."}]},
+{ id:"c1l7", title:"Temperature and Viscosity (Viscosity Index)", mins:5,
+  sections:[
+    {h:"Oil thins as it heats — always", p:"Every oil gets thinner as temperature rises and thicker as it cools. An oil that's perfect at a 60 °C operating temperature may be far too thick to flow at a cold morning startup, and an oil chosen for cold flow may be water-thin at full load temperature. Selection is always a compromise across the machine's real temperature range."},
+    {h:"Viscosity index (VI) measures the change", p:"Viscosity index is a number describing how much an oil's viscosity changes with temperature. A high-VI oil changes less — it holds its body better when hot and stays more fluid when cold. A low-VI oil changes a lot over the same temperature swing."},
+    {h:"Why synthetics often win on VI", p:"Many synthetic base oils naturally have a high VI, and VI improver additives can raise it further in mineral oils. For equipment that starts cold and runs hot, or lives outdoors through seasons, VI is often the deciding spec — not the grade on the drum by itself."}],
+  watch:["Cold-start groaning or slow response on winter mornings — the oil may be far too thick at startup temperature.","An oil that works in summer failing in winter, or the reverse — suspect the VI, not just the grade.","Checking viscosity only at 40 °C for a machine that runs at 80 °C."],
+  quiz:[
+    {q:"As temperature rises, an oil's viscosity…", o:["Doubles every 10 °C","Increases","Stays exactly the same","Decreases"], a:3, why:"All oils thin as they heat up; the question is only how much."},
+    {q:"A high viscosity index (VI) means the oil…", o:["Is always synthetic","Changes viscosity less as temperature changes","Has more additives","Is thicker than all other oils"], a:1, why:"VI describes stability of viscosity across temperature — high VI, smaller change."},
+    {q:"Why does a machine that starts cold and runs hot need a high-VI oil?", o:["So it flows at startup yet still holds a film at running temperature","To make the oil last forever","To save money on filters","High VI oils never need changing"], a:0, why:"High VI narrows the viscosity swing between cold start and hot operation."},
+    {q:"Which often has a naturally high VI?", o:["Grease thickener","Oil mixed with water","Many synthetic base oils","Used oil"], a:2, why:"Many synthetics, such as PAOs, have inherently high viscosity indexes."},
+    {q:"An oil selected only by its 40 °C grade may fail a machine that runs at 80 °C because…", o:["Filters stop working at 80 °C","At 80 °C the oil is much thinner than its 40 °C number suggests","Hot oil always thickens","The grade changes color at 80 °C"], a:1, why:"Viscosity falls with temperature, so film thickness at running temperature is what actually matters."}]},
+{ id:"c1l8", title:"Grease Consistency and NLGI Grades", mins:5,
+  sections:[
+    {h:"Consistency is how stiff the grease is", p:"Grease consistency is measured by worked penetration: a standard cone sinks into worked grease, and the depth in tenths of a millimetre (0.1 mm) sets the grade. The deeper the cone sinks, the softer the grease — and the lower the NLGI number."},
+    {h:"The NLGI scale", p:"Grades run from 000 (nearly fluid) to 6 (block-hard). Worked penetration ranges: 000 is 445–475, 00 is 400–430, 0 is 355–385, 1 is 310–340, 2 is 265–295, 3 is 220–250, 4 is 175–205, 5 is 130–160, and 6 is 85–115. Soft grades (000 to 1) pump through centralized systems and gearboxes; stiff grades stay put in leaky housings."},
+    {h:"NLGI 2 runs the world", p:"NLGI 2 is the most common general-purpose grade — firm enough to stay in a bearing, soft enough to feed into the contact. NLGI 1 often serves cold weather or centralized systems; NLGI 3 shows up in some high-speed or vertical-shaft applications. Match the grade to the application, not to habit."}],
+  watch:["Grease too stiff for a centralized system — lines starve the far bearings while near ones get plenty.","Grease too soft for a leaky housing — it slumps out and the bearing runs dry.","Judging consistency by squeezing the cartridge — penetration is a measured test, not a feel."],
+  quiz:[
+    {q:"NLGI grade is determined by…", o:["The dropping point","Worked penetration — how deep a cone sinks, in 0.1 mm","The grease's color","The base oil viscosity"], a:1, why:"NLGI grades come from the worked penetration test, measured in tenths of a millimetre."},
+    {q:"What is the worked penetration range for NLGI 2?", o:["445–475","85–115","130–160","265–295"], a:3, why:"NLGI 2 grease measures 265–295 (0.1 mm) in worked penetration."},
+    {q:"Which NLGI grade is nearly fluid and used in some gearboxes and central systems?", o:["NLGI 3","NLGI 4","NLGI 000","NLGI 6"], a:2, why:"NLGI 000, at 445–475 penetration, is a semi-fluid grease."},
+    {q:"Which is the most common general-purpose NLGI grade?", o:["NLGI 2","NLGI 5","NLGI 1","NLGI 0"], a:0, why:"NLGI 2 balances staying power and feedability for most rolling bearings."},
+    {q:"A higher NLGI number means the grease is…", o:["Higher viscosity oil","Stiffer (lower penetration)","More expensive","Softer"], a:1, why:"Higher NLGI numbers mean the cone sinks less — a stiffer grease."}]}
+]},
+{ id:"c2", title:"Lubrication Theory and Selection", lessons:[
+{ id:"c2l1", title:"Hydrodynamic Lubrication", mins:5,
+  sections:[
+    {h:"Surfing on oil", p:"In hydrodynamic lubrication, motion itself builds the film. A rotating shaft drags oil into a wedge-shaped gap; the oil can't escape fast enough, pressure builds, and the pressure lifts the shaft completely off the bearing surface. The faster the rotation, the stronger the lift."},
+    {h:"What it needs to work", p:"Three things: enough speed, enough viscosity, and a continuous supply of oil. Lose any one — slow the shaft, thin the oil with heat, or starve the supply — and the wedge collapses. This is why plain journal bearings are most at risk during startup and shutdown, when speed is low."},
+    {h:"Lambda tells you the regime", p:"The film-thickness ratio, lambda (λ), compares film thickness to combined surface roughness. Above 3, surfaces are fully separated — full film. Between 1 and 3, it's mixed film. Below 1, asperities collide — boundary conditions. Hydrodynamic bearings in steady operation live comfortably above 3."}],
+  watch:["Startup and shutdown wear on journal bearings — the film doesn't exist yet at low speed.","Oil supply interruptions, even brief ones — the wedge dies within revolutions.","Thinned oil from overheating shrinking the film toward mixed conditions."],
+  quiz:[
+    {q:"In hydrodynamic lubrication, what creates the pressure that separates the surfaces?", o:["The oil pump alone","Magnetic forces","The weight of the shaft","Motion dragging oil into a wedge-shaped gap"], a:3, why:"Relative motion pulls oil into a converging wedge, generating the pressure that lifts the surfaces apart."},
+    {q:"A journal bearing is most vulnerable to wear when…", o:["Running at full speed","During startup and shutdown, when speed is low","The oil is brand new","It is fully loaded at speed"], a:1, why:"At low speed the hydrodynamic wedge hasn't formed, so surfaces can touch."},
+    {q:"A lambda (λ) ratio above 3 means…", o:["Full-film separation","Boundary lubrication","The oil is too thick","Mixed film"], a:0, why:"Lambda above 3 means film thickness well exceeds surface roughness — full separation."},
+    {q:"Which three things does hydrodynamic lubrication need?", o:["Grease, heat, and pressure","Speed, viscosity, and continuous oil supply","Load, noise, and vibration","Filters, breathers, and seals"], a:1, why:"Speed builds the wedge, viscosity holds it, and supply keeps it fed."},
+    {q:"If oil overheats and thins badly in a journal bearing, the risk is…", o:["The shaft lifts higher","Fuel savings","The film shrinks and the bearing drops toward mixed-film wear","Nothing — thinner is always better"], a:2, why:"Lost viscosity means a thinner film and a lower lambda, moving toward surface contact."}]},
+{ id:"c2l2", title:"Elastohydrodynamic (EHL) Lubrication", mins:5,
+  sections:[
+    {h:"Tiny contacts, enormous pressure", p:"Rolling bearings and gear teeth meet at points or lines, so loads concentrate into tiny contact patches with extreme pressures. Under that pressure two things happen: the metal surfaces flatten slightly (elastic deformation), and the oil's viscosity rises dramatically inside the contact. That combination is elastohydrodynamic lubrication — EHL."},
+    {h:"The film is thin but mighty", p:"EHL films are extremely thin — often less than the surface roughness features around them — yet they separate the surfaces millions of cycles at a time. Because the film is so thin, EHL contacts are sensitive: a small drop in viscosity or a dent from a debris particle can break through locally."},
+    {h:"Cleanliness matters double here", p:"A hard particle passing through an EHL contact gets pressed into the raceway, leaving a dent with raised edges. Those raised edges become stress points that start spalling later. This is why rolling bearing life depends so heavily on oil cleanliness and correct viscosity at operating temperature."}],
+  watch:["Dented, frosted-looking raceways — classic evidence of debris passing through the contact.","Bearing life falling far short of catalogue ratings — check viscosity at running temperature and cleanliness first.","Gear tooth pitting starting at the pitch line, where EHL conditions are most demanding."],
+  quiz:[
+    {q:"EHL lubrication occurs mainly in…", o:["Oil sumps","Plain journal bearings","Grease fittings","Rolling bearings and gear teeth contacts"], a:3, why:"EHL describes the concentrated point and line contacts of rolling elements and gear teeth."},
+    {q:"Inside an EHL contact, the oil's viscosity…", o:["Freezes","Turns to gas","Rises dramatically under extreme pressure","Drops to near zero"], a:2, why:"Under contact pressures, oil viscosity increases sharply, helping it carry the load in a thin film."},
+    {q:"What does the 'elasto' part of EHL refer to?", o:["Elastic grease thickeners","Metal surfaces deforming elastically under load","Rubber seals stretching","The oil turning elastic"], a:1, why:"Surfaces flatten elastically at the contact, spreading load over a small patch."},
+    {q:"Why are EHL contacts so sensitive to debris particles?", o:["Particles dissolve in the contact","Particles change the oil color","Particles make the oil foam","Particles dent the raceway, and dent edges become fatigue starting points"], a:3, why:"Dents with raised edges concentrate stress and seed surface fatigue and spalling."},
+    {q:"EHL films are typically…", o:["Extremely thin, yet able to separate surfaces under load","The same as hydrodynamic films in a sump","Very thick, like a cushion","Made of grease only"], a:0, why:"EHL films are remarkably thin but effective because pressure stiffens the oil within the contact."}]},
+{ id:"c2l3", title:"Boundary and Mixed-Film Lubrication", mins:5,
+  sections:[
+    {h:"When the film isn't enough", p:"Boundary lubrication is what happens when the oil film is thinner than the surface roughness — lambda below 1. Peaks (asperities) on the two surfaces collide, weld microscopically, and tear apart. Friction and wear jump. This regime rules at startup, shutdown, slow speeds, shock loads, and starved contacts."},
+    {h:"Mixed film is the in-between", p:"With lambda between 1 and 3, part of the load rides on the oil film and part on touching asperities. Many real machines pass through mixed film every start and stop, and some slow, heavily loaded equipment lives there permanently. Time spent in mixed and boundary conditions is where most wear accumulates."},
+    {h:"Chemistry takes over", p:"When physics can't keep surfaces apart, chemistry has to protect them. That's the job of anti-wear and extreme-pressure additives: they react with the metal to form sacrificial surface films that shear instead of the metal tearing. In boundary service, the additive package matters as much as the viscosity."}],
+  watch:["Slow-turning, heavily loaded equipment — it may never build a full film.","Frequent start-stop duty wearing parts faster than continuous running.","Polished, scored, or galled surfaces — the signature of asperity contact."],
+  quiz:[
+    {q:"Boundary lubrication corresponds to a lambda ratio of…", o:["Between 1 and 3","Above 3","Below 1","Exactly 10"], a:2, why:"Below lambda 1, film thickness is less than surface roughness and asperities collide."},
+    {q:"In mixed-film lubrication (lambda 1–3)…", o:["Friction is zero","Only grease works","Surfaces never touch","Load is shared between the oil film and touching asperities"], a:3, why:"Mixed film means partial separation — some load on the film, some on surface peaks."},
+    {q:"When do machines most often experience boundary conditions?", o:["At startup, shutdown, slow speed, or shock load","Only in winter","At steady full speed","Never, if oil is present"], a:0, why:"Low speed and overload collapse the film, leaving asperity contact."},
+    {q:"What protects surfaces when the oil film can't?", o:["Larger breathers","Higher oil level","AW and EP additives forming sacrificial surface films","Thicker paint"], a:2, why:"Anti-wear and extreme-pressure additives react with metal to create protective films that shear in place of the metal."},
+    {q:"Why does frequent start-stop duty wear machines faster?", o:["Oil drains out completely each stop","Every start and stop passes through mixed and boundary regimes","Motors overheat","Filters clog at startup"], a:1, why:"Most wear accumulates while the film is forming or collapsing, not at steady full-film running."}]},
+{ id:"c2l4", title:"Choosing the Right Viscosity", mins:5,
+  sections:[
+    {h:"Start with the maker, then verify", p:"The equipment maker's recommendation is the starting point — it assumes a typical speed, load, and temperature. Your job is to confirm it fits your actual conditions. A machine running hotter, slower, or more heavily loaded than the book assumes may need a different grade."},
+    {h:"Speed down, viscosity up", p:"The core trade: faster surfaces build film easily and want thinner oil; slower, heavily loaded surfaces need thicker oil to maintain separation. Temperature cuts across everything — judge the oil by its viscosity at the actual operating temperature, not the 40 °C number on the label."},
+    {h:"The cost of guessing wrong", p:"Too thin: film collapse, wear, and heat. Too thick: churning losses, heat, poor cold-start flow, and starved contacts at startup. Both directions cost money — one in wear, the other in energy and heat. When between grades, consider operating temperature first and let it break the tie."}],
+  watch:["A replacement motor or gearbox 'same as the old one' that actually runs at a different speed — recheck the grade.","Churning heat in an overfilled or over-viscous gearbox — temperature climbs with no load change.","Cold morning alarms after an oil change to a heavier grade."],
+  quiz:[
+    {q:"The starting point for viscosity selection is…", o:["Whatever is in the store room","The thickest oil available","The equipment maker's recommendation, checked against actual conditions","The oil used in a different machine"], a:2, why:"Maker specs assume typical conditions; verify them against your speed, load, and temperature."},
+    {q:"As surface speed decreases and load increases, the oil generally needs to be…", o:["Thicker (higher viscosity)","Foamier","Synthetic only","Thinner"], a:0, why:"Slow, loaded contacts need more viscosity to hold a separating film."},
+    {q:"Viscosity should be judged at…", o:["0 °C","The machine's actual operating temperature","Whatever the lab uses","The temperature on the drum label"], a:1, why:"Film forms at running temperature, so that's the viscosity that counts."},
+    {q:"Oil that is too viscous for the job causes…", o:["Churning losses, heat, and poor cold-start flow","Better filtration","Lower energy bills","Instant bearing failure every time"], a:0, why:"Excess viscosity wastes energy as heat and can starve contacts before the oil warms and flows."},
+    {q:"Oil that is too thin for the job risks…", o:["Filter bypass","Nothing — thin oil always protects","Over-greasing","Film collapse, wear, and heat"], a:3, why:"Insufficient viscosity lets the film fail under load, causing wear and heat."}]},
+{ id:"c2l5", title:"Grease Selection", mins:5,
+  sections:[
+    {h:"Four decisions, in order", p:"Grease selection comes down to four things: the base oil viscosity (the oil does the lubricating, so match it to speed and load like any oil), the thickener type (for temperature, water, and compatibility), the NLGI grade (for how it must be applied), and the additive package (EP for shock load, for example)."},
+    {h:"Speed drives base oil choice", p:"Fast bearings want lower-viscosity base oil so grease feeds and doesn't churn; slow, loaded bearings want higher-viscosity base oil for film strength. A grease's data sheet lists its base oil viscosity — read it, because two NLGI 2 greases can hide completely different oils inside."},
+    {h:"Environment drives the rest", p:"Water washdown points toward calcium sulfonate or another water-resistant thickener. High heat points toward a complex or synthetic-based product with a suitable temperature range. Sealed electric motor bearings often spec polyurea. Let the environment and the maker's spec narrow the field, then standardize."}],
+  watch:["Choosing grease by thickener name alone while ignoring base oil viscosity.","A 'multi-purpose' grease quietly used everywhere, including the two applications it doesn't fit.","High-speed bearings filled with a heavy-base-oil EP grease and running hot."],
+  quiz:[
+    {q:"In grease selection, which component actually forms the lubricating film?", o:["The dye","The base oil","The cartridge","The thickener"], a:1, why:"The base oil bleeds out of the thickener and lubricates; match its viscosity to speed and load."},
+    {q:"A high-speed bearing generally wants a grease with…", o:["Lower base oil viscosity so it feeds without churning","Very high base oil viscosity","NLGI 6 consistency","No additives"], a:0, why:"High speeds need a lighter base oil to avoid churning heat and to keep the contact fed."},
+    {q:"For a bearing in constant water washdown, you'd favor…", o:["A grease with no thickener","Any grease — water doesn't matter","The softest grease available","A water-resistant thickener such as calcium sulfonate"], a:3, why:"Thickener choice governs water resistance; calcium sulfonate is a strong pick for wet service."},
+    {q:"Two greases are both NLGI 2. What else must you compare before swapping them?", o:["Only the price","Thickener type, base oil viscosity, and additives","Only the color","The size of the cartridge"], a:1, why:"NLGI grade is only consistency — chemistry and base oil can differ completely."},
+    {q:"EP additives in grease are most valuable when…", o:["The bearing is sealed for life","The grease is stored","Shock loads or boundary conditions occur","Speed is extremely high"], a:2, why:"Extreme-pressure additives protect when loads squeeze the film into boundary territory."}]},
+{ id:"c2l6", title:"Compatibility — Mixing Greases and Oils", mins:5,
+  sections:[
+    {h:"Mixing is a chemistry experiment", p:"Two lubricants that each work fine alone can misbehave together. In greases, incompatible thickeners react so the mixture softens and leaks out, hardens and stops feeding, or bleeds its oil away. In oils, additive packages can clash, dropping out deposits or cancelling each other's protection."},
+    {h:"Grease rules of thumb", p:"Same thickener family is usually the safer mix, but 'usually' is not a guarantee — check a compatibility chart from the grease maker. When switching thickener types, purge the old grease as completely as the equipment allows: pump new grease until it exits clean, and shorten the next few relubrication intervals to flush the rest."},
+    {h:"Oil rules of thumb", p:"Never top up a system with a different oil type just because the viscosity grade matches — a VG 46 hydraulic oil and a VG 46 turbine oil are different products. Some base fluids, like PAG synthetics, are outright immiscible with mineral oils and will separate. When a change of product is planned, drain and flush rather than blend."}],
+  watch:["Grease weeping from seals or turning to liquid after a product change — classic incompatibility.","A 'universal top-up' drum with no label of what's actually inside.","Cloudy oil or sludge after two oil products were combined in one system."],
+  quiz:[
+    {q:"Mixing greases with incompatible thickeners can cause the blend to…", o:["Turn into hydraulic oil","Soften and leak, harden and stop feeding, or bleed oil","Become a better grease","Last twice as long"], a:1, why:"Thickener structures can break each other down, destroying the grease's ability to hold and release oil."},
+    {q:"When changing a bearing to a different thickener type, the right approach is…", o:["Just add the new grease on top","Mix both greases in the gun first","Stop lubricating the bearing","Purge old grease thoroughly and shorten the next relubrication intervals"], a:3, why:"Flushing out the old product limits the amount of incompatible mixture in the bearing."},
+    {q:"A VG 46 hydraulic oil and a VG 46 turbine oil…", o:["Are the same product","Can always be mixed 50/50","Share a viscosity grade but are different formulations — don't swap casually","Differ only in color"], a:2, why:"Viscosity grade says nothing about additive package or intended service."},
+    {q:"Which base fluid is notably immiscible with mineral oils?", o:["PAO in all cases","PAG (polyalkylene glycol) synthetics","Group III oil","Group II mineral oil"], a:1, why:"PAGs generally do not mix with mineral oils and will separate if combined."},
+    {q:"The reliable source for whether two greases can mix is…", o:["The grease maker's compatibility chart","The NLGI grade","A coworker's memory","The color chart on the wall"], a:0, why:"Compatibility is tested by makers; their charts — not color or habit — are the reference."}]},
+{ id:"c2l7", title:"Lubricant Consolidation", mins:5,
+  sections:[
+    {h:"Too many products is its own failure mode", p:"Many plants stock dozens of lubricants accumulated over decades. Every extra product is another chance to grab the wrong drum, another partial container going stale, and another product nobody can identify. Consolidation means deliberately cutting the list to the smallest set that correctly covers every application."},
+    {h:"How consolidation works", p:"Start with a survey: every lubricated asset, what it uses now, and what its maker specifies. Then group applications by real requirements — viscosity, type, temperature, environment — and assign one approved product per group. Modern multi-service oils and greases often cover several old products legitimately."},
+    {h:"Guardrails", p:"Never consolidate across a specification you don't understand — food-grade requirements, special synthetics, warranty-critical products, and incompatible chemistries stay separate. Label everything that survives: machine tags and container labels must match the new short list, or the wrong-product problem just changes its name."}],
+  watch:["A storeroom shelf of mystery drums with faded or missing labels.","Two products on the list that are actually the same spec bought from two vendors.","Consolidation done by purchasing alone, without checking machine requirements."],
+  quiz:[
+    {q:"The main goal of lubricant consolidation is…", o:["Eliminating grease entirely","Buying the cheapest oil","Using one oil for literally everything","Reducing to the smallest product set that correctly covers all applications"], a:3, why:"Fewer, correctly-matched products means fewer wrong-product mistakes and less stale stock."},
+    {q:"Consolidation should start with…", o:["A survey of every asset, its current lubricant, and its maker's spec","Throwing out old drums","A call to one vendor","Relabeling everything the same"], a:0, why:"You can't group applications until you know what each machine actually requires."},
+    {q:"Which should NOT be consolidated away casually?", o:["Two drums of the same oil","Obsolete products for scrapped machines","Products required by warranty, food-grade, or special chemistry needs","Duplicate products with identical specs"], a:2, why:"Specification-driven products exist for a reason; collapsing them risks damage or non-compliance."},
+    {q:"A hidden cost of stocking too many lubricants is…", o:["Lower training needs","Higher chance of applying the wrong product","Cleaner storerooms","Better machine reliability"], a:1, why:"Every extra look-alike product raises the odds someone grabs the wrong one."},
+    {q:"After consolidating, what keeps the gains?", o:["Ordering extra of everything","Nothing — it stays fixed forever","Matching labels on machines and containers to the new approved list","Hiding the list from technicians"], a:2, why:"Clear, matching identification is what stops the old wrong-product habits from returning."}]}
+]},
+{ id:"c3", title:"Contamination Control and Oil Analysis", lessons:[
+{ id:"c3l1", title:"Contamination — The Enemy", mins:5,
+  sections:[
+    {h:"Most wear is contamination wear", p:"Dirt, water, and wear debris cause the majority of lubrication-related failures. A hard particle the size of the oil film is the most destructive thing in a machine: it bridges the gap between surfaces, gouges both, and creates more particles in the process. Wear makes wear — the chain reaction is called three-body abrasion."},
+    {h:"Where it comes from", p:"Contamination is born in (left from manufacturing and repairs), ingested through breathers, seals, and open ports, generated inside by wear and oil degradation, and introduced during servicing — every open fill cap and dirty transfer container is an invitation. New oil, by the way, is rarely clean oil; oil as delivered often needs filtration before it meets a critical machine."},
+    {h:"Control beats cure", p:"You cannot filter your way out of a machine that keeps eating dirt. Exclusion first — seals, breathers, clean transfers, closed containers — then removal with filtration, then monitoring with oil analysis to prove it's working. That order matters."}],
+  watch:["Open or missing fill caps and breathers replaced with rags — direct dirt highways into the sump.","New oil assumed clean and poured straight into a critical gearbox.","A machine that keeps making wear metal no matter how often the oil changes — find the entry point."],
+  quiz:[
+    {q:"The most destructive particle size in a lubricated contact is roughly…", o:["About the size of the oil film thickness","Any size is equally harmful","Far larger than the oil film","Too small to see under any microscope"], a:0, why:"Particles near film thickness bridge the surfaces and gouge both — the classic three-body abrasion setup."},
+    {q:"'Wear makes wear' describes…", o:["Filters wearing out","Bearings wearing in","Particles creating more particles in a chain reaction","Oil getting darker"], a:2, why:"Each abrasive event generates fresh debris, accelerating further wear if debris isn't removed."},
+    {q:"Which is the correct order of contamination control?", o:["Exclude entry, remove what's inside, monitor to verify","Change oil daily, ignore breathers","Filter, then hope, then analyze","Analyze first, never exclude"], a:0, why:"Exclusion stops new contamination, filtration removes what's present, and analysis verifies the program works."},
+    {q:"New oil as delivered is…", o:["Always sterile and clean","Often dirtier than critical machines allow — it may need filtering first","Cleaner than any filtered oil","Free of all particles"], a:1, why:"Drums and bulk deliveries pick up contamination in transport and storage; critical systems filter new oil in."},
+    {q:"Contamination enters a machine by…", o:["Only in the rain","Only through the drain plug","It never enters after assembly","Breathers, seals, open ports, and servicing — plus what's left inside from build or repair"], a:3, why:"Ingression points and service practices are the main routes, alongside built-in and internally generated contamination."}]},
+{ id:"c3l2", title:"ISO 4406 Cleanliness Codes", mins:5,
+  sections:[
+    {h:"A scorecard for dirt", p:"ISO 4406:1999 reports oil cleanliness as three code numbers, counting particles per millilitre larger than 4 µm, 6 µm, and 14 µm. A report like 18/16/13 reads left to right from smallest to largest particle size. Lower numbers mean cleaner oil."},
+    {h:"Every step doubles the dirt", p:"Each code number covers a range, and stepping up one code doubles the particle count. Code 16 means 320–640 particles per mL in that size range; 17 is 640–1,300; 18 is 1,300–2,500; 19 is 2,500–5,000. So oil at 19/17/14 carries roughly eight times the fine particles of oil at 16/14/11 — small code changes are big cleanliness changes."},
+    {h:"Targets are equipment-specific", p:"A typical target for a servo hydraulic system might be around 16/14/11, while a rugged gearbox might tolerate 19/17/14 — but treat those as typical examples only: set targets from your equipment maker's limits and your program's goals, not from a chart on the wall. Trend your own machines; a code creeping up two steps is a warning even if it's still 'within target'."}],
+  watch:["Comparing cleanliness codes without noting which standard or sizes were counted.","Celebrating a one-code improvement that a sampling error could explain — trend several samples.","A sudden two-code jump — something is ingesting dirt or generating wear right now."],
+  quiz:[
+    {q:"In ISO 4406:1999, the three code numbers count particles larger than…", o:["4, 6, and 14 µm per millilitre","1, 2, and 3 µm","10, 20, and 40 µm","Any size, combined"], a:0, why:"The standard reports counts per mL at >4 µm, >6 µm, and >14 µm."},
+    {q:"Stepping up one ISO code number means the particle count roughly…", o:["Stays the same","Increases by 10","Triples","Doubles"], a:3, why:"Each code range is twice the previous one — code steps are doublings."},
+    {q:"Code 18 corresponds to how many particles per mL?", o:["1,300–2,500","160–320","5,000–10,000","320–640"], a:0, why:"Code 16 is 320–640, 17 is 640–1,300, and 18 is 1,300–2,500 per mL."},
+    {q:"Oil reported as 16/14/11 versus 19/17/14 is…", o:["Impossible to compare","Much cleaner — roughly eight times fewer fine particles","About the same","Dirtier"], a:1, why:"Three code steps at the first position means about 2×2×2 = eight times the particle count."},
+    {q:"The right cleanliness target for a machine comes from…", o:["Whatever the last plant used","The oil vendor's brochure","The equipment maker's limits and your program's goals","A universal number for all machines"], a:2, why:"Targets are equipment- and program-specific — typical values are examples, not universal rules."}]},
+{ id:"c3l3", title:"Water Contamination", mins:5,
+  sections:[
+    {h:"Three forms of water", p:"Water exists in oil as dissolved (invisible, held in solution), emulsified (tiny droplets making oil look hazy), and free water (a separate layer that settles to the bottom). Oil looks clear while dissolved, turns cloudy as emulsion forms, and free water collects where you can drain it — if you look."},
+    {h:"What water does", p:"Water attacks on several fronts: it promotes rust, speeds up oil oxidation, washes out and deactivates additives, and under load it can flash or collapse in the contact, wrecking the film. Rolling bearings are especially sensitive — even small amounts of water measurably shorten fatigue life."},
+    {h:"Numbers and removal", p:"Water is measured by Karl Fischer titration and reported in ppm. Around 100 ppm is a common caution level for many oils — treat it as a typical guide and follow your equipment maker's limits. Removal options include settling and draining free water, vacuum dehydration, centrifuges, and absorbent filter elements; prevention means fixing the source — cooler leaks, washdown entry, condensation from breathing humid air."}],
+  watch:["Hazy or milky oil in a sight glass — emulsion is already present.","Free water drained at every check but never investigated — the source is still feeding it.","Crackle-test-only checks on critical machines — it detects water crudely; Karl Fischer gives the number."],
+  quiz:[
+    {q:"Water in oil exists in which three forms?", o:["Bound, loose, and vapor","Ice, steam, and liquid","Dissolved, emulsified, and free","Surface, mixed, and settled"], a:2, why:"Dissolved water is invisible, emulsified water hazes the oil, and free water separates as its own layer."},
+    {q:"Water content in oil is measured accurately by…", o:["Karl Fischer titration, reported in ppm","Looking at the color","Weighing the drum","The crackle test alone"], a:0, why:"Karl Fischer is the standard lab method for quantifying water in ppm."},
+    {q:"A common caution level for water in many oils is around…", o:["Zero is the only acceptable reading ever","100 ppm","5,000 ppm","10,000 ppm"], a:1, why:"About 100 ppm is a widely used caution level for many oils — always confirm against your maker's limits."},
+    {q:"Why are rolling bearings especially hurt by water?", o:["Water makes grease too soft only","Water improves load capacity","Bearings are waterproof, so it doesn't matter","Water shortens fatigue life and promotes rust in the contact"], a:3, why:"Even small water concentrations measurably reduce rolling bearing fatigue life and drive corrosion."},
+    {q:"The best first response to recurring free water is…", o:["Find and fix the entry source — cooler leak, washdown, or condensation","Add more oil","Drain it forever and ignore the source","Change the filter weekly"], a:0, why:"Removal treats the symptom; sealing the source — leak, spray, or humid breathing — solves it."}]},
+{ id:"c3l4", title:"Air Contamination", mins:4,
+  sections:[
+    {h:"Air where it doesn't belong", p:"Air enters oil as entrained bubbles (tiny, suspended), foam (bubbles gathered at the surface), dissolved air, and free air pockets. Entrained air is the troublemaker: it makes oil look cloudy, travels with the oil, and collapses violently in pumps and bearings."},
+    {h:"Why bubbles hurt", p:"Air is compressible; oil mostly isn't. In hydraulic systems, entrained air makes actuators spongy and control erratic. When bubbles collapse under pressure they create micro-jets and local heat that pit surfaces and oxidize oil — a process sometimes called micro-dieseling when the heat scorches the oil. Air also speeds oxidation everywhere it touches."},
+    {h:"Causes and cures", p:"Common causes: suction leaks, low oil level letting return lines splash, returns dumping above the oil surface, and depleted foam inhibitors. Fixes are mechanical — seal the suction side, keep levels right, let returns discharge below the surface, give oil residence time to release air — plus the right oil with healthy foam and air-release properties."}],
+  watch:["A pump that sounds like it's pumping gravel — cavitation and aeration both talk like that.","Foam that stands on the reservoir surface instead of breaking in seconds.","Spongy, jerky hydraulic motion after a suction-side repair."],
+  quiz:[
+    {q:"Entrained air in oil causes problems mainly because…", o:["Air makes oil too viscous","Bubbles are compressible and collapse violently under pressure","Air is heavier than oil","Air changes the oil's grade"], a:1, why:"Compressibility makes systems spongy, and bubble collapse pits surfaces and scorches oil locally."},
+    {q:"Foam differs from entrained air how?", o:["They are the same thing","Foam only occurs in grease","Foam gathers at the surface; entrained air is suspended throughout the oil","Foam is water, not air"], a:2, why:"Foam is the surface blanket; entrained bubbles are dispersed in the bulk oil and travel with it."},
+    {q:"A common cause of aeration is…", o:["A suction-side leak or return oil splashing above the surface","Oil that is too clean","Too much filtration","A large reservoir"], a:0, why:"Leaks on the suction side and splashing returns whip air into the oil."},
+    {q:"Micro-dieseling refers to…", o:["A small diesel engine fault","A type of filter","Oil foaming in winter","Bubble collapse heating and scorching oil locally"], a:3, why:"Adiabatic compression of bubbles can create intense local heat that degrades oil and surfaces."},
+    {q:"Air contamination also accelerates…", o:["Filter life","Viscosity index","Oil oxidation","Seal swelling only"], a:2, why:"More oxygen contact throughout the oil speeds the oxidation reactions that age it."}]},
+{ id:"c3l5", title:"Oil Sampling Done Right", mins:5,
+  sections:[
+    {h:"Garbage sample, garbage data", p:"Oil analysis is only as good as the sample. A sample pulled from a dead leg, a drain stream, or a dirty bottle tells you about that bottle — not the machine. The goal is a sample that represents the oil actually working in the machine, taken the same way every time."},
+    {h:"Where and when", p:"Sample from a live, turbulent zone — a dedicated sample valve on a pressure line or just before the filter, or mid-sump with a vacuum pump while the machine runs or just after shutdown. Flush the valve or tube first so you're not testing stagnant oil. Sample at consistent intervals and operating conditions so results trend cleanly."},
+    {h:"Clean technique", p:"Use a clean, dry sample bottle every time; cap it immediately; label it before you walk away — machine, date, oil type, hours. Never sample into a reused soda bottle, never top up a half-full bottle from a second pull, and don't let the sample sit in a hot truck for a month before shipping."}],
+  watch:["Samples drawn from the drain while changing oil — that's the dirtiest oil in the machine and represents nothing in service.","Unlabeled or 'mystery' bottles arriving at the lab.","Sample points that move around — trending dies when every sample comes from a different place."],
+  quiz:[
+    {q:"The best oil sample is taken from…", o:["The drain plug during an oil change","The top of a storage drum","A live, turbulent zone via a proper sample point, machine running or just shut down","A dead leg that never flows"], a:2, why:"Representative samples come from actively circulating oil, not stagnant or drained oil."},
+    {q:"Why flush the sample valve or tube before filling the bottle?", o:["It's not necessary","To warm up the bottle","To check the oil color","To clear stagnant oil so the sample represents the system"], a:3, why:"Dead oil sitting in the port would skew results; flushing brings fresh system oil to the bottle."},
+    {q:"Consistent sampling intervals and points matter because…", o:["It looks professional","Trending only works when samples are comparable","Oil changes color otherwise","The lab charges less"], a:1, why:"Trends are the real value of analysis; changing the method each time destroys comparability."},
+    {q:"Which container is acceptable for a sample?", o:["An open coffee cup carried carefully","Any old jar","A rinsed soda bottle","A clean, dry, dedicated sample bottle, capped immediately"], a:3, why:"Contaminated containers contaminate the result — use proper sample bottles every time."},
+    {q:"A sample label should include…", o:["Machine ID, date, oil type, and hours or mileage","The lab's address","The technician's initials only","Just the date"], a:0, why:"Without machine, oil, and time-in-service context, the lab can't interpret or trend the result."}]},
+{ id:"c3l6", title:"Oil Analysis Tests", mins:5,
+  sections:[
+    {h:"The core slate", p:"A routine report bundles several tests. Viscosity confirms the oil is still in grade. Elemental spectroscopy counts wear metals (iron, copper, lead), contaminants (silicon from dirt, sodium, water-related elements), and additive elements (zinc, phosphorus, calcium) — one test, three stories. Particle counting gives the ISO cleanliness code."},
+    {h:"Chemistry checks", p:"Total acid number (TAN) tracks oxidation and acid buildup; total base number (TBN) matters mainly in engine oils, where it measures remaining acid-fighting reserve. Karl Fischer measures water in ppm. FTIR spectroscopy fingerprints oxidation, soot, and wrong-fluid contamination by how the oil absorbs infrared light."},
+    {h:"Reading trends, not snapshots", p:"Almost every test means more as a trend than as a single number. Iron rising steadily is information; iron doubling between samples is an alarm. Wear debris analysis — ferrography or filter debris inspection — goes beyond counting to actually looking at particle shape, which reveals how the wear is happening."}],
+  watch:["Judging a machine by one test in isolation — viscosity fine but iron climbing is still a sick machine.","Additive elements dropping — could be wrong-oil top-up diluting the package.","Silicon and iron rising together — dirt is entering and wearing the machine at the same time."],
+  quiz:[
+    {q:"Elemental spectroscopy on an oil sample reports…", o:["Only the oil's viscosity","The ISO code only","Wear metals, contaminant elements, and additive elements","The oil's color precisely"], a:2, why:"One spectroscopic scan covers wear debris metals, ingested elements like silicon, and the additive package."},
+    {q:"Silicon showing up in a report usually indicates…", o:["The oil is oxidizing","Dirt (silica) contamination entering the oil","Water in the oil","A healthy additive"], a:1, why:"Silicon is the classic marker for dirt ingress through breathers, seals, or poor handling."},
+    {q:"TAN (total acid number) primarily tracks…", o:["Oxidation and acid buildup in the oil","Foam tendency","Particle counts","How basic the oil is"], a:0, why:"Rising TAN signals the oil is oxidizing and accumulating acidic byproducts."},
+    {q:"Why is trend more valuable than a single result?", o:["Single results are always wrong","Rates of change reveal developing problems a snapshot can't","Labs prefer it","Trending is cheaper"], a:1, why:"A parameter doubling between samples is an alarm even if both values sit inside broad limits."},
+    {q:"Ferrography and debris analysis add value by…", o:["Counting particles faster","Removing water","Measuring viscosity","Examining particle shape and type to reveal the wear mechanism"], a:3, why:"Particle morphology — cutting, fatigue chunks, spheres — tells you how wear is occurring, not just how much."}]},
+{ id:"c3l7", title:"Reading an Oil Analysis Report", mins:5,
+  sections:[
+    {h:"Work the report in order", p:"Start with identity: right machine, right oil, right hours — reports get misfiled. Then scan the flagged items, but read the whole slate: viscosity, water, cleanliness code, wear metals, TAN. A single red flag with everything else calm usually means one specific problem; several yellows drifting together means the oil or machine is aging as a system."},
+    {h:"Know the caution numbers", p:"Common cautions: viscosity changed more than ±10 percent from the new-oil value; water around 100 ppm for many oils; TAN risen about 1.0 mg KOH/g above the new-oil baseline, suggesting oxidation is well underway. Treat all of these as typical guides — your program's alarm limits and the equipment maker's limits govern, and baselines must come from your actual new oil, not a generic chart."},
+    {h:"Decide: act, watch, or resample", p:"Every report should end in a decision. Clear problem with a clear cause — act: fix the breather, dehydrate, change the oil. Suspicious but unconfirmed — resample soon and verify before spending money; sampling errors are real. Normal — file it, extend nothing blindly, and let the trend build. Write the decision down; an unread report is worse than none because it creates false comfort."}],
+  watch:["Acting on one wild result without a confirming resample — bad samples happen.","Comparing results against limits for a different oil — baselines belong to your product.","Reports filed with no decision recorded — the program becomes expensive paper."],
+  quiz:[
+    {q:"A common caution limit for viscosity change from new oil is…", o:["±1 percent","Any change is fine","±50 percent","±10 percent"], a:3, why:"A shift beyond about ±10 percent from the new-oil baseline is a widely used caution trigger."},
+    {q:"A TAN rise of about how much above the new-oil baseline is a common oxidation caution?", o:["1.0 mg KOH/g","10 mg KOH/g","0.1 mg KOH/g","TAN doesn't relate to oxidation"], a:0, why:"Roughly +1.0 mg KOH/g over baseline is a common signal that oxidation is well advanced."},
+    {q:"One parameter flags high but everything else is calm. Best first move?", o:["Ignore the report","Change every oil in the plant","Verify — often resample to confirm before major action","Order a new machine"], a:2, why:"Sampling and lab errors happen; a confirming resample protects against expensive false alarms."},
+    {q:"Alarm limits for your reports should come from…", o:["The oil's color","Your program's limits and the equipment maker — using your actual new oil as baseline","The oldest report on file","A generic internet chart"], a:1, why:"Limits are program- and equipment-specific; baselines must be your real new-oil values."},
+    {q:"Several parameters drifting yellow together usually means…", o:["The oil or machine is degrading as a system, not one isolated fault","A lab conspiracy","Nothing — yellows can be ignored","Time to stop sampling"], a:0, why:"Correlated drift across viscosity, TAN, and wear metals points to systemic aging or a shared root cause."}]},
+{ id:"c3l8", title:"Filtration and Beta Ratios", mins:5,
+  sections:[
+    {h:"Filters are rated by beta, not adjectives", p:"A filter's beta ratio at size x is the particle count upstream divided by the count downstream at that size: βx = upstream ÷ downstream. It is the honest measure of how well a filter captures particles of a given size. 'Nominal' ratings without a beta are marketing, not engineering."},
+    {h:"The numbers that matter", p:"β200 means for every 200 particles of that size arriving, 1 passes — that's 99.5 percent capture efficiency. β1000 passes 1 in 1,000 — 99.9 percent. Notice the trap: the difference between 99.5 and 99.9 sounds small, but the β1000 filter passes five times fewer particles. Compare filters at the same particle size, or you're comparing nothing."},
+    {h:"Placement and practice", p:"Filter new oil into the machine, filter continuously where the duty justifies it (kidney-loop/offline filtration cleans without disturbing the system), and watch differential pressure — a filter in bypass is a filter in name only. Depth media generally holds more dirt than surface media; either way, a plugged filter that gets ignored will eventually open its bypass and pass everything."}],
+  watch:["A filter chosen by physical size and thread alone — 'it fits' is not a rating.","Differential pressure gauges in the red for weeks — the filter is bypassing or about to.","Beta ratios compared at different micron sizes between brands."],
+  quiz:[
+    {q:"The beta ratio βx is defined as…", o:["Downstream count ÷ upstream count","Filter cost ÷ filter size","Upstream particle count ÷ downstream count at size x","Pressure drop ÷ flow"], a:2, why:"Beta compares how many particles of size x enter versus how many get through."},
+    {q:"A β200 filter captures what percentage at its rated size?", o:["98 percent","100 percent","90 percent","99.5 percent"], a:3, why:"Passing 1 in 200 means capturing 199 of 200 — 99.5 percent efficiency."},
+    {q:"β1000 corresponds to what capture efficiency?", o:["99 percent","99.9 percent","95 percent","99.99 percent"], a:1, why:"1 particle passing per 1,000 arriving equals 99.9 percent capture."},
+    {q:"Why is β1000 meaningfully better than β200 if both sound like '99-something percent'?", o:["It costs less","It flows faster always","It passes about five times fewer particles","It isn't better"], a:2, why:"0.1 percent passing versus 0.5 percent passing is a fivefold difference in what reaches the machine."},
+    {q:"A filter whose bypass valve is open is…", o:["Passing unfiltered oil — effectively not filtering","Cleaning the oil twice","Ready for another year","Filtering at peak efficiency"], a:0, why:"Bypass protects against starvation but sends dirty oil straight through; high differential pressure is a change-it signal."}]}
+]},
+{ id:"c4", title:"Application, Storage, and Program Management", lessons:[
+{ id:"c4l1", title:"Storage and Handling", mins:5,
+  sections:[
+    {h:"Oil's first enemy is your storeroom", p:"Lubricants degrade before they ever reach a machine: drums stored outdoors collect water around the bungs as they breathe with temperature swings, dust settles on every surface you later open, and unlabelled containers guarantee eventual mistakes. Store lubricants indoors where possible, on their sides or with bungs protected if they must be outside, and keep the area clean enough to eat in — that's the standard."},
+    {h:"First in, first out", p:"Rotate stock so the oldest product is used first. Grease and oil both have shelf lives — grease can bleed and harden in a neglected cartridge, additives can settle in long-stored oil. Date containers when they arrive, and don't let 'spare' drums celebrate birthdays in the corner."},
+    {h:"Clean transfer is a discipline", p:"Dedicated, labeled, closed transfer containers for each product. Never a galvanized container for oil (zinc can react with additives), never an open jug, never a container that 'probably had VG 46 in it.' Filter oil as it goes into critical machines. The five minutes saved with a dirty jug costs bearings."}],
+  watch:["Drums stored upright outdoors with water pooled on top — every temperature cycle sips that water past the bung.","Transfer containers without labels, or one jug serving every product.","Grease cartridges stored in a hot cab or freezing shed for months."],
+  quiz:[
+    {q:"Why is outdoor drum storage risky?", o:["Rain washes labels off and nothing else","Sunlight changes the oil's color only","Temperature swings make drums breathe, drawing water and dirt in past the bungs","Drums rust only on the inside"], a:2, why:"Breathing with temperature cycles pulls standing water and contamination into the oil."},
+    {q:"FIFO in lubricant storage means…", o:["Fill in, filter out","Filter it, fill it, forget it","Fastest injector first out","First in, first out — use the oldest stock first"], a:3, why:"Rotating stock prevents products from aging past their shelf life in storage."},
+    {q:"Why avoid galvanized containers for transferring oil?", o:["Zinc from the coating can react with oil additives","They're hard to label","They make oil foam","They're too heavy"], a:0, why:"Zinc can react with additive chemistry — use dedicated, suitable, labeled containers."},
+    {q:"A transfer container should be…", o:["Open-topped for easy pouring","Dedicated, labeled, and closed for each product","Whatever is handy","Shared between all products to save space"], a:1, why:"Dedicated closed containers prevent cross-contamination and wrong-product errors."},
+    {q:"Grease stored too long can…", o:["Improve with age","Turn into oil","Become NLGI 6 automatically","Bleed oil and harden, losing its ability to feed a bearing"], a:3, why:"Aging grease separates and stiffens; shelf life and rotation apply to grease too."}]},
+{ id:"c4l2", title:"Desiccant Breathers and Seals", mins:4,
+  sections:[
+    {h:"Every reservoir breathes", p:"As oil levels and temperatures change, air moves in and out of every tank and gearbox. Whatever is in that air — moisture, dust — comes along. An open breather pipe or a coarse foam plug is an open door. A desiccant breather filters particles and strips moisture from incoming air, drying it before it reaches the oil."},
+    {h:"How desiccant breathers work", p:"Incoming air passes through a particulate filter, then through silica gel that adsorbs water vapor. The gel changes color as it saturates — commonly from a bright color toward a spent color — telling you at a glance when to replace it. Size the breather to the tank's air exchange rate; an undersized breather chokes the breathing and gets bypassed or removed."},
+    {h:"Seals finish the job", p:"Breathers guard the air path, but seals guard the shafts. Worn lip seals, damaged labyrinth seals, and loose inspection covers all ingest contamination, especially in washdown or dusty duty. Upgrading sealing on a problem machine often pays faster than upgrading its filter."}],
+  watch:["A desiccant breather whose gel is fully spent-color and still in service — it's a plain pipe now.","Breathers removed because they 'restricted breathing' — the real problem was sizing.","Oil leaks outward at a shaft seal — remember the same path leaks dirt inward."],
+  quiz:[
+    {q:"A desiccant breather's job is to…", o:["Measure oil level","Vent pressure only","Add moisture to the oil","Filter particles and remove moisture from air entering the reservoir"], a:3, why:"It cleans and dries incoming air so the reservoir breathes without ingesting dirt and water."},
+    {q:"How do you know a desiccant breather is spent?", o:["The silica gel changes color as it saturates with moisture","It makes noise","The tank gets lighter","It stops the machine"], a:0, why:"Color-indicating gel shows saturation at a glance — replace the breather when it's spent."},
+    {q:"Why must a breather be correctly sized?", o:["Size only affects price","An undersized breather restricts airflow and gets bypassed or removed","Bigger is always better with no downside","Undersized breathers filter better"], a:1, why:"If the machine can't breathe through it, people defeat it — and then nothing is filtered."},
+    {q:"A shaft seal leaking oil outward also…", o:["Improves lubrication","Seals perfectly against dirt","Can ingest contamination inward along the same path","Lowers the ISO code"], a:2, why:"Seal paths work both ways; outward leaks signal a route for inward dirt and water."},
+    {q:"Reservoirs 'breathe' because…", o:["Seals are designed to leak air","Oil evaporates constantly","Pumps suck air deliberately","Air moves in and out as oil level and temperature change"], a:3, why:"Thermal expansion and level changes exchange air with the surroundings every cycle."}]},
+{ id:"c4l3", title:"Applying Oil — Splash, Bath, Mist, Circulating", mins:5,
+  sections:[
+    {h:"Bath and splash — the simple end", p:"In an oil bath, the component dips directly into the sump; in splash systems, a gear or slinger throws oil onto the parts. Both are simple and reliable within their limits — level is critical: too low starves the top components, too high churns, foams, and overheats. Bath systems have no filtration while running, so oil condition rests on changes and cleanliness discipline."},
+    {h:"Circulating systems — the controlled end", p:"A pump delivers filtered, often cooled oil to each point and returns it to a reservoir. Circulating systems suit high speed, high heat, and critical machines: flow can be monitored, oil can be cleaned continuously, and temperature controlled. The cost is complexity — pumps, filters, coolers, alarms — and a pump failure is a lubrication failure, so monitoring matters."},
+    {h:"Mist and the middle ground", p:"Oil mist systems carry tiny oil droplets in air through piping to many points — common on pump and motor bearing fleets. They deliver fresh oil continuously and keep housings slightly pressurized against contamination. Ring-oiled and wick systems sit between bath and circulation: a ring riding the shaft lifts oil from a small sump to the journal, simple but sensitive to level, speed, and oil viscosity."}],
+  watch:["A bath gearbox run 10 mm low — the top gear may be running on splash that no longer reaches it.","Circulating system flow alarms acknowledged but never investigated.","Oil rings not spinning — check through the sight glass; a stalled ring means a starved journal."],
+  quiz:[
+    {q:"In a splash/bath system, the most critical routine check is…", o:["Pump amps","Oil color","Oil level — too low starves parts, too high churns and overheats","Filter differential pressure"], a:2, why:"Bath systems live and die by level; there's no pump to compensate."},
+    {q:"Circulating systems are preferred for critical, high-heat machines because…", o:["Oil can be filtered, cooled, and flow-monitored continuously","They use less oil","They use no filters","They never fail"], a:0, why:"Pumped delivery with filtration and cooling gives control that bath systems can't."},
+    {q:"Oil mist systems deliver lubricant as…", o:["A solid stream","Grease cartridges","A bath the parts dip into","Tiny oil droplets carried in air to many points"], a:3, why:"Mist generators atomize oil into an air stream piped to each bearing housing."},
+    {q:"A ring-oiled bearing's ring must be seen to be…", o:["Submerged completely","Rotating with the shaft, lifting oil to the journal","Removed monthly","Stationary"], a:1, why:"The ring carries oil from sump to shaft by rotation; a stalled ring starves the bearing."},
+    {q:"A weakness of simple bath systems is…", o:["They require mist generators","They use pumps","They cool the oil too much","No filtration while running — oil condition depends on changes and cleanliness"], a:3, why:"Without circulation through a filter, contaminants stay in the bath until the oil is changed."}]},
+{ id:"c4l4", title:"Greasing Bearings — How Much Is Too Much", mins:5,
+  sections:[
+    {h:"More is not better — it's hotter", p:"An over-greased bearing churns grease like a mixer. Churning makes heat, heat thins the oil out of the grease, the grease oxidizes and hardens, seals get pushed out — and the bearing fails from too much lubricant. Under-greasing starves the contact. The target is a bearing cavity roughly one-third to one-half full of grease for most bearings, with the contact itself continuously fed a small amount."},
+    {h:"Know your gun's dose", p:"One stroke of a typical hand grease gun delivers roughly 1 gram of grease — but it varies by gun, so calibrate yours: pump ten strokes onto a scale and divide. Without that number, 'three pumps per bearing' is a guess dressed as a procedure. Lever guns, pistol grips, and battery guns all deliver differently."},
+    {h:"Technique that protects bearings", p:"Clean the fitting before the gun goes on — you're about to push whatever is on it into the bearing. Pump slowly, ideally while the shaft turns if it's safe, and stop if you feel sudden high resistance. If a relief plug exists, remove it during greasing so old grease and pressure can escape. Log the amount per point; the quantity is part of the task, not a detail."}],
+  watch:["A bearing that runs hotter right after greasing and cools over days — classic over-greasing signature.","Grease purging past seals every round — the cavity is full and the excess has nowhere else to go.","Fittings caked in dirt being greased without a wipe — you're injecting the dirt."],
+  quiz:[
+    {q:"A typical hand grease gun delivers about how much per stroke?", o:["Exactly 1 gram for every gun ever made","Roughly 1 gram — approximate, and it varies by gun","About 10 grams","About 100 grams"], a:1, why:"Roughly a gram per stroke is typical, but calibrate your own gun — delivery varies."},
+    {q:"The right grease fill for most bearing cavities is about…", o:["As much as the gun can force in","A single pea-sized dab","Completely packed solid","One-third to one-half of the free space"], a:3, why:"One-third to one-half full feeds the contact without churning; packed solid overheats."},
+    {q:"Over-greasing a bearing causes…", o:["Churning, heat, seal damage, and eventual failure","Lower friction always","Cooler running","Better sealing forever"], a:0, why:"Excess grease churns into heat, degrades, and can blow seals out."},
+    {q:"Before attaching the gun, you should…", o:["Remove the fitting","Add more dirt to the fitting","Clean the grease fitting so you don't inject contamination","Heat the fitting"], a:2, why:"The gun pushes surface dirt straight into the bearing unless the fitting is wiped first."},
+    {q:"How do you calibrate a grease gun's output?", o:["All guns are identical","Ask another technician","Read the box it came in","Pump a counted number of strokes onto a scale and divide the weight"], a:3, why:"Weighing a known number of strokes gives your gun's real grams-per-stroke."}]},
+{ id:"c4l5", title:"Automatic Lubricators", mins:4,
+  sections:[
+    {h:"Why automate", p:"Automatic lubricators — single-point units and multi-line systems — deliver small, frequent doses of grease or oil on schedule. That beats the manual pattern of too much, too late. They shine on points that are dangerous to reach, easy to forget, or sensitive to dose size, and they keep feeding during nights and weekends when nobody is on rounds."},
+    {h:"Types you'll meet", p:"Single-point lubricators include spring, gas-driven, and electromechanical units screwed onto one bearing each, set to empty over weeks or months. Centralized systems use a pump and divider valves or progressive distributors to feed many points from one reservoir — powerful, but a blocked line can quietly starve one point while the rest look fine."},
+    {h:"Automation is not abdication", p:"Units run empty, batteries die, lines plug, and settings get bumped. Automatic systems still need inspection routes: confirm the unit is dispensing, check the reservoir level, verify the bearing is actually receiving grease, and replace or refill on schedule. The failure mode of automation is silent — nobody notices until the bearing does."}],
+  watch:["A single-point lubricator past its replacement date, empty but still mounted like it's working.","Centralized system pressure fine while one divider line is blocked solid.","Settings changed by hand with no record — nobody knows the dose anymore."],
+  quiz:[
+    {q:"The main advantage of automatic lubricators is…", o:["They use no grease","They never need inspection","Small, frequent, on-schedule doses instead of too much, too late","They eliminate bearings"], a:2, why:"Steady small doses match bearing needs better than infrequent manual floods."},
+    {q:"Single-point lubricators are typically…", o:["Hand guns with bigger handles","Individual units mounted on one bearing, set to dispense over weeks or months","Oil mist generators","Whole-plant systems"], a:1, why:"One unit serves one point and empties over a set period."},
+    {q:"The dangerous failure mode of centralized systems is…", o:["Grease that is too clean","Too much noise","A blocked line silently starving one point while others look normal","Excess battery life"], a:2, why:"Divider systems can fault at one outlet without obvious signs at the pump."},
+    {q:"Automatic systems still require…", o:["Manual greasing on top of every dose","Daily full disassembly","Nothing after installation","Inspection routes — check dispensing, levels, and that bearings receive lubricant"], a:3, why:"Empty units, dead batteries, and plugged lines fail silently without routine checks."},
+    {q:"Good candidates for automatic lubrication include points that are…", o:["Dangerous to reach, easy to forget, or dose-sensitive","Never used","Already failed","Right beside the storeroom"], a:0, why:"Automation pays most where manual service is risky, unreliable, or imprecise."}]},
+{ id:"c4l6", title:"Lubrication Failure Modes", mins:5,
+  sections:[
+    {h:"Starvation and the wrong product", p:"The most common lubrication failures are embarrassingly basic: no lubricant (missed task, empty lubricator, blocked line), the wrong lubricant (viscosity too thin to hold a film, or an incompatible grease quietly destroying itself), or lubricant in the wrong amount. These aren't exotic metallurgy — they're program failures, and they're preventable."},
+    {h:"Contaminated and degraded lubricant", p:"Next come dirty and worn-out lubricants. Abrasive contamination grinds surfaces; water corrodes and fatigues them; oxidized oil turns acidic and varnishes. Each shows evidence: particles and silicon on analysis, TAN climbing, grease hardened or bled in the housing. The failure mode names the fix — exclusion and filtration for dirt, source control for water, condition-based changes for oxidation."},
+    {h:"Read the failed part", p:"Failed bearings tell the story if you look before scrapping them: scoring and dull frosting point to abrasion; rust and etched surfaces to water; darkened, heat-tinted metal to starvation or overload; spalling with dented raceways to debris fatigue. Match the evidence to the mode, fix the mode — swapping the bearing without fixing the cause just schedules the repeat failure."}],
+  watch:["The same bearing position failing repeatedly — the cause is in the system, not the bearing bin.","A failed bearing thrown in scrap before anyone looked at it — evidence destroyed.","Failure reports that say 'bearing failed' with no mode — that's a description, not a diagnosis."],
+  quiz:[
+    {q:"The most common lubrication failure causes are…", o:["Missing, wrong, or wrong-amount lubricant — basic program failures","Bearings wearing out exactly on schedule","Exotic metallurgy defects","Lightning strikes"], a:0, why:"Starvation, wrong product, and wrong quantity dominate real-world lubrication failures."},
+    {q:"Dented raceways with later spalling point to…", o:["Wrong NLGI grade only","Debris particles denting the surface and seeding fatigue","Over-greasing","Water corrosion"], a:1, why:"Hard particles pressed through the contact leave dents whose edges start fatigue spalls."},
+    {q:"Rust and etched surfaces on a failed bearing suggest…", o:["High viscosity","Abrasive dirt","Water contamination","Too much filtration"], a:2, why:"Corrosion patterns are water's signature on bearing steel."},
+    {q:"Why inspect a failed bearing before scrapping it?", o:["Its damage pattern identifies the failure mode so you fix the cause, not just the part","To weigh it","Scrap yards require it","To reuse it"], a:0, why:"Scoring, rust, heat tint, and spalling each point to a different root cause."},
+    {q:"Oxidized, degraded oil contributes to failure by…", o:["Making oil too slippery","Cleaning the machine","Increasing film thickness","Forming acids and varnish and losing protective additives"], a:3, why:"Oxidation depletes additives and creates corrosive, deposit-forming byproducts."}]},
+{ id:"c4l7", title:"Running a Lubrication Program", mins:5,
+  sections:[
+    {h:"A program is a system, not a person", p:"A lubrication program that depends on one conscientious technician collapses when that person is away. A real program is written down: an asset list with every lubricated point, the correct product, the correct amount, the correct interval, and the correct procedure — assigned, scheduled, and tracked like any other maintenance work."},
+    {h:"The building blocks", p:"Consolidated, labeled products; clean storage and transfer; routes built around equipment, not memory; condition monitoring through oil analysis and inspections; and training so every person who touches a grease gun knows why the details matter. Identification is the glue — machine tags, container labels, and color or shape coding that all agree with each other."},
+    {h:"Measure and improve", p:"Track what tells the truth: route completion, oil analysis alarm rates, cleanliness results versus target, lubricant consumption, and repeat failures. Review them, fix the biggest leak in the system, and repeat. Programs don't fail in a day and don't heal in a day — steady, measured pressure on the basics is what moves reliability."}],
+  watch:["Routes that exist on paper but completion is never checked.","One person holding the whole program in their head — a single point of failure.","Money spent on premium lubricants while storage and transfer stay dirty — the basics outrank the boutique."],
+  quiz:[
+    {q:"A sound lubrication program is built on…", o:["One expert's memory","Buying premium oil only","Greasing everything weekly","A written asset list with product, amount, interval, and procedure for every point"], a:3, why:"Documented, scheduled, tracked tasks survive vacations and turnover; memory doesn't."},
+    {q:"Identification systems (tags, labels, coding) matter because…", o:["They look tidy","They replace training","They prevent wrong-product application, the most basic failure","Auditors like colors"], a:2, why:"Matching machine and container identification is what stops the wrong lubricant reaching the point."},
+    {q:"Useful program metrics include…", o:["The number of drums purchased","Route completion, analysis alarm rates, cleanliness vs target, and repeat failures","Technicians' opinions only","How shiny the storeroom floor is"], a:1, why:"These measures show whether the system is actually controlling lubrication."},
+    {q:"Oil analysis in a program serves to…", o:["Verify contamination control and lubricant condition so actions are condition-based","Fill filing cabinets","Replace all inspections","Justify never changing oil"], a:0, why:"Analysis closes the loop — it proves exclusion and filtration work and times interventions by condition."},
+    {q:"The right order of investment for a weak program is usually…", o:["More grease guns","Basics first — storage, transfer, identification, routes — then upgrades","Premium synthetics first, basics later","A bigger storeroom"], a:1, why:"Clean handling and correct application of standard products beat premium products handled badly."}]}
+]}
+];
+
+/* ===================== TIPS ===================== */
+var TIPS = [
+"Wipe every grease fitting clean before the gun goes on — the dirt on it is headed straight into the bearing.",
+"Calibrate your grease gun once: ten strokes on a scale tells you your real grams per stroke.",
+"Store drums indoors and off the floor; a drum that breathes rainwater is a water pump.",
+"Label every transfer container with the exact product name — 'the yellow jug' is not a specification.",
+"Check oil level with the machine in its normal state, and write down what 'normal' is for that machine.",
+"New oil is not clean oil — filter it on the way into any critical machine.",
+"A desiccant breather with spent, fully color-changed gel is just an open pipe — replace it.",
+"If a bearing runs hot right after greasing and cools over a few days, you over-greased it.",
+"Sample oil from the same point, the same way, every time — trending dies when the method wanders.",
+"Never top up a system with a different oil just because the viscosity grade matches.",
+"Grease color tells you nothing about thickener type — read the data sheet, not the dye.",
+"Keep grease guns dedicated: one gun, one grease, with the product name on the gun.",
+"Too much grease is a failure mode, not insurance — one-third to one-half full is the target for most bearings.",
+"Drain free water from sumps on a schedule, but spend your real effort finding where it gets in.",
+"When you change grease types, purge until new grease exits clean, then shorten the next intervals.",
+"Foam standing on a reservoir surface is a symptom — check suction leaks, level, and return splash.",
+"Put the sample label on the bottle before you pull the sample, not after you walk away.",
+"An oil ring that isn't spinning is a bearing that isn't being lubricated — look through the sight glass.",
+"Rotate lubricant stock first in, first out, and date every container the day it arrives.",
+"Read the failed bearing before it hits the scrap bin — its surfaces name the failure mode.",
+"Keep a short approved-product list and make machine tags match container labels exactly.",
+"Slow down the pump when greasing by hand — slow strokes feed the bearing instead of blowing the seal.",
+"A rising ISO cleanliness code over two samples is a warning even if you're still inside the target.",
+"Write the decision on every oil analysis report — act, watch, or resample — and sign it."
+];
+
+/* ===================== STATE ===================== */
+var KEY = "taf-mlt1-training-v1";
+var state = { done:{}, best:{} };
+try {
+  var raw = localStorage.getItem(KEY);
+  if (raw) { var p = JSON.parse(raw); if (p && p.done && p.best) state = p; }
+} catch(e) {}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e) {} }
+
+var ALL = [];
+COURSES.forEach(function(c){ c.lessons.forEach(function(l){ ALL.push({course:c, lesson:l}); }); });
+function totalDone(){ return ALL.filter(function(x){ return state.done[x.lesson.id]; }).length; }
+function courseDone(c){ return c.lessons.filter(function(l){ return state.done[l.id]; }).length; }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+
+/* ===================== NAV ===================== */
+var views = ["home","courses","lesson","quizbank","tips"];
+var currentTab = "home";
+function show(name){
+  views.forEach(function(v){ document.getElementById("view-"+v).classList.toggle("hidden", v!==name); });
+  var tabFor = (name==="lesson") ? "courses" : name;
+  document.querySelectorAll(".tab").forEach(function(t){ t.classList.toggle("on", t.dataset.tab===tabFor); });
+  currentTab = name;
+  window.scrollTo(0,0);
+}
+document.querySelectorAll(".tab").forEach(function(t){
+  t.addEventListener("click", function(){
+    var tab = t.dataset.tab;
+    if (tab==="home") renderHome();
+    if (tab==="courses") renderCourses();
+    if (tab==="quizbank") renderQuizBank();
+    if (tab==="tips") renderTips();
+    show(tab);
+  });
+});
+
+/* ===================== HOME ===================== */
+var resetArmed = false, resetTimer = null;
+function badges(){
+  var d = totalDone();
+  var c1 = COURSES[0].lessons.every(function(l){ return state.done[l.id]; });
+  var c3 = COURSES[2].lessons.every(function(l){ return state.done[l.id]; });
+  return [
+    {icon:"⚙", name:"First Lesson Done", desc:"Pass any 1 lesson", got: d>=1},
+    {icon:"🔧", name:"Halfway There", desc:"Pass 15 of 30 lessons", got: d>=15},
+    {icon:"🛢", name:"Fundamentals Complete", desc:"Finish Course 1", got: c1},
+    {icon:"🔬", name:"Contamination & Analysis Complete", desc:"Finish Course 3", got: c3},
+    {icon:"🏆", name:"All Lessons Complete", desc:"Pass all 30 lessons", got: d>=ALL.length}
+  ];
+}
+function nextLesson(){
+  for (var i=0;i<ALL.length;i++){ if (!state.done[ALL[i].lesson.id]) return ALL[i]; }
+  return null;
+}
+function renderHome(){
+  var d = totalDone(), total = ALL.length;
+  var pct = Math.round(d/total*100);
+  var C = 2*Math.PI*48, off = C - (C*d/total);
+  var nx = nextLesson();
+  var html = "";
+  html += '<div class="hero"><div class="ring-wrap">'
+    + '<svg width="118" height="118" viewBox="0 0 118 118">'
+    + '<circle cx="59" cy="59" r="48" fill="none" stroke="#1d3552" stroke-width="11"/>'
+    + '<circle cx="59" cy="59" r="48" fill="none" stroke="#4da3ff" stroke-width="11" stroke-linecap="round" stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'"/>'
+    + '</svg><div class="ring-center"><div class="pct">'+pct+'%</div><div class="lbl">'+d+' of '+total+' lessons</div></div></div>'
+    + '<div class="hero-txt"><h2>'+(d===0 ? "Start with the fundamentals" : (nx ? "Keep going — you're on track" : "All lessons passed. Nice work."))+'</h2>'
+    + '<p>30 short lessons and 150 quiz questions covering lubrication fundamentals, selection, contamination control, oil analysis, and program management.</p>'
+    + (nx ? '<button class="btn" id="startBtn">'+(d===0?"Start: ":"Continue: ")+esc(nx.lesson.title)+'</button>'
+          : '<button class="btn" id="startBtn">Review courses</button>')
+    + '</div></div>';
+  html += '<p class="disclaimer">Training and preparation only — this app does not grant any certification. Progress is stored only on this device.</p>';
+  html += '<h2 class="sec">Your courses</h2>';
+  COURSES.forEach(function(c){
+    var cd = courseDone(c), ct = c.lessons.length, pc = Math.round(cd/ct*100);
+    html += '<div class="course-card"><div class="row"><h3>'+esc(c.title)+'</h3><span class="cnt">'+cd+' / '+ct+' passed</span></div>'
+      + '<div class="bar"><i style="width:'+pc+'%"></i></div></div>';
+  });
+  html += '<h2 class="sec">Badges</h2><div class="badges">';
+  badges().forEach(function(b){
+    html += '<div class="badge '+(b.got?"earned":"locked")+'"><div class="ic">'+b.icon+'</div><div><b>'+esc(b.name)+'</b><span>'+(b.got?"Earned ✓":esc(b.desc))+'</span></div></div>';
+  });
+  html += '</div>';
+  html += '<div class="reset-zone"><button class="reset-link" id="resetLink">Reset all progress</button></div>';
+  document.getElementById("view-home").innerHTML = html;
+  document.getElementById("startBtn").addEventListener("click", function(){
+    if (nx) openLesson(nx.course, nx.lesson); else { renderCourses(); show("courses"); }
+  });
+  var rl = document.getElementById("resetLink");
+  rl.addEventListener("click", function(){
+    if (!resetArmed) {
+      resetArmed = true; rl.textContent = "Tap again to confirm reset — this clears all progress"; rl.classList.add("armed");
+      clearTimeout(resetTimer); resetTimer = setTimeout(function(){ resetArmed=false; renderHome(); if(currentTab==="home") show("home"); }, 4000);
+    } else {
+      clearTimeout(resetTimer); resetArmed = false;
+      state = { done:{}, best:{} }; save(); renderHome(); show("home");
+    }
+  });
+}
+
+/* ===================== COURSES ===================== */
+function renderCourses(){
+  var html = "";
+  COURSES.forEach(function(c, ci){
+    html += '<h2 class="sec">Course '+(ci+1)+' · '+esc(c.title)+'</h2>';
+    c.lessons.forEach(function(l, li){
+      var done = !!state.done[l.id];
+      var best = state.best[l.id];
+      html += '<button class="lesson-row'+(done?" done":"")+'" data-c="'+c.id+'" data-l="'+l.id+'">'
+        + '<span class="num">'+(done?"✓":(li+1))+'</span>'
+        + '<span class="t"><b>'+esc(l.title)+'</b><span>'+l.mins+' min read · 5 questions'+(best!=null ? ' · Best score '+best+'/5' : '')+(done?' · Passed':'')+'</span></span>'
+        + '<span class="chev">›</span></button>';
+    });
+  });
+  document.getElementById("view-courses").innerHTML = html;
+  document.querySelectorAll("#view-courses .lesson-row").forEach(function(b){
+    b.addEventListener("click", function(){
+      var c = COURSES.filter(function(x){ return x.id===b.dataset.c; })[0];
+      var l = c.lessons.filter(function(x){ return x.id===b.dataset.l; })[0];
+      openLesson(c, l);
+    });
+  });
+}
+
+/* ===================== LESSON ===================== */
+var quizState = null;
+function openLesson(course, lesson){
+  quizState = { answers:{}, score:0, total:lesson.quiz.length, lessonId:lesson.id };
+  var ci = COURSES.indexOf(course)+1;
+  var li = course.lessons.indexOf(lesson)+1;
+  var html = '<button class="backlink" id="backBtn">‹ Back to courses</button>';
+  html += '<div class="lesson-head"><h2>'+esc(lesson.title)+'</h2>'
+    + '<p class="meta">Course '+ci+' · '+esc(course.title)+' · Lesson '+li+' of '+course.lessons.length+' · '+lesson.mins+' min read</p></div>';
+  lesson.sections.forEach(function(s){
+    html += '<div class="teach"><h3>'+esc(s.h)+'</h3><p>'+esc(s.p)+'</p></div>';
+  });
+  html += '<div class="watch"><h3>⚠ What to watch for</h3><ul>';
+  lesson.watch.forEach(function(w){ html += '<li>'+esc(w)+'</li>'; });
+  html += '</ul></div>';
+  html += '<h3 class="quiz-title">Check your understanding</h3><p class="quiz-sub">5 questions · score 4 or 5 to pass · unlimited retakes</p>';
+  html += '<div id="quizZone">';
+  lesson.quiz.forEach(function(q, qi){
+    html += '<div class="q" data-q="'+qi+'"><p class="qq">'+(qi+1)+'. '+esc(q.q)+'</p>';
+    q.o.forEach(function(o, oi){
+      html += '<button class="opt" data-q="'+qi+'" data-o="'+oi+'">'+esc(o)+'</button>';
+    });
+    html += '<p class="why" id="why-'+qi+'"></p></div>';
+  });
+  html += '</div><div id="lessonResult"></div>';
+  document.getElementById("view-lesson").innerHTML = html;
+  document.getElementById("backBtn").addEventListener("click", function(){ renderCourses(); show("courses"); });
+  document.querySelectorAll("#view-lesson .opt").forEach(function(b){
+    b.addEventListener("click", function(){ answerLesson(lesson, b); });
+  });
+  show("lesson");
+}
+function answerLesson(lesson, btn){
+  var qi = +btn.dataset.q, oi = +btn.dataset.o;
+  if (quizState.answers[qi] != null) return;
+  var q = lesson.quiz[qi];
+  quizState.answers[qi] = oi;
+  var correct = (oi === q.a);
+  if (correct) quizState.score++;
+  var box = btn.closest(".q");
+  box.querySelectorAll(".opt").forEach(function(o){
+    o.disabled = true;
+    var oidx = +o.dataset.o;
+    if (oidx === q.a) o.classList.add("correct");
+    else if (oidx === oi) o.classList.add("wrong");
+    else o.classList.add("dim");
+  });
+  var why = document.getElementById("why-"+qi);
+  why.innerHTML = (correct ? "<b>Correct.</b> " : "<b>Not quite.</b> ") + esc(q.why);
+  why.classList.add("show");
+  if (Object.keys(quizState.answers).length === quizState.total) finishLesson(lesson);
+}
+function finishLesson(lesson){
+  var s = quizState.score, pass = s >= 4;
+  var prevBest = state.best[lesson.id] || 0;
+  if (s > prevBest) state.best[lesson.id] = s;
+  if (pass) state.done[lesson.id] = true;
+  save();
+  var html = '<div class="result '+(pass?"pass":"fail")+'"><h3>'+(pass?"Passed":"Not yet")+' — '+s+' / 5</h3>'
+    + '<p>'+(pass ? "Lesson marked complete. Your best score is saved on this device."
+                   : "You need 4 of 5 to pass. Re-read the sections above and try again — retakes are unlimited.")+'</p>'
+    + '<div class="rowbtns"><button class="btn ghost" id="retakeBtn">Retake quiz</button>'
+    + '<button class="btn" id="toCoursesBtn">Back to courses</button></div></div>';
+  var zone = document.getElementById("lessonResult");
+  zone.innerHTML = html;
+  zone.scrollIntoView({behavior:"smooth", block:"center"});
+  document.getElementById("retakeBtn").addEventListener("click", function(){
+    var c = COURSES.filter(function(x){ return x.lessons.indexOf(lesson) >= 0; })[0];
+    openLesson(c, lesson);
+  });
+  document.getElementById("toCoursesBtn").addEventListener("click", function(){ renderCourses(); show("courses"); });
+}
+
+/* ===================== QUIZ BANK ===================== */
+var bank = null;
+function shuffle(a){
+  for (var i=a.length-1;i>0;i--){ var j = Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; }
+  return a;
+}
+function renderQuizBank(){
+  var pool = [];
+  ALL.forEach(function(x){ x.lesson.quiz.forEach(function(q){ pool.push({q:q, lessonTitle:x.lesson.title, courseTitle:x.course.title}); }); });
+  shuffle(pool);
+  bank = { items: pool.slice(0,20), answers:{}, score:0 };
+  var html = '<div class="lesson-head"><h2>Quiz Bank</h2><p class="meta">20 questions drawn at random from all 150 lesson questions. Quiz Bank scores do not mark lessons as passed.</p></div>';
+  html += '<button class="btn block" id="newBankBtn" style="margin-bottom:14px">↻ New 20 questions</button>';
+  html += '<div id="bankZone">';
+  bank.items.forEach(function(it, qi){
+    html += '<div class="q" data-q="'+qi+'"><p class="qq">'+(qi+1)+'. '+esc(it.q.q)+'</p>';
+    it.q.o.forEach(function(o, oi){ html += '<button class="opt" data-q="'+qi+'" data-o="'+oi+'">'+esc(o)+'</button>'; });
+    html += '<p class="why" id="bwhy-'+qi+'"></p></div>';
+  });
+  html += '</div><div id="bankResult"></div>';
+  document.getElementById("view-quizbank").innerHTML = html;
+  document.getElementById("newBankBtn").addEventListener("click", function(){ renderQuizBank(); show("quizbank"); });
+  document.querySelectorAll("#view-quizbank .opt").forEach(function(b){
+    b.addEventListener("click", function(){ answerBank(b); });
+  });
+}
+function answerBank(btn){
+  var qi = +btn.dataset.q, oi = +btn.dataset.o;
+  if (bank.answers[qi] != null) return;
+  var it = bank.items[qi], q = it.q;
+  bank.answers[qi] = oi;
+  var correct = (oi === q.a);
+  if (correct) bank.score++;
+  var box = btn.closest(".q");
+  box.querySelectorAll(".opt").forEach(function(o){
+    o.disabled = true;
+    var oidx = +o.dataset.o;
+    if (oidx === q.a) o.classList.add("correct");
+    else if (oidx === oi) o.classList.add("wrong");
+    else o.classList.add("dim");
+  });
+  var why = document.getElementById("bwhy-"+qi);
+  why.innerHTML = (correct ? "<b>Correct.</b> " : "<b>Not quite.</b> ") + esc(q.why);
+  why.classList.add("show");
+  if (Object.keys(bank.answers).length === bank.items.length) finishBank();
+}
+function finishBank(){
+  var s = bank.score, total = bank.items.length;
+  var msg;
+  if (s >= 18) msg = "Exam-ready form. Keep the streak warm with a fresh set now and then.";
+  else if (s >= 14) msg = "Solid. Review the misses below and you'll close the gap fast.";
+  else if (s >= 10) msg = "Getting there. Work through the missed lessons, then draw a new set.";
+  else msg = "Good starting point — the lessons are short. Revisit the topics below and try a fresh 20.";
+  var html = '<div class="result '+(s>=14?"pass":"fail")+'"><h3>Score: '+s+' / '+total+'</h3><p>'+msg+'</p>'
+    + '<div class="rowbtns"><button class="btn" id="againBtn">New 20 questions</button></div></div>';
+  var missed = bank.items.filter(function(it, i){ return bank.answers[i] !== it.q.a; });
+  if (missed.length){
+    html += '<h2 class="sec">Missed questions — review</h2>';
+    missed.forEach(function(it){
+      html += '<div class="missed"><div class="src">From: '+esc(it.lessonTitle)+'</div>'
+        + '<p><b>'+esc(it.q.q)+'</b></p>'
+        + '<p class="ca">Correct answer: '+esc(it.q.o[it.q.a])+'</p>'
+        + '<p>'+esc(it.q.why)+'</p></div>';
+    });
+  } else {
+    html += '<div class="missed"><p><b>Perfect run — no misses to review.</b></p></div>';
+  }
+  var zone = document.getElementById("bankResult");
+  zone.innerHTML = html;
+  zone.scrollIntoView({behavior:"smooth", block:"start"});
+  document.getElementById("againBtn").addEventListener("click", function(){ renderQuizBank(); show("quizbank"); });
+}
+
+/* ===================== TIPS ===================== */
+function renderTips(){
+  var html = '<div class="lesson-head"><h2>Lube Tips</h2><p class="meta">24 weekly field tips — one practical habit at a time.</p></div>';
+  TIPS.forEach(function(t, i){
+    html += '<div class="tip"><span class="wk">Week '+(i+1)+'</span><p>'+esc(t)+'</p></div>';
+  });
+  document.getElementById("view-tips").innerHTML = html;
+}
+
+/* ===================== INIT ===================== */
+renderHome();
+renderCourses();
+renderTips();
+show("home");
+</script>
+</body>
+</html>

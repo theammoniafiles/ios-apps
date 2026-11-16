@@ -1,0 +1,814 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<link rel="icon" href="data:," />
+<title>Root Cause Analysis Training</title>
+<style>
+  :root{
+    --bg:#0c1626; --bg2:#101f36; --card:#14273f; --card2:#182e4a;
+    --line:#27405f; --ink:#e8eef6; --muted:#9db2c9; --faint:#6f87a3;
+    --accent:#4da3ff; --accent2:#2f7fd6; --amber:#f5b942; --amber-bg:#2b2110;
+    --good:#3ecf7a; --good-bg:#0f2e1e; --bad:#ff6b6b; --bad-bg:#33161a;
+    --steel:#8fa9c4;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    font-size:16px;line-height:1.5;padding-bottom:86px}
+  button,[role="button"],select,summary,input:not([type="checkbox"],[type="radio"]){min-height:2.25rem}
+  button{font:inherit;cursor:pointer}
+  .wrap{max-width:760px;margin:0 auto;padding:0 16px}
+  .topbar{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,#0e1c31,#0c1626);
+    border-bottom:1px solid var(--line)}
+  .topbar-in{max-width:760px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:10px}
+  .gear{flex:0 0 auto;color:var(--accent)}
+  .topbar h1{font-size:19px;margin:0;letter-spacing:.2px}
+  .topbar .sub{font-size:12.5px;color:var(--muted);margin:0}
+  .hero{background:linear-gradient(160deg,var(--bg2),#0d1a2c);border:1px solid var(--line);
+    border-radius:14px;padding:18px;margin:16px 0;display:flex;gap:18px;align-items:center}
+  .ring-wrap{position:relative;width:118px;height:118px;flex:0 0 auto}
+  .ring-wrap svg{transform:rotate(-90deg)}
+  .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .ring-center .pct{font-size:26px;font-weight:800;line-height:1}
+  .ring-center .lbl{font-size:11px;color:var(--muted);margin-top:3px}
+  .hero-txt h2{margin:0 0 6px;font-size:19px}
+  .hero-txt p{margin:0 0 12px;color:var(--muted);font-size:14px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:10px;
+    background:var(--accent2);color:#fff;font-weight:700;padding:11px 18px;min-height:44px;font-size:15px;text-decoration:none}
+  .btn:active{filter:brightness(1.15)}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+  .btn.block{width:100%}
+  .disclaimer{font-size:12.5px;color:var(--faint);margin:10px 2px 0}
+  h2.sec{font-size:16px;margin:22px 0 10px;color:var(--steel);text-transform:uppercase;letter-spacing:.8px}
+  .course-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+  .course-card .row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .course-card h3{margin:0;font-size:16.5px}
+  .course-card .cnt{font-size:13px;color:var(--muted);white-space:nowrap}
+  .bar{height:9px;background:#0a1322;border-radius:99px;overflow:hidden;margin-top:10px;border:1px solid var(--line)}
+  .bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:99px}
+  .badges{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .badge{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;gap:10px;align-items:center}
+  .badge .ic{font-size:22px;line-height:1}
+  .badge b{font-size:14px;display:block}
+  .badge span{font-size:12px;color:var(--muted)}
+  .badge.locked{opacity:.45}
+  .badge.earned{border-color:#3d6ea5}
+  .lesson-row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);
+    border:1px solid var(--line);border-radius:12px;padding:13px 14px;margin-bottom:10px;color:var(--ink)}
+  .lesson-row:active{background:var(--card2)}
+  .lesson-row .num{flex:0 0 auto;width:34px;height:34px;border-radius:50%;background:#0a1322;border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--steel)}
+  .lesson-row.done .num{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+  .lesson-row .t{flex:1;min-width:0}
+  .lesson-row .t b{display:block;font-size:15.5px}
+  .lesson-row .t span{font-size:12.5px;color:var(--muted)}
+  .lesson-row .chev{color:var(--faint);font-size:18px}
+  .backlink{background:none;border:0;color:var(--accent);font-weight:600;padding:10px 0;min-height:44px;font-size:15px}
+  .lesson-head{margin:14px 0 4px}
+  .lesson-head h2{font-size:23px;margin:0 0 4px;line-height:1.25}
+  .meta{color:var(--muted);font-size:13.5px;margin:0 0 8px}
+  .teach{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:12px 0}
+  .teach h3{margin:0 0 6px;font-size:16.5px;color:var(--accent)}
+  .teach p{margin:0;color:#d5e0ee;font-size:15.5px}
+  .teach p + p{margin-top:8px}
+  .watch{background:var(--amber-bg);border:1px solid #6b5316;border-radius:12px;padding:14px 16px;margin:14px 0}
+  .watch h3{margin:0 0 8px;font-size:15.5px;color:var(--amber)}
+  .watch ul{margin:0;padding-left:20px}
+  .watch li{margin:5px 0;font-size:15px}
+  .quiz-title{font-size:19px;margin:22px 0 4px}
+  .quiz-sub{color:var(--muted);font-size:13.5px;margin:0 0 12px}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+  .q p.qq{margin:0 0 10px;font-weight:600;font-size:15.5px}
+  .opt{display:block;width:100%;text-align:left;background:#0d1a2c;border:1px solid var(--line);color:var(--ink);
+    border-radius:9px;padding:11px 13px;margin:8px 0;font-size:15px;min-height:44px}
+  .opt:active{border-color:var(--accent)}
+  .opt.correct{background:var(--good-bg);border-color:var(--good);color:#c9f5da}
+  .opt.wrong{background:var(--bad-bg);border-color:var(--bad);color:#ffd7d7}
+  .opt.dim{opacity:.55}
+  .opt[disabled]{cursor:default}
+  .why{display:none;margin:10px 0 0;font-size:14px;color:var(--muted);border-top:1px dashed var(--line);padding-top:9px}
+  .why.show{display:block}
+  .why b{color:var(--ink)}
+  .result{border-radius:12px;padding:16px;margin:16px 0;border:1px solid var(--line);background:var(--card)}
+  .result.pass{border-color:var(--good);background:var(--good-bg)}
+  .result.fail{border-color:#6b5316;background:var(--amber-bg)}
+  .result h3{margin:0 0 6px;font-size:18px}
+  .result p{margin:0 0 12px;color:#d5e0ee;font-size:14.5px}
+  .result .rowbtns{display:flex;gap:10px;flex-wrap:wrap}
+  .missed{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 16px;margin-bottom:10px}
+  .missed .src{font-size:12px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+  .missed p{margin:6px 0;font-size:14.5px}
+  .missed .ca{color:var(--good);font-weight:600}
+  .tip{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;gap:13px}
+  .tip .wk{flex:0 0 auto;background:#0a1322;border:1px solid var(--line);color:var(--amber);font-weight:800;
+    border-radius:9px;padding:6px 9px;font-size:12.5px;height:fit-content;white-space:nowrap}
+  .tip p{margin:2px 0 0;font-size:15px}
+  .reset-zone{margin:26px 0 8px;text-align:center}
+  .reset-link{background:none;border:0;color:var(--faint);font-size:13.5px;text-decoration:underline;padding:10px;min-height:44px}
+  .reset-link.armed{color:var(--bad);font-weight:700}
+  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#0a1424;border-top:1px solid var(--line);
+    padding-bottom:env(safe-area-inset-bottom)}
+  .tabbar-in{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+  .tab{background:none;border:0;color:var(--muted);padding:9px 2px 10px;font-size:11.5px;display:flex;flex-direction:column;
+    align-items:center;gap:3px;min-height:56px}
+  .tab .ti{font-size:21px;line-height:1}
+  .tab.on{color:var(--accent)}
+  .hidden{display:none}
+  @media (min-width:560px){ .badges{grid-template-columns:1fr 1fr 1fr} }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-in">
+    <svg class="gear" width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+    <div>
+      <h1>Root Cause Analysis Training</h1>
+      <p class="sub">Find the real cause. Fix it once.</p>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="view-home"></section>
+  <section id="view-courses" class="hidden"></section>
+  <section id="view-lesson" class="hidden"></section>
+  <section id="view-quizbank" class="hidden"></section>
+  <section id="view-tips" class="hidden"></section>
+</main>
+
+<nav class="tabbar" aria-label="Main">
+  <div class="tabbar-in">
+    <button class="tab on" data-tab="home"><span class="ti">⌂</span>Home</button>
+    <button class="tab" data-tab="courses"><span class="ti">▦</span>Courses</button>
+    <button class="tab" data-tab="quizbank"><span class="ti">?</span>Quiz Bank</button>
+    <button class="tab" data-tab="tips"><span class="ti">✦</span>RCA Tips</button>
+  </div>
+</nav>
+
+<script>
+"use strict";
+/* ===================== DATA ===================== */
+var COURSES = [
+{ id:"c1", title:"RCA Foundations", lessons:[
+{ id:"c1l1", title:"What Root Cause Analysis Is", mins:4,
+  sections:[
+    {h:"Fixing the failure is not the same as fixing the cause", p:"When a pump trips, swapping the motor gets production running again — but if nobody asks why the motor overloaded, the same trip comes back next month with a different motor. Root cause analysis is the disciplined work of tracing a failure back through everything that allowed it to happen, then changing those conditions so the failure cannot repeat."},
+    {h:"A root cause is something you can act on", p:"A root cause is not just an earlier event in a chain. It is a cause that, if you correct it, prevents the failure from recurring — and it sits inside your control. 'The bearing wore out' is a step in the story. 'The bearing ran dry because the oiler route skipped this machine for six weeks' is a cause you can fix."},
+    {h:"RCA is a process, not a meeting", p:"Good RCA follows a repeatable path: define the problem precisely, gather evidence before it disappears, build a timeline, test possible causes against the evidence, choose corrective actions, and verify they worked. Skipping steps is how investigations end with guesses dressed up as findings."}],
+  watch:["The same failure showing up for the third time — repeat failures are the loudest sign RCA never actually happened.","A work order closed with 'replaced part, running fine' and nothing about why the part failed.","An investigation that starts by naming who was on shift instead of what happened."],
+  quiz:[
+    {q:"What is the main goal of root cause analysis?", o:["Get the machine running again as fast as possible","Document the failure for the work order history","Decide who was responsible for the failure","Find and correct the conditions that allowed the failure so it does not recur"], a:3, why:"Restarting production is repair. RCA goes further — it removes the conditions that produced the failure."},
+    {q:"Which statement best describes a root cause?", o:["A cause that, if corrected, prevents recurrence and is within your control","Whatever the most senior person in the room believes","The part that broke","The last thing that happened before the failure"], a:0, why:"A root cause must be actionable and, once fixed, must actually stop the failure from coming back."},
+    {q:"A bearing failed. Which finding is closest to a root cause?", o:["The bearing seized","The operator did not hear the noise","The oiler route skipped this machine for six weeks, so the bearing ran dry","The shaft scored during the seizure"], a:2, why:"The missed lubrication is a condition you can correct — and correcting it prevents the next dry bearing."},
+    {q:"What is the correct order for a sound RCA?", o:["Interview everyone first, then inspect the machine","Define the problem, gather evidence, build a timeline, test causes, act, and verify","Write the report, then investigate if time allows","Pick a cause, then look for evidence that supports it"], a:1, why:"Evidence comes before conclusions. Testing candidate causes against facts is what separates analysis from opinion."},
+    {q:"A repeat failure is usually a sign that…", o:["Bad luck comes in threes","The operators need more discipline","The equipment is just old","The earlier fix addressed the symptom, not the cause"], a:3, why:"When the same failure returns, the conditions that created it were never changed."}]},
+{ id:"c1l2", title:"Symptoms vs Causes", mins:4,
+  sections:[
+    {h:"Symptoms are what you can see, hear, and measure", p:"High vibration, a tripped breaker, a puddle under a seal, a hot bearing housing — these are symptoms. They are real and they matter, but they are the failure announcing itself, not the reason it happened. Treating a symptom as the cause is the most common way investigations go wrong."},
+    {h:"Keep asking what produced this", p:"Work backwards one step at a time. The breaker tripped — symptom. The motor drew high current — closer. The pump was cavitating because the suction strainer was plugged — closer still. The strainer plugged because an upstream gasket shed material after the wrong gasket was installed. Each step answers 'why did the previous step happen?'"},
+    {h:"The test: if I fix only this, does it stay fixed?", p:"For any candidate cause, ask the recurrence question. If you clean the strainer and nothing else, the wrong gasket keeps shedding and the strainer plugs again. The gasket specification and the install check are where the fix holds. That test quickly separates surface findings from real causes."}],
+  watch:["Reports that stop at the first observable: 'tripped on overload,' 'leaking seal,' 'bearing hot.'","The same symptom treated over and over — wiped, reset, topped up — without anyone asking what produces it.","A cause that is really just the symptom restated in different words."],
+  quiz:[
+    {q:"Which of these is a symptom, not a cause?", o:["The suction strainer was plugged with gasket debris","The wrong gasket material was installed","The PM interval was longer than the filter life","High vibration on the pump bearing housing"], a:3, why:"High vibration is the failure announcing itself. The plugged strainer and wrong gasket are steps toward why."},
+    {q:"What is the best question to move from a symptom toward a cause?", o:["What produced this condition?","Have we seen this before?","How fast can we restart?","Who was working that night?"], a:0, why:"Asking what produced each condition walks you backwards through the chain instead of stopping at the surface."},
+    {q:"A breaker keeps tripping and the crew keeps resetting it. What is the breaker trip?", o:["A corrective action","The root cause","A symptom — the protective device doing its job","Proof the breaker is defective"], a:2, why:"The trip is the protection responding to an underlying condition, usually excess current from a mechanical or process problem."},
+    {q:"What is the 'recurrence test' for a candidate cause?", o:["Can I fix it on this shift?","If I fix only this, does the failure stay fixed?","Does the supervisor agree with it?","Has this cause happened before?"], a:1, why:"If fixing the candidate leaves the failure free to return, you have not reached the cause yet."},
+    {q:"'The seal leaked because the seal failed' is a problem because…", o:["It blames the seal vendor","Seals never actually fail","It restates the symptom as its own cause and explains nothing","It is too short for a report"], a:2, why:"Circular findings name no condition you can change, so nothing gets fixed."}]},
+{ id:"c1l3", title:"The Chain of Causation", mins:5,
+  sections:[
+    {h:"Failures are chains, not single events", p:"Almost every failure is the end of a chain: a sequence of conditions and events, each one making the next possible. A valve left in the wrong position starves a pump; the pump cavitates; the seal overheats; the seal leaks; the leak trips the low-level switch. Break any link early enough and the failure never completes."},
+    {h:"Physical, human, and system links", p:"Chains usually contain three kinds of links. Physical links are the hardware story — wear, fatigue, contamination. Human links are actions or omissions — a step skipped, a reading misread. System links are the conditions behind the human ones — unclear procedures, missing labels, training gaps, workload. A complete investigation walks all three."},
+    {h:"Cut the chain at the strongest link", p:"You rarely fix every link. Choose the links where a change is reliable and lasting: relabel the valve and add it to the round sheet, not just remind people to be careful. The deeper system links are usually the strongest places to intervene, because they protect against the next person making the same slip."}],
+  watch:["An investigation that names exactly one cause for a complex failure — real chains have several links.","A chain that jumps from the failure straight to a person, skipping the physical steps in between.","Corrective actions aimed only at the last link — the one closest to the failure is often the weakest place to intervene."],
+  quiz:[
+    {q:"Why is a failure described as a chain rather than a single event?", o:["Because paperwork requires multiple entries","Because chains are used in the equipment","Because a sequence of conditions and events, each enabling the next, leads to the failure","Because every failure takes a long time"], a:2, why:"Each link makes the next possible. Understanding the sequence shows you where the failure could have been interrupted."},
+    {q:"Which is a system link in a causation chain?", o:["The technician skipped a step","The pump cavitated","The seal overheated","The procedure had no step for verifying valve position, and the valve was unlabeled"], a:3, why:"System links are the organizational conditions — procedures, labels, training — that set people up to succeed or fail."},
+    {q:"If a chain is: unlabeled valve → valve left closed → pump cavitates → seal fails, where is intervention usually strongest?", o:["Stocking more spare seals","Telling operators to listen for cavitation","Labeling the valve and adding a position check to the round sheet","Replacing the seal faster"], a:2, why:"Fixing the labeling and the check removes the condition that started the chain, protecting every future shift."},
+    {q:"What are the three kinds of links most chains contain?", o:["Physical, human, and system","Morning, evening, and night shift","Electrical, mechanical, and hydraulic","Old, new, and borrowed"], a:0, why:"The hardware story, the human actions, and the system conditions behind those actions together explain a failure."},
+    {q:"Breaking a chain early means…", o:["Stopping the investigation sooner","Interrupting the sequence before the failure fully develops","Closing the work order early","Blaming the first link"], a:1, why:"Any link removed early enough prevents the later links — and the failure — from happening."}]},
+{ id:"c1l4", title:"Why 'Operator Error' Is Almost Never the Root Cause", mins:5,
+  sections:[
+    {h:"It describes what happened, not why it happened", p:"'Operator error' tells you a person did something that contributed to the failure. It does not tell you why that action made sense at the time, or why the system allowed one slip to become a failure. Stopping there guarantees the next operator, in the same conditions, does the same thing."},
+    {h:"Ask what the job looked like from inside", p:"Was the valve labeled? Did two valves look identical? Was the procedure written for a different revision of the equipment? Was the operator on hour eleven, covering two areas, with an alarm sounding every few minutes? People generally do what the situation invites them to do. Change the invitation."},
+    {h:"The replacement test", p:"Ask: would another competent person, in the same situation with the same information, likely have done the same thing? If yes, the cause lives in the situation — the design, the procedure, the workload — not in the person. Discipline cannot fix a trap that is still set."}],
+  watch:["Any report whose final cause names a person and a verb: 'operator failed to…' with nothing after it.","Corrective actions that read 'counseled the employee' or 'reminded the crew' — the weakest actions there are.","Two different people making the same 'error' — that is the system telling you the trap is still set."],
+  quiz:[
+    {q:"Why is 'operator error' almost never a root cause?", o:["It describes what happened without explaining why the action occurred or why the system allowed it to cause a failure","Operators never make mistakes","It is illegal to write in a report","Supervisors dislike the phrase"], a:0, why:"It is a description, not an explanation. The conditions that produced the action remain in place for the next person."},
+    {q:"What is the replacement test?", o:["Checking whether a spare part is in stock","Replacing the operator on the next shift","Testing a replacement component before installing it","Asking whether another competent person in the same situation would likely have done the same thing"], a:3, why:"If a competent replacement would likely do the same, the cause is in the situation, not the individual."},
+    {q:"An operator opened the wrong valve. Which follow-up question digs deepest?", o:["Did he sign the training sheet?","How long has he worked here?","Were the two valves labeled, and did they look identical?","Who was his supervisor?"], a:2, why:"Look-alike, unlabeled valves are a built-in trap. Fixing the labeling prevents the error for everyone."},
+    {q:"Which corrective action is weakest after a human slip?", o:["Labeling look-alike valves differently","Counseling the employee to be more careful","Adding a position indicator to the valve","Revising the procedure to include a verification step"], a:1, why:"Reminders and counseling change nothing about the conditions that produced the slip."},
+    {q:"When two different operators make the same mistake in a month, the best interpretation is…", o:["The situation is inviting the mistake — a system cause","Both operators should be retrained and that closes it","The crew needs discipline","Coincidence"], a:0, why:"Repeated identical errors by different people are evidence of a trap in the setup, not two careless individuals."}]},
+{ id:"c1l5", title:"When to Investigate — and When Not To", mins:4,
+  sections:[
+    {h:"You cannot RCA everything", p:"A full investigation takes hours of skilled time. Spend it where it pays: failures with safety or environmental risk, high downtime or repair cost, and — most underrated — repeat failures of any size. The pump seal that fails every six weeks costs more over a year than one big breakdown, and its repetition proves the cause is still alive."},
+    {h:"Set triggers in advance", p:"Decide your thresholds before emotions run the meeting: any injury or near miss with real potential, downtime over a set number of hours, repair cost over a set amount, or the third occurrence of the same failure within a window. Triggers written down in calm times get applied fairly in heated ones."},
+    {h:"Small failures still deserve a small look", p:"Not investigating formally does not mean shrugging. A five-minute 'what changed, what produced this' at the workbench catches cheap lessons. Match the depth of the investigation to the size of the loss and the chance of recurrence — deep for big or repeating problems, light for true one-offs with low consequence."}],
+  watch:["The same 'minor' failure appearing month after month with no trigger ever firing.","Investigations launched only when someone senior is angry — that selects for politics, not learning.","Full RCA theater on a true one-off while repeat failures get no attention at all."],
+  quiz:[
+    {q:"Which failure most deserves a full RCA?", o:["A light bulb burned out once","A belt that wore out at the end of its expected life","A seal that has failed for the third time in two months","A one-time trip caused by a lightning strike"], a:2, why:"Repeat failures prove an active cause is still in place — that is where investigation pays back fastest."},
+    {q:"Why set investigation triggers in advance?", o:["To delay investigations","So the decision is fair and consistent instead of driven by whoever is upset","To limit the number of reports managers read","To create more paperwork"], a:1, why:"Pre-set thresholds based on risk, cost, downtime, and repeats keep selection rational under pressure."},
+    {q:"Which is a sensible RCA trigger?", o:["Only failures over a million dollars","Failures that happen on day shift only","Any failure a supervisor personally witnesses","Downtime over a set threshold, any serious near miss, or a third repeat of the same failure"], a:3, why:"Triggers should track consequence and recurrence, not visibility or personalities."},
+    {q:"A cheap part fails once, with low consequence and no pattern. The proportionate response is…", o:["Replace the whole machine","A brief look at what produced it, then move on","A full multi-day RCA with a team","Ignore it completely and record nothing"], a:1, why:"Depth should match loss and recurrence risk. A short, honest look captures the lesson without burning scarce hours."},
+    {q:"Why are repeat small failures often costlier than one big failure?", o:["They recur indefinitely because the cause was never removed, quietly adding up downtime and parts","Small parts are more expensive","They are not — small is always cheap","They generate more meetings"], a:0, why:"An unremoved cause keeps billing you. Six 'minor' failures a year can exceed one major breakdown."}]},
+{ id:"c1l6", title:"The Investigation Mindset", mins:4,
+  sections:[
+    {h:"Curiosity before conclusions", p:"The investigator's job is to find out what happened, not to confirm what everyone already thinks. The first story you hear — especially a confident one — is a hypothesis, not a finding. Hold it lightly, write it down as a possibility, and go look at the physical evidence before it gets cleaned up, repaired, or thrown away."},
+    {h:"Separate facts, inferences, and opinions", p:"A fact: the discharge pressure log shows zero at 03:10. An inference: the pump probably lost prime before 03:10. An opinion: nights never check the strainer. All three can appear in a good investigation, but they must never be blended. Label which is which, and build conclusions only on facts and tested inferences."},
+    {h:"Be willing to be wrong in public", p:"Investigations die when the investigator defends an early theory against new evidence. Treat every candidate cause as innocent until the evidence convicts it — and be ready to drop your favorite theory when a measurement contradicts it. The goal is a fix that works, not a theory that wins."}],
+  watch:["A conclusion announced in the first ten minutes, with the rest of the investigation spent defending it.","Words like 'obviously' and 'clearly' in findings — they usually mark the spot where evidence should be.","Witnesses being told the suspected cause before they give their account."],
+  quiz:[
+    {q:"How should an investigator treat the first confident explanation they hear?", o:["Write it as the conclusion and investigate only if challenged","Treat it as a hypothesis to be tested against evidence","Repeat it to witnesses to confirm it","Accept it if the speaker is senior"], a:1, why:"Confidence is not evidence. Early stories are starting points for testing, nothing more."},
+    {q:"'The log shows discharge pressure at zero at 03:10' is an example of…", o:["A corrective action","An inference","An opinion","A fact"], a:3, why:"It is a recorded observation — a fact. What it means about the pump is inference, and must be labeled as such."},
+    {q:"New measurements contradict your leading theory. The right move is…", o:["Drop or revise the theory; the evidence outranks your attachment to it","Discard the measurements — instruments drift","Mention the theory anyway — it was probably partly right","Blame the person who took the measurements"], a:0, why:"An investigator serves the evidence. Defending a dead theory is how wrong fixes get funded."},
+    {q:"Why should witnesses not be told the suspected cause before their account?", o:["It makes the report longer","It contaminates their memory — they start reporting the theory instead of what they saw","It slows the interview down","It is against the law"], a:1, why:"Suggestion reshapes recall. Get the clean account first, then test theories against it."},
+    {q:"Which phrase in a finding should make a reviewer suspicious?", o:["'The gauge read 40 psi at 02:00'","'This cause was ruled out because…'","'Obviously the night shift skipped the check'","'Two of three samples showed…'"], a:2, why:"'Obviously' usually covers a gap where evidence was never gathered — and it smuggles in blame."}]},
+{ id:"c1l7", title:"Myths That Wreck Investigations", mins:4,
+  sections:[
+    {h:"Myth: every failure has one root cause", p:"Real failures grow from several contributing conditions lining up at once: a marginal design, a deferred PM, and an unclear procedure. Insisting on a single cause forces the team to argue over which link 'really' did it and to leave the other live causes in place. Most failures need two or three corrective actions, not one."},
+    {h:"Myth: the failed part tells the whole story", p:"The broken component is where the failure finished, not where it started. A fatigued shaft may have cracked because of misalignment that existed since installation. Replacing the part without reading what the part is telling you — and what loaded it — just restarts the clock on the same failure."},
+    {h:"Myth: experience makes evidence optional", p:"Twenty years on the same equipment is valuable — and it is also how 'we have seen this before' shuts down looking. Familiar failures sometimes have new causes: a different supplier's part, a changed operating rate. Experience should tell you where to look first, never excuse you from looking."}],
+  watch:["A team arguing for an hour over which single cause is 'the' root cause.","A failed part in the scrap bin before anyone photographed or examined it.","'Same as last time' written on a work order with no evidence checked."],
+  quiz:[
+    {q:"Why is 'one failure, one root cause' a myth?", o:["Most failures result from several contributing conditions aligning, and fixing only one leaves the others active","Teams enjoy arguing","Causes are impossible to count","Reports only allow one entry"], a:0, why:"Multiple live causes usually combine. A single-cause hunt leaves real contributors in place to fail again."},
+    {q:"The failed component itself is best understood as…", o:["Irrelevant once removed","Proof of a manufacturing defect","The whole explanation","Where the failure finished — it shows effects, and sometimes evidence of what loaded it"], a:3, why:"The part records the end of the story. The loads and conditions that broke it are the story's beginning."},
+    {q:"An experienced tech says 'we have seen this before, no need to check.' The risk is…", o:["None — experience is always right","Checking wastes exactly five minutes","A familiar symptom may have a new cause this time, and skipping evidence misses it","The tech will be offended"], a:2, why:"Experience should guide where to look first. It never replaces looking."},
+    {q:"A shaft failed in fatigue. What question keeps the investigation honest?", o:["What loaded the shaft beyond its design — alignment, balance, operating pattern?","How fast can a new shaft arrive?","Was the shaft under warranty?","Who made the shaft?"], a:0, why:"Fatigue is a mechanism, not a cause. The abnormal loading behind it is the cause to find."},
+    {q:"Which is the healthiest team behavior when causes are debated?", o:["The senior person's cause wins","List all candidate causes and test each against the evidence","Pick the cause that is cheapest to fix","Vote and move on"], a:1, why:"Testing candidates against evidence — not seniority, votes, or price — is what makes findings trustworthy."}]}
+]},
+{ id:"c2", title:"Evidence and Timelines", lessons:[
+{ id:"c2l1", title:"Preserving the Scene", mins:4,
+  sections:[
+    {h:"The scene starts disappearing immediately", p:"The moment a failure is found, the evidence begins to vanish: parts get swapped, valves get turned back, spills get cleaned, alarms get acknowledged, and memories start rewriting themselves. The first job of an investigation is not analysis — it is stopping the loss of evidence while the area is made safe."},
+    {h:"Safe first, then freeze", p:"Make the scene safe: isolate energy, stop leaks, protect people. Then freeze what is left. Leave valve positions as found, leave the failed part where it lies if it is safe to do so, and keep settings, switch positions, and control states untouched until they are recorded. Tag the equipment so a helpful second shift does not 'fix' the evidence away."},
+    {h:"Record before you restore", p:"Production pressure is real, and sometimes the machine must go back together fast. Even then, ten minutes of photos, position notes, and pulling the failed parts aside for later examination preserves most of the value. What you cannot do is reconstruct a scene from memory a week later — that reconstruction will quietly become the story everyone believes."}],
+  watch:["A failed part already in the scrap bin, cleaned, when the investigator arrives.","Valve and switch positions 'put back to normal' before anyone recorded where they were found.","A scene cleaned for the next shift with no photos taken first."],
+  quiz:[
+    {q:"What is the investigator's first job when arriving at a failure?", o:["Order replacement parts","Stop the loss of evidence while the area is made safe","Interview the operator","Start the 5 Whys"], a:1, why:"Analysis can wait; disappearing evidence cannot. Safety first, then freeze the scene."},
+    {q:"Why leave valve positions as found?", o:["It saves time on restart","Turning valves is dangerous in all cases","As-found positions are evidence of how the system was actually lined up when it failed","So the next shift sees them"], a:2, why:"The as-found lineup is a fact you can never recover once someone restores it to normal."},
+    {q:"Production demands an immediate restart. What preserves the investigation?", o:["Nothing can be done — restart and forget it","Writing the report from the alarm list only","Asking the crew to remember everything carefully","Ten minutes of photos, position notes, and setting the failed parts aside"], a:3, why:"A short, deliberate capture of photos, positions, and parts keeps most of the evidence value even under time pressure."},
+    {q:"Why tag the failed equipment after a failure?", o:["To mark it for scrap","So operators avoid the area forever","So nobody helpfully repairs or discards the evidence before it is examined","For inventory"], a:2, why:"Well-meaning repairs destroy evidence. A tag tells every shift the scene is being held."},
+    {q:"What is the biggest risk of reconstructing a scene from memory a week later?", o:["The reconstruction quietly becomes the accepted story, whether or not it is accurate","Photos would have been too expensive","The report will be shorter","People enjoy telling stories"], a:0, why:"Memory fills gaps with what makes sense, and the filled-in version hardens into 'fact.'"}]},
+{ id:"c2l2", title:"What to Collect Before Anything Is Touched", mins:5,
+  sections:[
+    {h:"The perishable list", p:"Some evidence survives for days; some survives for minutes. Collect the perishable items first: control system states and alarm lists before they roll over, as-found positions, temperatures and pressures while the machine is still in its failed state, fluid levels and samples before anything is drained or topped up, and the failed parts themselves."},
+    {h:"Samples and readings tell the truth later", p:"An oil sample taken from a failed bearing housing before teardown can show wear metals and contamination that vanish once the housing is flushed. A photo of a gauge beats a memory of 'about half, I think.' Write readings down with the time and the instrument used — a number without a time is half a fact."},
+    {h:"Collect the paperwork trail too", p:"Pull the recent work orders, PM records, round sheets, and operating logs for the days before the failure, plus any recent changes: new parts, new supplier, new procedure revision, changed setpoints. Failures often begin at a change. Get the records before they are filed, corrected, or lost."}],
+  watch:["Oil topped up or drained before a sample was taken — the story in that oil is gone.","Alarm history cleared or scrolled past the failure window.","A 'recent change' nobody mentions until the third interview."],
+  quiz:[
+    {q:"Which evidence should be collected first?", o:["Witness statements","The oldest maintenance records","Perishable evidence: control states, as-found positions, readings in the failed state, samples before draining","The vendor manual"], a:2, why:"Evidence that disappears in minutes outranks evidence that will still be there tomorrow."},
+    {q:"Why sample oil from a failed bearing before teardown?", o:["Oil samples are required by law","Wear metals and contamination in that oil can reveal the failure mechanism — and flushing destroys them","To check the oil level","To reuse the oil"], a:1, why:"The oil carries the physical record of what was wearing and what got in. Teardown and flushing erase it."},
+    {q:"A reading written down should always include…", o:["The reader's opinion of the cause","The supervisor's initials","Only the value","The value, the time, and the instrument or source"], a:3, why:"A number without a time and source cannot be placed on a timeline or checked later."},
+    {q:"Why pull records of recent changes during evidence collection?", o:["Failures frequently begin at a change — new part, supplier, setpoint, or procedure — so changes must be on the list of candidates","Paperwork impresses management","Changes are always the cause","To find who approved the change for blame"], a:0, why:"Change is a classic failure trigger. It belongs on the candidate list early, to be tested like everything else."},
+    {q:"Which is the best record of a gauge reading at the scene?", o:["A reading taken after restart","The operator's memory of 'about half'","A photo of the gauge as found","The gauge's normal range from the manual"], a:2, why:"A photo captures the actual as-found value with no memory distortion."}]},
+{ id:"c2l3", title:"Photos, Measurements, and Logs", mins:4,
+  sections:[
+    {h:"Photograph wide, medium, and close", p:"Take three ranges of photos: wide shots that show where the equipment sits and how it connects, medium shots of the assembly, and close-ups of the damage, fracture faces, wear patterns, and nameplates. Add a scale reference — a coin, a ruler, a glove — in close-ups so size is readable later. Photograph as-found positions of valves, switches, and linkages before anything moves."},
+    {h:"Measure, do not estimate", p:"Shaft runout, coupling gap, belt tension, clearances, temperatures at defined points — measured values can be compared against specs and against the next investigation. Estimates cannot. Record the instrument and its units. 'Hot' is an opinion; 'bearing housing 96 °C, infrared gun, 10:15' is evidence."},
+    {h:"Logs are witnesses that do not forget", p:"Historian trends, alarm and event logs, round sheets, and CMMS history give you the machine's own account. Pull a window wider than the failure — days or weeks before, not just the trip minute — because the drift toward failure is often visible in the trend long before the event. Note gaps in the logs too; missing data is data."}],
+  watch:["Close-up photos with no wide shot — nobody can tell where the damage actually was.","Measurements recorded without units or instrument.","A trend pulled for only the hour of the failure, hiding the week-long drift that preceded it."],
+  quiz:[
+    {q:"What three photo ranges give a complete record?", o:["Before, during, and after repair","Front, back, and top","Color, black-and-white, and infrared","Wide (context), medium (assembly), and close-up (damage and nameplates)"], a:3, why:"Context plus detail: reviewers later need to know both where things were and exactly what the damage looked like."},
+    {q:"Why put a coin or ruler in a close-up photo?", o:["To show the date","So the size of the damage is readable later — scale reference","It is a tradition","To prove who took the photo"], a:1, why:"Without a scale reference, a crack or wear scar cannot be sized from a photo."},
+    {q:"Which is evidence rather than opinion?", o:["'Too hot to touch for long'","'The housing felt hot'","'It was hotter than usual'","'Bearing housing 96 °C, infrared gun, 10:15'"], a:3, why:"A measured value with instrument and time can be compared, checked, and trended. Impressions cannot."},
+    {q:"Why pull log trends for days before the failure, not just the trip minute?", o:["The drift toward failure — rising temperature, pressure, vibration — is often visible long before the event","The trip minute is never recorded","Logs are free","More data looks thorough"], a:0, why:"The approach to failure is often the most informative part of the record."},
+    {q:"A round sheet has a blank week before the failure. How should that be treated?", o:["Ignore it — blank means normal","Blame the newest operator","As data in itself: either checks were missed or records were, and both matter","Fill it in from memory"], a:2, why:"Missing records are a finding — about the checks, the recording discipline, or both."}]},
+{ id:"c2l4", title:"Interviewing Witnesses Without Leading Them", mins:5,
+  sections:[
+    {h:"You want their memory, not your theory", p:"A witness interview has one product: what the person actually saw, heard, and did, in their own words. The moment you ask 'You did check the strainer first, right?' you have stopped collecting memory and started collecting agreement. Ask open questions — 'Walk me through your shift from the start' — and let silence do its work."},
+    {h:"Sequence matters: free account first", p:"Start with the uninterrupted account. Then go back with specific questions: times, positions, sounds, smells, what the gauges showed, what they did next. Interview people separately so accounts do not blend into a group story, and interview soon — memory degrades and gets edited by every retelling."},
+    {h:"Make it safe to tell the truth", p:"Witnesses who expect blame give you the edited version. State plainly that the purpose is to understand what happened so it does not recur, keep the tone curious rather than cross-examining, and never promise outcomes you cannot control. Write down what they said, read it back, and let them correct it."}],
+  watch:["Questions that contain the answer: 'The alarm had been going off for a while, hadn't it?'","Group interviews where the senior person's version becomes everyone's version.","A witness who suddenly sounds like they are reading the official theory — someone got to them first."],
+  quiz:[
+    {q:"Which is a non-leading interview question?", o:["'You checked the oil level first, right?'","'Walk me through what you did from the start of the round'","'Why did you skip the strainer check?'","'The valve was already closed when you got there, wasn't it?'"], a:1, why:"Open prompts collect the witness's own memory. The others plant answers or accusations."},
+    {q:"Why interview witnesses separately?", o:["So accounts do not blend into one group story shaped by the most confident speaker","To compare who is lying","It takes longer and looks thorough","Privacy law requires it"], a:0, why:"Independent accounts let you compare genuine recollections and spot where stories truly agree or differ."},
+    {q:"When should witness interviews happen?", o:["After the report is drafted","At the next scheduled meeting","Only if the physical evidence is unclear","As soon as practical — memory degrades and is edited by every retelling"], a:3, why:"Early accounts are closest to the event and least contaminated by discussion and theory."},
+    {q:"A witness expects blame. What happens to the evidence?", o:["They bring documents","They talk more","You get the edited, self-protective version instead of what actually happened","Nothing — fear improves memory"], a:2, why:"Fear edits testimony. A clearly stated learning purpose and a curious tone protect the quality of the account."},
+    {q:"What is the right closing step of an interview?", o:["Promise the witness anonymity in all cases","Read back what you recorded and let the witness correct it","Tell the witness your conclusion","Ask who they think is at fault"], a:1, why:"Read-back catches your misunderstandings while the witness can still fix them."}]},
+{ id:"c2l5", title:"Building a Factual Event Timeline", mins:4,
+  sections:[
+    {h:"One clock, one line, only facts", p:"A timeline lists events in time order from sources you can point to: historian timestamps, log entries, alarm records, work orders, and witness accounts labeled as such. Every entry gets a time and a source. If two sources disagree, both go on the line with their sources — the disagreement itself is a clue, not a problem to hide."},
+    {h:"Start earlier than feels necessary", p:"Begin the timeline before the failure — at the last known-good state. The PM completed, the part replaced, the setpoint changed, the trend that started drifting. The failure event sits near the end of the line; the causes live in the entries before it. A timeline that starts at the trip tells you almost nothing."},
+    {h:"The timeline disciplines the theory", p:"Once the line is built, test every candidate cause against it. A cause that requires an event to happen before something that demonstrably happened earlier is dead — chronology is merciless. Causes that survive the timeline earn further testing; causes that fail it get crossed off in the open, where everyone can see why."}],
+  watch:["Timeline entries with no source — 'around midday, things got worse.'","A timeline that begins at the moment of the trip.","Conflicting times quietly averaged instead of investigated."],
+  quiz:[
+    {q:"Every timeline entry should carry…", o:["A severity rating","A responsible person","The investigator's interpretation","A time and a source"], a:3, why:"Time plus source makes each entry checkable. Interpretations belong in the analysis, not the timeline."},
+    {q:"Where should a timeline begin?", o:["At the last known-good state, before the failure developed","At the moment of failure","At the start of the shift","When the investigator arrives"], a:0, why:"Causes live in the entries before the event. Starting at the trip hides the entire build-up."},
+    {q:"Two sources give different times for the same event. What belongs on the timeline?", o:["The time from the more senior source","The average of the two","Neither — drop the event","Both times, each with its source — the conflict is itself a clue"], a:3, why:"Contradictions can reveal clock errors, sequence errors, or a wrong assumption. Hiding them destroys that value."},
+    {q:"How does a timeline kill a candidate cause?", o:["By majority vote of the team","By making the report too long","If the cause requires an event order that contradicts the recorded chronology, it cannot be right","It cannot — timelines are just records"], a:2, why:"Chronology is a hard constraint. A cause that needs effects before their causes is impossible."},
+    {q:"Which is a proper timeline entry?", o:["'The pump had been struggling for days'","'02:40 — low oil pressure alarm, historian log'","'Operator error occurred in the morning'","'Night shift probably topped up the oil at some point'"], a:1, why:"A timestamped entry from a named record. The others are guesses, impressions, or conclusions wearing a timeline's clothes."}]},
+{ id:"c2l6", title:"Spotting Gaps and Contradictions", mins:4,
+  sections:[
+    {h:"Gaps are where the story is missing a chapter", p:"Read the timeline like a skeptic. A pump runs normally at 01:00 and is found destroyed at 04:00 with nothing in between — that three-hour hole is not empty, it is unknown, and what happened inside it matters. Mark gaps explicitly and aim your next questions and data pulls at them instead of papering over them."},
+    {h:"Contradictions point at wrong assumptions", p:"The log says the valve was opened at 09:00; the witness says it was found closed at 09:30; the paint mark shows it has not moved in weeks. One of your sources is wrong — maybe a clock, maybe a memory, maybe the log entry was made for a different valve. Each contradiction you resolve removes a wrong assumption the whole analysis might have been built on."},
+    {h:"Do not force a tidy story", p:"The pressure to deliver a clean narrative makes teams round off the awkward facts. Resist it. A report that says 'the interval between 01:00 and 04:00 is unaccounted for' is more valuable than a smooth story invented to fill it — because the honest gap tells the next investigator exactly where the monitoring needs to improve."}],
+  watch:["A narrative with no gaps at all — real evidence is never that tidy.","Two documents that disagree, with only the convenient one quoted in the report.","'Approximately' doing heavy lifting on the most important times in the sequence."],
+  quiz:[
+    {q:"A timeline shows normal operation at 01:00 and a destroyed pump at 04:00, nothing between. The three hours are…", o:["Safe to fill with the most likely story","Proof nothing happened","The night shift's break","An explicit gap to mark and investigate — the failure developed in there"], a:3, why:"Unknown is not the same as uneventful. Marking the gap directs the next questions and exposes monitoring weaknesses."},
+    {q:"What does a contradiction between sources usually indicate?", o:["The witness should be excluded","The investigation should stop","One of the sources or assumptions is wrong — a clock, a memory, or an identification — and finding which protects the whole analysis","Someone is lying"], a:2, why:"Contradictions are diagnostic gold: resolving them removes false foundations before conclusions are built on them."},
+    {q:"The log says a valve was opened; its paint mark shows it has not moved in weeks. Best next step?", o:["Investigate the contradiction: wrong valve logged, entry error, or a second similar valve","Delete the log entry","Average the two accounts","Trust the log — paper beats paint"], a:0, why:"Either record could be wrong, and the reason why will matter. Look-alike valves and copy-forward entries are common culprits."},
+    {q:"Why not fill a gap with the most plausible story?", o:["Management prefers gaps","An invented bridge becomes accepted fact and misdirects both the fix and future investigations","Plausible stories are always wrong","It makes the report longer"], a:1, why:"Honest gaps preserve truth and point at monitoring improvements. Invented ones corrupt everything built on them."},
+    {q:"Which report sentence is the sign of a disciplined investigation?", o:["'The interval 01:00–04:00 is unaccounted for; no records or witnesses cover it'","'Events proceeded normally until the failure'","'All evidence supports the conclusion'","'It can be assumed the check was done'"], a:0, why:"Naming the unknown plainly is more valuable — and more honest — than a smooth invented narrative."}]},
+{ id:"c2l7", title:"Data, Not Opinions", mins:4,
+  sections:[
+    {h:"Every claim needs a receipt", p:"An investigation runs on statements that can be checked: measurements, records, photos, samples, test results. When a claim has no receipt — 'those pumps always cavitate,' 'the PM was definitely done' — treat it as a question to verify, not a brick to build on. Ask, politely and relentlessly: how do we know that?"},
+    {h:"Opinions are hypotheses in disguise", p:"Experienced people's opinions are valuable — as leads. 'I think the coupling was misaligned' becomes useful the moment it is converted into a test: measure the alignment, check the witness marks, review the install record. The opinion points the flashlight; only the measurement decides."},
+    {h:"Beware the confident summary", p:"The most dangerous sentence in any investigation is a smooth summary that everyone nods at. Slow down and unpack it into its evidence. If the summary survives unpacking, it is a finding. If it dissolves into 'well, that's what usually happens,' you have just saved the plant from fixing the wrong thing."}],
+  watch:["Findings written with no reference to any measurement, record, or photo.","'Everyone knows' used as a source.","A PM marked complete that nobody can connect to a person, a time, or a reading."],
+  quiz:[
+    {q:"What should you ask of any claim in an investigation?", o:["'Does the vendor agree?'","'Who said it?'","'How do we know that — what is the receipt?'","'Is it in the report template?'"], a:2, why:"Checkable evidence — a measurement, record, or sample — is the only safe foundation for a finding."},
+    {q:"An experienced tech believes the coupling was misaligned. How does that belief become useful?", o:["Repeat it in the meeting until others agree","Convert it into a test: measure alignment and check the install record","Ask the tech to sign a statement","Write it as the cause — experience counts as evidence"], a:1, why:"Opinions are excellent hypotheses. Testing turns them into findings or rules them out — both are progress."},
+    {q:"Which statement is data?", o:["'The PM was definitely done'","'Those pumps always cavitate at low flow'","'It sounded rough on Tuesday'","'Suction pressure fell below the required inlet pressure three times this week, per the trend'"], a:3, why:"It cites recorded values from a named source. The rest are impressions or assurances."},
+    {q:"Why unpack a smooth, confident summary?", o:["To fill meeting time","To embarrass the speaker","Because summaries can hide missing evidence — unpacking shows whether it is a finding or a habit","Longer reports are better"], a:2, why:"If a summary dissolves under unpacking, you have caught a wrong fix before funding it."},
+    {q:"A PM is marked complete but has no readings, no time, and no name attached. It should be treated as…", o:["Unverified — a claim without a receipt, to be checked before building on it","Proof of falsification","Adequate for audit purposes","Complete — the box is checked"], a:0, why:"A bare checkbox is a claim. Investigations build only on claims that survive verification."}]}
+]},
+{ id:"c3", title:"Analysis Methods", lessons:[
+{ id:"c3l1", title:"5 Whys Done Properly", mins:5,
+  sections:[
+    {h:"The method in one breath", p:"State the problem precisely. Ask why it happened. Take the answer — if it is supported by evidence — and ask why that happened. Repeat until you reach a cause you can act on that, if corrected, prevents recurrence. Five is a guideline, not a law: some chains take three whys, some take seven. The number matters far less than stopping at the right place."},
+    {h:"One path, evidence at every step", p:"Each answer must come from the evidence, not from imagination. 'Why did the bearing fail? It ran dry. Why? The oil port was plugged. Why? Paint covered it during the last repaint. Why? The repaint work order had no masking step.' Every link was checked: the dry bearing, the plugged port, the paint, the work order. An unverified link turns the whole chain into a story."},
+    {h:"Branch when reality branches", p:"Sometimes one why has two real answers — the pump tripped because the suction was blocked AND the high-level alarm that should have warned the crew had been silenced. Follow both branches. A single straight line is tidy, but failures are not obliged to be tidy."}],
+  watch:["Whys answered from a conference room with no one checking the equipment or records.","A chain that conveniently ends at a person on the fourth why, every single time.","Five whys forced to exactly five when the chain clearly ended at three — or needed seven."],
+  quiz:[
+    {q:"In 5 Whys, what must support each answer before you ask the next why?", o:["The previous investigation's report","The team leader's agreement","Evidence — the answer must be verified, not imagined","A majority vote"], a:2, why:"An unverified link turns the chain into fiction. Each step must be checked against facts."},
+    {q:"Is stopping at exactly five whys required?", o:["No — five is a guideline; stop when you reach an actionable cause whose correction prevents recurrence","Yes — the method fails otherwise","Only for safety events","Yes, but you may round to four"], a:0, why:"Chains end where they end. The stop test is actionability and recurrence prevention, not the count."},
+    {q:"A why produces two genuine contributing answers. What do you do?", o:["Stop the analysis","Follow both branches — real failures often have parallel contributors","Pick the more likely one","Ask a sixth why to merge them"], a:1, why:"Blocking one branch while ignoring the other leaves a live cause in place."},
+    {q:"Which is a well-formed problem statement for 5 Whys?", o:["'The bearing is bad'","'Reliability is poor'","'The night shift is careless'","'Pump P-204 tripped on high vibration three times in May'"], a:3, why:"Specific equipment, specific event, specific pattern. Vague statements produce vague chains."},
+    {q:"The chain reaches 'the repaint work order had no masking step.' Why is this a good place to stop?", o:["It is the fifth why","It blames the painters","It is actionable — adding a masking step to the work order prevents painted-over ports everywhere","It is the deepest anyone can go"], a:2, why:"The stop test: correct it and the failure cannot recur the same way — and the fix reaches beyond this one machine."}]},
+{ id:"c3l2", title:"When 5 Whys Stops Too Early", mins:4,
+  sections:[
+    {h:"The classic early stops", p:"Chains get abandoned at predictable places: at the failed part ('the seal wore out'), at a person ('the operator missed it'), at a vague force ('vibration caused it'), or at a condition nobody questions ('the PM interval is 90 days — always has been'). Each of these is a doorway, not a destination. Ask why once more and the real cause often steps through."},
+    {h:"Two tests for 'deep enough'", p:"Test one — prevention: if we fix only this, can the failure still happen another way or on another machine? Test two — reach: does this cause explain just this event, or the pattern of similar events? A cause that fails either test is a link, not a root. 'The seal wore out' fails both: seals will keep wearing wherever the same conditions apply."},
+    {h:"Going too deep is real, too", p:"Chasing whys past your ability to act — 'why does gravity pull the load down' — wastes the team's energy and credibility. Stop where a cause is real, evidence-backed, and within the organization's power to change. Depth is a means to a fix, not a contest."}],
+  watch:["A chain that ends at a component's normal end-of-life wear with no question about what drove the wear.","'Human error' appearing as the final link — it is a middle link wearing a crown.","A cause so broad ('improve communication') that no one could ever verify it was fixed."],
+  quiz:[
+    {q:"Which ending shows the chain stopped too early?", o:["'The work order lacked a masking step'","'The PM interval exceeded the filter's rated life'","'Two identical valves were unlabeled'","'The seal wore out'"], a:3, why:"Wear is a mechanism, not an explanation. What drove the wear — load, lubrication, contamination — is the next why."},
+    {q:"What is the prevention test for depth?", o:["Is the fix cheap?","Can we prevent all failures forever?","If we fix only this cause, can the failure still recur another way or on similar equipment?","Did we ask five whys?"], a:2, why:"If the failure can still recur with the fix in place, the chain stopped at a link, not a root."},
+    {q:"'Improve communication' as a final cause fails because…", o:["It is too expensive","It requires a meeting","Communication does not matter","It is too vague to act on or verify — no specific condition is named or changed"], a:3, why:"A real root cause names a changeable condition. Slogans cannot be implemented or checked."},
+    {q:"Where should a chain legitimately stop?", o:["At a cause that is evidence-backed and within the organization's power to change","At the first answer that sounds technical","When the meeting runs out of time","At exactly the fifth why, always"], a:0, why:"Actionable and supported — beyond that point you are chasing philosophy, not prevention."},
+    {q:"'The operator missed the check' as a final link is weak because it ignores…", o:["The operator's feelings","Why the check was missable — workload, sheet design, access, competing alarms","The supervisor's role in scheduling","Whether the operator likes the job"], a:1, why:"Missable checks are a design property of the task. The conditions behind the miss are the fixable cause."}]},
+{ id:"c3l3", title:"Fishbone Diagrams", mins:5,
+  sections:[
+    {h:"What the diagram does", p:"A fishbone (cause-and-effect) diagram puts the problem at the head of a fish and sorts possible causes onto bones by category. Its job is breadth: it forces a team to look beyond the first category that comes to mind and generate candidates across the whole system before testing any of them. It is a brainstorming organizer, not a proof."},
+    {h:"Build it before you judge", p:"Write the problem as a precise effect statement — 'Seal on the transfer pump leaks within two weeks of replacement, three times running.' Then fill each category bone with every plausible cause the team can name, adding sub-branches for causes of causes. No evaluating yet: a cause thrown out too early by a confident voice is a cause you will meet again at the next failure."},
+    {h:"Then test — the diagram proves nothing", p:"When the bones are full, the real work starts: circle the candidates worth testing and check each against evidence, measurements, and the timeline. Cross off the dead ones visibly. The finished diagram, with tested and untested causes marked, is a map of what you know — and an honest picture of what you only guessed."}],
+  watch:["A fishbone treated as the conclusion — causes listed, none tested, actions assigned anyway.","A diagram with one fat bone and five empty ones — the team only looked where it always looks.","The problem statement written as a cause ('poor maintenance') instead of an effect."],
+  quiz:[
+    {q:"What is the main purpose of a fishbone diagram?", o:["To assign blame by department","To prove which cause is correct","To organize a broad search for candidate causes by category before testing them","To replace the timeline"], a:2, why:"The fishbone generates and sorts candidates. Proof comes later, from evidence and testing."},
+    {q:"Which is a proper effect statement at the head of the fish?", o:["'Transfer pump seal leaks within two weeks of replacement, three times running'","'Operator error'","'Why do seals fail?'","'Poor maintenance practices'"], a:0, why:"A precise, observable effect — equipment, failure, pattern. Causes do not belong at the head."},
+    {q:"During the brainstorming phase, the team should…", o:["Only accept causes with documents attached","Fill every category with plausible causes without judging them yet","Debate each cause as it is offered","Let the senior tech list all the causes"], a:1, why:"Early judgment kills breadth. Evaluation is a separate, later phase."},
+    {q:"After the diagram is full, what makes it useful?", o:["Testing circled candidates against evidence and visibly crossing off the dead ones","Assigning every cause an owner","Counting the causes — more is better","Framing it for the office"], a:0, why:"The diagram earns its keep when testing separates live candidates from guesses."},
+    {q:"One category bone is fat and the rest are empty. This signals…", o:["The diagram is finished","The empty categories are irrelevant to all failures","The cause is definitely in the fat category","The team only searched where it habitually looks — breadth failed"], a:3, why:"Lopsided bones usually mean a lopsided search, not a lopsided reality."}]},
+{ id:"c3l4", title:"Fishbone Categories for Maintenance", mins:5,
+  sections:[
+    {h:"The six bones: a memory aid for breadth", p:"A common maintenance set uses six categories. People: skills, training, staffing, fatigue, communication. Methods: procedures, PM tasks and intervals, work instructions, planning. Machines: design, age, condition, installation, protection devices. Materials: parts quality, lubricants, spares, substitutions. Measurement: gauges, instruments, calibration, alarm setpoints, inspection quality. Environment: heat, dust, moisture, vibration from neighbors, lighting, access."},
+    {h:"Worked example: the pump that keeps tripping", p:"Effect: a circulation pump trips weekly. People: a new operator may not recognize the cavitation sound. Methods: the suction strainer check may sit on a monthly PM while debris builds in days. Machines: the motor cooling fins are matted with dust. Materials: a substitute strainer with a coarser mesh was installed at the last change. Measurement: the current meter reads low, hiding real load. Environment: the room hit record heat this summer. Six bones, six very different fixes."},
+    {h:"Categories are prompts, not boxes to force", p:"Use the categories to provoke thinking, then let causes live where they fit best — some causes straddle two bones, and that is fine. If your team consistently finds a category useless or one missing (some add 'management systems' or fold it into Methods), adapt the set. The categories serve the search; the search does not serve the categories."}],
+  watch:["A team that cannot fill the Measurement bone — uncalibrated gauges and dead alarms hide in plain sight there.","Materials causes nobody checks because 'parts is purchasing's problem' — substitutes and wrong specs start failures.","Environment dismissed as 'just the weather' when heat, dust, and moisture are measurable and manageable."],
+  quiz:[
+    {q:"What are the six fishbone categories used in this course for maintenance?", o:["Cost, quality, delivery, safety, morale, output","Plan, do, check, act, review, close","People, methods, machines, materials, measurement, environment","Electrical, mechanical, hydraulic, pneumatic, structural, chemical"], a:2, why:"The six M-and-P categories are a breadth checklist: people, methods, machines, materials, measurement, and environment."},
+    {q:"A substitute strainer with a coarser mesh was installed. Which bone?", o:["People","Materials","Environment","Methods"], a:1, why:"Parts, spares, and substitutions — including their specifications — belong to Materials."},
+    {q:"An ammeter reads low, so real motor overloads are invisible. Which bone?", o:["Methods","Materials","Machines","Measurement"], a:3, why:"Instruments, calibration, and alarm quality are Measurement — the senses of the plant."},
+    {q:"In the worked example, what did the six bones produce?", o:["Proof the operator was at fault","A ranking of departments","Six distinct candidate causes, each with a different potential fix","One cause with six names"], a:2, why:"Breadth is the point: each category surfaced a different, testable candidate."},
+    {q:"How should the category set be treated?", o:["As prompts for thinking; adapt them if a category is consistently missing or useless","As decoration for the report","As a scoring system","As fixed law — causes must fit one bone only"], a:0, why:"Categories serve the search. Forcing or ignoring misfits defeats their purpose."}]},
+{ id:"c3l5", title:"Fault Tree Analysis", mins:5,
+  sections:[
+    {h:"Work top-down from the failure event", p:"Fault tree analysis starts with one precisely defined top event — the failure you are studying, such as 'pump delivers no flow while commanded to run.' You then ask: what combinations of lower events could produce this? Each branch is broken down further until you reach basic events you cannot or need not decompose: a tripped breaker, a closed valve, a failed coupling."},
+    {h:"OR gates: any one will do", p:"Under an OR gate, any single input event is enough to cause the output. 'No flow' might have an OR gate above: no power OR no suction supply OR no discharge path. OR gates widen the tree — they list alternative routes to the same failure, which is why they dominate most real trees."},
+    {h:"AND gates: it takes the combination", p:"Under an AND gate, all inputs must occur together to produce the output. 'Tank overflows' might need inflow continuing AND the high-level alarm failed AND the operator response delayed. AND gates are where protection lives: each input is a barrier, and the failure needs every barrier down at once. Finding an AND gate in a tree tells you where adding or restoring one barrier buys the most safety."}],
+  watch:["A top event written vaguely ('pump problems') — the tree explodes into everything and explains nothing.","AND and OR confused: treating alternatives as if all were required, or a combination as if any one sufficed.","A tree built downward forever with no basic events where decomposition sensibly stops."],
+  quiz:[
+    {q:"A fault tree starts with…", o:["One precisely defined top event — the failure under study","The most common component failure","A list of all spare parts","The oldest alarm in the log"], a:0, why:"The top event anchors the tree. Vague top events produce vague, endless trees."},
+    {q:"Under an OR gate, the output occurs when…", o:["No inputs occur","Any one input occurs","All inputs occur together","Inputs occur in a fixed order"], a:1, why:"OR means alternatives: each input is an independent route to the output."},
+    {q:"'Tank overflows' requires inflow continuing AND the alarm failed AND response delayed. The gate is…", o:["Not a gate","An OR gate","A transfer gate","An AND gate — all three must coincide"], a:3, why:"AND gates model combinations. Each input is a barrier; the failure needs them all down together."},
+    {q:"Why are AND gates good news in a tree?", o:["They make the tree shorter","They prove the design is perfect","Each input is a barrier — restoring or adding one barrier blocks the whole path","They eliminate the need for testing"], a:2, why:"Where failure needs a combination, a single restored barrier prevents it. That is the cheapest protection you will ever buy."},
+    {q:"When do you stop breaking events down?", o:["When the page is full","At basic events — failures or states you cannot or need not decompose further","After exactly three levels","When every branch reaches a person"], a:1, why:"Basic events are the tree's foundation: component failures and states taken as given for this analysis."}]},
+{ id:"c3l6", title:"FMEA Basics", mins:5,
+  sections:[
+    {h:"Think about failure before it happens", p:"Failure modes and effects analysis flips RCA around: instead of studying a failure that occurred, you study how something could fail. For each component or step, you list its failure modes — the ways it can fail — then the effects each mode would produce, and the causes that could bring the mode about."},
+    {h:"Three judgments per failure mode", p:"Severity: how bad is the effect if it happens — injury, environmental release, days of downtime, or a minor annoyance? Occurrence: how likely is the cause to produce this mode, given the equipment's age, duty, and history? Detection: if the mode starts developing, how likely are current controls — inspections, alarms, rounds — to catch it before the effect lands? Rate each on a simple scale your team defines and uses consistently."},
+    {h:"The output is a prioritized work list", p:"An FMEA does not end with ratings; it ends with actions aimed at the worst combinations — reduce severity where you can, cut occurrence with design or PM changes, and improve detection with better monitoring or inspection. Then re-rate. The discipline of asking 'how could this fail, how bad, how likely, would we catch it' is the real product; the numbers just sort the queue."}],
+  watch:["An FMEA filled in once and filed forever — it should change when equipment, duty, or controls change.","Detection rated optimistically because an alarm exists — without asking whether anyone responds to it.","Every severity rated maximum, which destroys the ranking the exercise exists to create."],
+  quiz:[
+    {q:"How does FMEA differ from investigating a failure that already happened?", o:["It uses different paperwork","It never involves equipment","It only applies to new designs","It is proactive — it studies how things could fail before they do"], a:3, why:"FMEA works the problem forwards from possible failure modes; RCA works backwards from an actual event."},
+    {q:"What is a failure mode?", o:["The report written afterward","The way a component or step can fail — for example, a valve failing closed","The cost of a failure","The person responsible"], a:1, why:"Modes are the distinct ways failure can occur; each mode has its own effects and causes."},
+    {q:"What does the Detection rating judge?", o:["Whether the failure has been detected before","How expensive detection equipment is","How fast the failure happens","How likely current controls are to catch the developing failure before its effect lands"], a:3, why:"Detection is about your controls — inspections, alarms, rounds — and whether they actually intercept the failure in time."},
+    {q:"An alarm exists but nobody responds to it. Its detection rating should be…", o:["Poor — a control that does not lead to action does not detect in any useful sense","Left blank","Average by default","Excellent — the alarm exists"], a:0, why:"Detection credit belongs only to controls that work end to end: sense, alert, and response."},
+    {q:"What is the proper output of an FMEA?", o:["A binder on the shelf","A purchase order","Actions targeting the worst severity/occurrence/detection combinations, followed by re-rating","A list of people to train"], a:2, why:"Ratings sort the queue; actions on the worst combinations are the point of the exercise."}]},
+{ id:"c3l7", title:"RPN and Its Limits", mins:4,
+  sections:[
+    {h:"How RPN is built", p:"The risk priority number multiplies the three FMEA ratings: RPN = Severity × Occurrence × Detection, each typically scored 1 to 10, giving a range of 1 to 1000. Higher means more urgent. It is a sorting tool — a way to decide which failure modes get engineering attention first when you cannot do everything at once."},
+    {h:"The multiplication hides traps", p:"Different risks can share one number: severity 10, occurrence 1, detection 4 gives 40 — and so does severity 4, occurrence 5, detection 2. The first can kill someone on a rare bad day; the second is a frequent nuisance. Same RPN, utterly different decisions. Also, the scales are judgments, not measurements: two honest teams can score the same mode far apart, and a one-point wobble anywhere swings the product."},
+    {h:"Rules for using RPN sanely", p:"Never let a low RPN bury a high severity: any mode whose effect involves serious injury gets action regardless of the product. Compare RPNs only within one team's consistent scoring. Revisit scores after actions and after real failures — a failure that actually happened has an occurrence rating written by reality, not by opinion. Treat the number as the start of a conversation, never the end of one."}],
+  watch:["A severity-10 failure mode deprioritized because its RPN came out mid-pack.","Teams arguing a rating from 4 to 5 to push a pet project up the list — the precision is fake.","RPNs compared across different plants or teams that scored with different habits."],
+  quiz:[
+    {q:"How is RPN calculated?", o:["Severity × Occurrence ÷ Detection","Severity × Occurrence × Detection","(Severity + Detection) × cost","Severity + Occurrence + Detection"], a:1, why:"RPN is the product of the three ratings — on 1–10 scales, a range of 1 to 1000."},
+    {q:"Mode A: S=10, O=1, D=4 (RPN 40). Mode B: S=4, O=5, D=2 (RPN 40). The lesson is…", o:["The modes are equally risky","RPN should use bigger scales","Equal RPNs can hide very different risks — a rare catastrophic mode is not the same decision as a frequent nuisance","Mode B matters more because it happens often"], a:2, why:"Multiplication compresses unlike risks into one number. Severity must be read on its own."},
+    {q:"Which rule keeps RPN use sane?", o:["Compare RPNs across all sites freely","Re-score until the ranking matches the budget","Always chase the highest RPN first, no exceptions","Any high-severity mode gets action regardless of its RPN"], a:3, why:"A rare but lethal mode must never wait behind arithmetic. Severity outranks the product."},
+    {q:"Why are RPN comparisons across different teams unreliable?", o:["Only engineers may score","The ratings are judgments — scoring habits differ, so the same mode can score far apart","Teams use different calculators","RPN expires after a month"], a:1, why:"Subjective scales mean RPN is a within-team sorting aid, not a universal measurement."},
+    {q:"A failure mode that the FMEA rated occurrence 2 actually happened twice this year. What should happen to its score?", o:["Reality outranks opinion: raise the occurrence rating and re-prioritize","Nothing — the FMEA is a fixed document","Lower the severity to compensate","Remove the mode from the FMEA"], a:0, why:"Real events are data. Update the analysis when the plant teaches you something."}]}
+]},
+{ id:"c4", title:"Fixes, People, and Reports", lessons:[
+{ id:"c4l1", title:"Slips, Mistakes, and Violations", mins:5,
+  sections:[
+    {h:"Three different failures of intention", p:"Not all human errors are the same, and they do not respond to the same fix. A slip is an action that goes wrong despite the right intention: reaching for the identical valve next to the one you meant. A lapse is a memory failure: intending to reopen the valve after the test, and forgetting. A mistake is a wrong intention: genuinely believing the valve should stay closed because the plan itself was based on a wrong understanding."},
+    {h:"Violations are a different animal", p:"A violation is a deliberate departure from the rule or procedure — but deliberate act does not automatically mean reckless person. People cut corners that the workplace quietly rewards: the shortcut everyone takes because the official route takes an hour and supervision has watched it happen for years. That is a routine violation, and it is owned by the system that tolerated it. Rare, truly reckless violations exist, but they are the exception, not the default explanation."},
+    {h:"Match the fix to the type", p:"Slips and lapses respond to design: labels, checklists, forcing functions, alarms, and making the right action the easy action. Mistakes respond to better information, procedures, and training. Routine violations respond to fixing the reason the shortcut exists and enforcing the standard consistently. Discipline fixes almost none of these — it mainly teaches people to hide the next one."}],
+  watch:["Every human contribution labeled 'carelessness' — a word that explains nothing and fixes nothing.","A checklist added as the fix for a mistake — checklists catch slips, not wrong understanding.","A 'violation' that turns out to be the way the job has actually been done, openly, for years."],
+  quiz:[
+    {q:"An operator reaches for the identical valve next to the one intended. This is…", o:["A lapse","A slip — right intention, wrong execution","A mistake","A violation"], a:1, why:"Slips are execution failures: the plan was right, the action went wrong — classic with look-alike controls."},
+    {q:"A technician fully intends to reopen a valve after a test but forgets. This is…", o:["A violation","A mistake","A slip","A lapse — a memory failure"], a:3, why:"Lapses are failures of memory, not of intention or knowledge. Reminders and checklists target them directly."},
+    {q:"What defines a mistake?", o:["The intention itself was wrong — the person believed the wrong plan was correct","Any error with serious consequences","The action was performed clumsily","An error by a new employee"], a:0, why:"Mistakes live in the plan, not the hands. They call for better information, procedures, and understanding."},
+    {q:"A shortcut has been taken openly for years because the official route takes an hour. This is best treated as…", o:["Not a violation at all","A routine violation owned by the system that tolerated and rewarded it","A slip","Individual recklessness"], a:1, why:"When a departure becomes the normal way of working, the fix is the conditions and the standard — not one person's punishment."},
+    {q:"Which fix matches slips and lapses best?", o:["Longer procedures","More classroom training","Design: labels, checklists, forcing functions, making the right action easy","Discipline"], a:2, why:"You cannot train away slips. You design the task so slips are hard to make and easy to catch."}]},
+{ id:"c4l2", title:"Latent Causes — the Organization Behind the Failure", mins:5,
+  sections:[
+    {h:"Active failures and latent conditions", p:"The person at the machine commits the active failure — the valve turned, the check missed. But latent conditions are the pre-existing weaknesses built into the workplace long before: the PM deferred three times, the procedure two revisions behind the equipment, the alarm list nobody pruned, the vacancy that left one operator covering two areas. Latent conditions sit quietly until they line up with an active failure and a gap in the defenses."},
+    {h:"Why latent causes are the real prize", p:"Fix the active failure and you have helped one situation. Fix a latent condition and you have removed a contributor from every future failure it would have fed. The deferred-PM backlog does not care which machine fails next. This is why deep investigations keep asking past the sharp end: the further back the cause, the wider its shadow — and the wider the benefit of removing it."},
+    {h:"How to surface them", p:"Ask organizational questions explicitly: What did the workload look like? What state was the backlog in? When was this procedure last matched to the equipment? What did the last three similar work orders say, and what was done with them? Latent causes rarely appear in the physical evidence — they appear in the records, the rosters, and the gap between how work is imagined and how it is actually done."}],
+  watch:["An investigation that never leaves the machine room — no questions about backlog, staffing, or procedure currency.","The same latent condition (deferred PM, dead alarm) appearing in investigation after investigation, unfixed.","Work-as-imagined procedures that describe a plant nobody actually works in."],
+  quiz:[
+    {q:"What is a latent condition?", o:["A hidden defect inside a component","An error the operator hides","A failure nobody has noticed yet","A pre-existing weakness built into the workplace — deferred PMs, outdated procedures, chronic understaffing — that sets up future failures"], a:3, why:"Latent conditions are organizational and present long before the event. They wait quietly until they combine with an active failure."},
+    {q:"Why are latent causes called 'the real prize' of an investigation?", o:["They impress auditors","Removing one latent condition removes a contributor from many future failures, not just this one","They excuse the operator","They are easier to write about"], a:1, why:"Their shadow is wide: a backlog or a bad procedure feeds failure after failure until it is fixed."},
+    {q:"Which question surfaces latent causes?", o:["'Who was on shift?'","'Is the part in stock?'","'When was this procedure last checked against the actual equipment?'","'How long will the repair take?'"], a:2, why:"Latent causes live in records, rosters, and procedure currency — organizational questions bring them out."},
+    {q:"The active failure is best described as…", o:["The organizational weakness","The final report's conclusion","The oldest cause in the chain","The act or omission at the sharp end, at the moment of the event"], a:3, why:"Active failures happen at the point of work. Latent conditions are what made them likely and consequential."},
+    {q:"The same dead alarm appears in three investigations in a year. That pattern means…", o:["A latent condition is being documented repeatedly but never removed — the system is filing its warnings instead of acting on them","Coincidence","Alarms are unreliable technology","Three careless crews"], a:0, why:"Recurring findings are the loudest latent-cause signal there is. The fix is organizational, not another note in a report."}]},
+{ id:"c4l3", title:"Why Blame Kills the Next Investigation", mins:4,
+  sections:[
+    {h:"Blame feels like accountability; it works like a gag", p:"When the last investigation ended with someone written up, the next witnesses arrive with lawyers' instincts: short answers, no volunteering, documents 'somewhere.' The facts an investigator needs most — what really happened, including the awkward parts — are exactly the facts blame teaches people to bury. You can have punishment or you can have the truth. Investigations run on truth."},
+    {h:"Accountability is not the same as blame", p:"Accountability means people answer honestly for their actions and the organization acts on what it learns — including real consequences for genuine recklessness. Blame is different: it is the emotional shortcut that stops at a person and learns nothing. A fair system separates the learning review from any disciplinary process, and treats honest reporting as something to protect, not punish."},
+    {h:"The information you lose is invisible", p:"Nobody announces 'I am withholding what I know.' The interview just gets thinner, the near misses stop being reported, and the next failure arrives with no warning data at all. Plants with strong reporting cultures are not plants with fewer problems — they are plants that hear about problems while the problems are still cheap."}],
+  watch:["Near-miss reports dropping after a high-profile investigation ended in discipline.","Witnesses asking 'am I in trouble?' before answering anything.","Interviews full of 'per procedure' answers that describe the manual instead of the day."],
+  quiz:[
+    {q:"What is blame's main cost to future investigations?", o:["It hurts morale in the abstract","It takes longer to write reports","Managers dislike paperwork","Witnesses stop volunteering the awkward facts investigations depend on"], a:3, why:"Fear edits testimony and kills near-miss reporting. The next investigation starts with worse evidence — or none."},
+    {q:"How does accountability differ from blame?", o:["They are the same thing","Accountability answers honestly for actions and acts on what is learned; blame stops at a person and learns nothing","Blame is the formal process","Accountability never has consequences"], a:1, why:"Real recklessness still carries consequences in an accountable system — but learning is not sacrificed to punishment."},
+    {q:"Near-miss reports fall sharply after an investigation ends in discipline. The best reading is…", o:["People learned that reporting is dangerous — the plant is now flying blinder","A coincidence of scheduling","The forms were too long","The plant got safer"], a:0, why:"Reporting is voluntary information. Punish its neighborhood and it quietly stops."},
+    {q:"Why separate the learning review from the disciplinary process?", o:["To double the meetings","To protect guilty people","So witnesses can speak fully for learning, while any conduct questions are handled fairly on their own track","Legal requires two binders"], a:2, why:"Mixing the two guarantees the learning conversation gets the edited version of events."},
+    {q:"A plant hears about many small problems early. This usually signals…", o:["A reporting culture where raising problems is safe — so problems get fixed while they are cheap","A plant with more problems than average","Too much free time","Weak supervision"], a:0, why:"High reporting is a sign of trust, and early knowledge is the cheapest failure prevention there is."}]},
+{ id:"c4l4", title:"Traps: First Fix, Correlation, and 'Always Done It This Way'", mins:4,
+  sections:[
+    {h:"Trap one: the first fix that works", p:"The machine restarts after you change the part, so the part must have been the cause. Maybe — or the act of opening the machine reseated a connector, drained a trap, or reset a control, and the changed part was innocent. A restart proves the symptom stopped; it does not prove your theory. When the failure matters, ask what else changed during the repair before crediting the part."},
+    {h:"Trap two: correlation wearing a cause's clothes", p:"Two things happening together is not one causing the other. Failures rose after the new shift pattern started — but the same month brought a production rate increase and a new parts supplier. Before crediting any one companion, check whether the failure follows it consistently, whether a mechanism connects them, and whether the failure ever happens without it."},
+    {h:"Trap three: 'always done it this way'", p:"Longevity feels like proof. But conditions drift: rates go up, materials change, equipment ages, and the practice that was safe for a decade quietly crosses a line. Worse, success hides the margin — you never learn how close you were. Treat 'always' as a claim to test against today's conditions, not as a verdict."}],
+  watch:["A failed part replaced and the old one scrapped unexamined — the verdict destroyed with the evidence.","A cause credited purely because it changed at the same time as the failures.","'Twenty years, no problem' offered as the entire defense of a practice nobody has re-examined."],
+  quiz:[
+    {q:"The machine restarts after a part swap. What has actually been proven?", o:["The symptom stopped — the repair may have fixed it another way, such as reseating or resetting something","The swapped part was the cause","The investigation is complete","The part vendor is at fault"], a:0, why:"Restart is evidence about the symptom, not the theory. Credit the cause only after asking what else changed during the repair."},
+    {q:"Failures rose the same month as a new shift pattern — and a rate increase and a new supplier. Crediting the shift pattern alone is…", o:["Impossible to evaluate","Correct, because shifts affect everything","The correlation trap — companions must be separated by consistency checks and a plausible mechanism","Efficient"], a:2, why:"Simultaneous changes are confounded. A cause must track the failure consistently and connect by mechanism."},
+    {q:"Which test helps separate correlation from cause?", o:["Checking the calendar","Checking whether the failure ever occurs without the suspected companion, and whether a mechanism links them","Voting in the toolbox talk","Asking who noticed first"], a:1, why:"If failures happen without it, it is not necessary; if it happens without failures, it is not sufficient. Mechanism plus consistency builds the case."},
+    {q:"Why is 'we have always done it this way' weak evidence of safety?", o:["Old practices are always wrong","New is always better","It is not documented","Conditions drift — rate, materials, equipment age — and success hides how thin the margin has become"], a:3, why:"A practice can outlive the conditions that made it safe, and years of luck conceal the shrinking margin."},
+    {q:"What should happen to the replaced part in an important failure?", o:["Scrap it immediately to keep the area tidy","Keep and examine it — it may prove or destroy the leading theory","Give it to the operator as a reminder","Return it for credit at once"], a:1, why:"The failed part is primary evidence. Discarding it unexamined destroys the verdict with it."}]},
+{ id:"c4l5", title:"Corrective Actions That Actually Prevent Recurrence", mins:5,
+  sections:[
+    {h:"Strong actions change conditions; weak actions beg people", p:"Corrective actions sit on a strength ladder. Strongest: eliminate the hazard or redesign so the error cannot happen — a forcing function, an interlock, a different part that cannot be installed backwards. Middle: engineering and administrative barriers — alarms that get answered, revised procedures with verification steps, PM changes. Weakest: reminders, retraining, and 'be more careful.' Weak actions are not useless, but an action list made only of them is a plan to fail again politely."},
+    {h:"Every action needs an owner and a date", p:"An action without a named owner and a due date is a wish. Write actions so a stranger could verify completion: not 'review lubrication practices' but 'add the gearbox oil sample to the monthly route, owner: planner, due: end of month, verified by route audit.' If completion cannot be checked, the action cannot be closed — and should not be written that way."},
+    {h:"Aim at the cause, and check for side effects", p:"Trace each action back to a specific cause in your analysis; an action that maps to no cause is decoration. Then ask what the action changes elsewhere: the new interlock that stops the pump also stops it during a legitimate flush; the added inspection adds hours to an already overloaded route. Good actions prevent the failure without quietly planting the next one."}],
+  watch:["An action list where every item is retrain, remind, or counsel.","Actions with no owner, no date, or verbs like 'review' and 'consider' that cannot be verified.","A fix so burdensome that the crew invents a workaround within a month — the workaround becomes the new latent condition."],
+  quiz:[
+    {q:"Which corrective action is strongest?", o:["Redesign the connection so the wrong part physically cannot be installed","Post a warning sign","Remind the crew at the safety talk","Retrain the operator"], a:0, why:"Eliminating the possibility of the error beats every appeal to attention. Design outranks vigilance."},
+    {q:"Why is 'review lubrication practices' a defective action?", o:["It is too short","Reviews are forbidden","It mentions lubrication","It cannot be verified — no owner, no date, no observable end state"], a:3, why:"Actions must be checkable: a named owner, a due date, and a completion state a stranger could confirm."},
+    {q:"An action that maps to no identified cause is…", o:["A bonus improvement","Decoration — effort spent where it cannot prevent the failure","Required for balance","Efficient"], a:1, why:"Every action should trace to a cause it removes or a barrier it restores. Unmapped actions consume the budget and leave the cause alive."},
+    {q:"Before finalizing an action, what side-effect question matters?", o:["'What does this change elsewhere — could it plant the next failure or get worked around?'","'Is it the cheapest option?'","'Can it be done this shift?'","'Will the vendor like it?'"], a:0, why:"Interlocks, added checks, and new steps all ripple. Unworkable actions breed workarounds, which become latent conditions."},
+    {q:"Where do 'retrain and remind' actions belong?", o:["Nowhere — they are banned","At the top of every action list","As supplements to stronger actions — acceptable support, never the whole plan","Only for new employees"], a:2, why:"Weak actions can reinforce a real fix. Alone, they leave every condition that produced the failure untouched."}]},
+{ id:"c4l6", title:"Verifying the Fix Worked", mins:4,
+  sections:[
+    {h:"Installed is not the same as effective", p:"Closing an action because the work was done answers the wrong question. The right question is whether the failure stopped — and that takes time and a deliberate check. Define, when the action is written, how effectiveness will be judged: the failure-free interval to beat, the trend to watch, the audit to pass. A seal fix is verified by months of dry operation, not by the work order closing."},
+    {h:"Watch for the failure moving, not dying", p:"Fixes sometimes relocate problems: the interlock stops the trip but production finds a bypass; the stiffer coupling survives but the gearbox bearing now takes the load. Verification includes looking downstream and sideways — did the failure truly end, or did it change its address? Check the neighboring equipment and the workaround culture, not just the original symptom."},
+    {h:"Close the loop in the records", p:"Record the verification result where the next investigator will find it: the equipment history, the FMEA ratings, the PM plan. If the fix failed verification, reopen the analysis honestly — a failed fix is new evidence about the cause, not an embarrassment to bury. The plants that learn fastest are the ones whose records admit what did not work."}],
+  watch:["Actions closed the day the part was installed, with no effectiveness check scheduled.","The same failure reappearing on the sister machine while the 'fixed' one is celebrated.","Verification defined as 'no complaints received.'"],
+  quiz:[
+    {q:"What distinguishes completion from effectiveness?", o:["Completion means the action was performed; effectiveness means the failure actually stopped, judged over a defined interval or check","Effectiveness is a management opinion","Completion requires a photo","Nothing — done is done"], a:0, why:"A work order closing proves activity. Only time, trends, or audits prove the failure is gone."},
+    {q:"When should the effectiveness check be defined?", o:["Only for safety actions","When the action is written — the interval, trend, or audit that will judge it","At the annual review","After the action is closed"], a:1, why:"Defining success in advance prevents the quiet slide into 'no news is good news.'"},
+    {q:"The trip stopped after an interlock was added, but crews now bypass it weekly. The fix is…", o:["Effective — no trips","A training issue only","Complete, since the interlock works","Not effective — the failure changed its address into a workaround, which is a new latent condition"], a:3, why:"Verification must look for relocation and workarounds, not just the absence of the original symptom."},
+    {q:"A fix fails verification. The correct response is…", o:["Reopen the analysis: the failed fix is new evidence that the cause was wrong or incomplete","Wait another year","Blame the installer","Close it anyway — effort was made"], a:0, why:"A failed fix is data. Honest reopening is how investigations converge on the real cause."},
+    {q:"Where should verification results be recorded?", o:["In the investigator's notebook only","On the break-room board","In the equipment history and related plans, where the next investigator will find them","Nowhere — verbal is fine"], a:2, why:"Records are the plant's memory. Verification that is not recorded cannot teach the next investigation."}]},
+{ id:"c4l7", title:"Writing the RCA Report and Tracking Actions to Closure", mins:5,
+  sections:[
+    {h:"A report a stranger could act on", p:"Write for the reader who was not there: the problem stated precisely, the timeline with sources, the evidence, the causes tested and how the dead ones died, the causes found, and the actions with owners and dates. Keep facts, inferences, and opinions visibly separate, exactly as you did in the investigation. A report that hides its reasoning cannot be reviewed — and unreviewable findings should not be trusted, including by you."},
+    {h:"Short enough to be read, complete enough to be checked", p:"Length is not rigor. Most plant failures deserve a tight few pages: one page of problem and timeline, one of analysis, one of actions. Put the bulky evidence — photos, trends, interview notes — in an appendix or the equipment file and reference it. The test: a competent reader can follow your logic in fifteen minutes and find every receipt you relied on."},
+    {h:"Tracking is where reports go to live or die", p:"Actions enter a tracked list with owners and dates, get reviewed on a rhythm — weekly for the overdue, monthly for the open — and close only on verification, not on someone's say-so. Overdue actions escalate visibly rather than aging quietly. And when the last action closes, the report goes into the equipment's history, so the next failure of that machine starts from knowledge instead of from zero."}],
+  watch:["A report whose conclusion cannot be traced to any evidence section — the reasoning is missing.","Actions that live only inside the report document, in no tracked system, aging invisibly.","Closure rates that look perfect because actions are written vaguely enough to always be 'done.'"],
+  quiz:[
+    {q:"Who should the report be written for?", o:["A competent reader who was not there — they must be able to follow the logic and find the evidence","The investigator's manager only","The file, unread","The person found at fault"], a:0, why:"Findings that cannot be followed and checked cannot be trusted or acted on with confidence."},
+    {q:"How should facts and opinions be handled in the report?", o:["Blended for readability","Facts only in the appendix","Opinions omitted entirely, even as labeled hypotheses","Kept visibly separate, as in the investigation itself"], a:3, why:"Separation lets reviewers weigh each claim correctly and see exactly what the conclusions rest on."},
+    {q:"What is the right home for bulky evidence like photos and trends?", o:["Deleted once the report is written","In the investigator's personal drive","In an appendix or the equipment file, referenced from the report","Printed and posted"], a:2, why:"The report stays readable while every receipt remains findable by the next reader."},
+    {q:"When may a corrective action be closed?", o:["At the end of the quarter","When completion is verified — and effectiveness checks are scheduled or passed per the plan","When the owner says it is done","When the report is filed"], a:1, why:"Say-so closure is how action lists become fiction. Verification is the closure standard."},
+    {q:"What should happen to the finished report?", o:["It is emailed once and deleted","It is kept by the investigator","It stays in the meeting folder","It goes into the equipment's history so the next failure starts from knowledge"], a:3, why:"Filed with the equipment, the report becomes the plant's memory — the starting point, not a repeat, of the next investigation."}]}
+]}
+];
+
+var TIPS = [
+"State the problem in one sentence with the equipment, the failure, and the pattern — before anyone offers a cause.",
+"Photograph the scene before anything is touched; memory edits itself within the hour.",
+"Ask what changed. Failures love to start at a change — a part, a person, a setpoint, a supplier.",
+"The failed part is evidence. Bag it, tag it, and keep it until the investigation closes.",
+"A symptom treated three times is a cause nobody has looked for yet.",
+"Interview witnesses separately, soon, and with open questions — never with your theory in the question.",
+"Every timeline entry gets a time and a source. No source, no entry.",
+"Mark the gaps in your timeline honestly; an honest gap points at the monitoring you need.",
+"Run the replacement test: would a competent person in the same spot likely have done the same?",
+"When two different people make the same error, stop retraining people and start fixing the trap.",
+"If fixing your candidate cause still lets the failure recur, you found a link, not the root.",
+"Five whys is a guideline, not a quota — stop at an actionable cause, whether that takes three whys or seven.",
+"A fishbone diagram generates candidates. Only testing against evidence promotes one to a finding.",
+"In a fault tree, hunt for AND gates — one restored barrier there blocks the whole path.",
+"Never let a low RPN bury a high severity. Rare and catastrophic still gets action.",
+"Slips need design fixes, mistakes need better information, routine violations need the system fixed.",
+"Discipline after an honest report buys you silence at the next investigation.",
+"A restart proves the symptom stopped. It does not prove your theory about the cause.",
+"Correlation needs a mechanism and consistency before it earns the name cause.",
+"'We have always done it this way' is a claim to test against today's conditions, not a verdict.",
+"Write actions a stranger could verify: an owner, a date, and an observable end state.",
+"Installed is not effective. Define the check that will prove the failure actually stopped.",
+"A fix that gets worked around within a month has just planted the next latent condition.",
+"File the finished report in the equipment history — the next failure should start from knowledge, not from zero."
+];
+
+/* ===================== STATE ===================== */
+var KEY = "taf-rca-training-v1";
+var state = { done:{}, best:{} };
+try {
+  var raw = localStorage.getItem(KEY);
+  if (raw) { var p = JSON.parse(raw); if (p && p.done && p.best) state = p; }
+} catch(e) {}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e) {} }
+
+var ALL = [];
+COURSES.forEach(function(c){ c.lessons.forEach(function(l){ ALL.push({course:c, lesson:l}); }); });
+function totalDone(){ return ALL.filter(function(x){ return state.done[x.lesson.id]; }).length; }
+function courseDone(c){ return c.lessons.filter(function(l){ return state.done[l.id]; }).length; }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+
+/* ===================== NAV ===================== */
+var views = ["home","courses","lesson","quizbank","tips"];
+var currentTab = "home";
+function show(name){
+  views.forEach(function(v){ document.getElementById("view-"+v).classList.toggle("hidden", v!==name); });
+  var tabFor = (name==="lesson") ? "courses" : name;
+  document.querySelectorAll(".tab").forEach(function(t){ t.classList.toggle("on", t.dataset.tab===tabFor); });
+  currentTab = name;
+  window.scrollTo(0,0);
+}
+document.querySelectorAll(".tab").forEach(function(t){
+  t.addEventListener("click", function(){
+    var tab = t.dataset.tab;
+    if (tab==="home") renderHome();
+    if (tab==="courses") renderCourses();
+    if (tab==="quizbank") renderQuizBank();
+    if (tab==="tips") renderTips();
+    show(tab);
+  });
+});
+
+/* ===================== HOME ===================== */
+var resetArmed = false, resetTimer = null;
+function badges(){
+  var d = totalDone();
+  var c1 = COURSES[0].lessons.every(function(l){ return state.done[l.id]; });
+  var c3 = COURSES[2].lessons.every(function(l){ return state.done[l.id]; });
+  return [
+    {icon:"⚙", name:"First Lesson Done", desc:"Pass any 1 lesson", got: d>=1},
+    {icon:"🔧", name:"Halfway There", desc:"Pass 14 of 28 lessons", got: d>=14},
+    {icon:"🧭", name:"Foundations Complete", desc:"Finish Course 1", got: c1},
+    {icon:"🌳", name:"Methods Complete", desc:"Finish Course 3", got: c3},
+    {icon:"🏆", name:"All Lessons Complete", desc:"Pass all 28 lessons", got: d>=ALL.length}
+  ];
+}
+function nextLesson(){
+  for (var i=0;i<ALL.length;i++){ if (!state.done[ALL[i].lesson.id]) return ALL[i]; }
+  return null;
+}
+function renderHome(){
+  var d = totalDone(), total = ALL.length;
+  var pct = Math.round(d/total*100);
+  var C = 2*Math.PI*48, off = C - (C*d/total);
+  var nx = nextLesson();
+  var html = "";
+  html += '<div class="hero"><div class="ring-wrap">'
+    + '<svg width="118" height="118" viewBox="0 0 118 118">'
+    + '<circle cx="59" cy="59" r="48" fill="none" stroke="#1d3552" stroke-width="11"/>'
+    + '<circle cx="59" cy="59" r="48" fill="none" stroke="#4da3ff" stroke-width="11" stroke-linecap="round" stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'"/>'
+    + '</svg><div class="ring-center"><div class="pct">'+pct+'%</div><div class="lbl">'+d+' of '+total+' lessons</div></div></div>'
+    + '<div class="hero-txt"><h2>'+(d===0 ? "Learn to fix it for good" : (nx ? "Keep going — you're on track" : "All lessons passed. Nice work."))+'</h2>'
+    + '<p>28 short lessons and 140 quiz questions on finding the real cause of failures — evidence, timelines, 5 Whys, fishbone, fault trees, FMEA, and fixes that hold.</p>'
+    + (nx ? '<button class="btn" id="startBtn">'+(d===0?"Start: ":"Continue: ")+esc(nx.lesson.title)+'</button>'
+          : '<button class="btn" id="startBtn">Review courses</button>')
+    + '</div></div>';
+  html += '<p class="disclaimer">Training and preparation only — this app does not grant any certification. Progress is stored only on this device.</p>';
+  html += '<h2 class="sec">Your courses</h2>';
+  COURSES.forEach(function(c){
+    var cd = courseDone(c), ct = c.lessons.length, pc = Math.round(cd/ct*100);
+    html += '<div class="course-card"><div class="row"><h3>'+esc(c.title)+'</h3><span class="cnt">'+cd+' / '+ct+' passed</span></div>'
+      + '<div class="bar"><i style="width:'+pc+'%"></i></div></div>';
+  });
+  html += '<h2 class="sec">Badges</h2><div class="badges">';
+  badges().forEach(function(b){
+    html += '<div class="badge '+(b.got?"earned":"locked")+'"><div class="ic">'+b.icon+'</div><div><b>'+esc(b.name)+'</b><span>'+(b.got?"Earned ✓":esc(b.desc))+'</span></div></div>';
+  });
+  html += '</div>';
+  html += '<div class="reset-zone"><button class="reset-link" id="resetLink">Reset all progress</button></div>';
+  document.getElementById("view-home").innerHTML = html;
+  document.getElementById("startBtn").addEventListener("click", function(){
+    if (nx) openLesson(nx.course, nx.lesson); else { renderCourses(); show("courses"); }
+  });
+  var rl = document.getElementById("resetLink");
+  rl.addEventListener("click", function(){
+    if (!resetArmed) {
+      resetArmed = true; rl.textContent = "Tap again to confirm reset — this clears all progress"; rl.classList.add("armed");
+      clearTimeout(resetTimer); resetTimer = setTimeout(function(){ resetArmed=false; renderHome(); if(currentTab==="home") show("home"); }, 4000);
+    } else {
+      clearTimeout(resetTimer); resetArmed = false;
+      state = { done:{}, best:{} }; save(); renderHome(); show("home");
+    }
+  });
+}
+
+/* ===================== COURSES ===================== */
+function renderCourses(){
+  var html = "";
+  COURSES.forEach(function(c, ci){
+    html += '<h2 class="sec">Course '+(ci+1)+' · '+esc(c.title)+'</h2>';
+    c.lessons.forEach(function(l, li){
+      var done = !!state.done[l.id];
+      var best = state.best[l.id];
+      html += '<button class="lesson-row'+(done?" done":"")+'" data-c="'+c.id+'" data-l="'+l.id+'">'
+        + '<span class="num">'+(done?"✓":(li+1))+'</span>'
+        + '<span class="t"><b>'+esc(l.title)+'</b><span>'+l.mins+' min read · 5 questions'+(best!=null ? ' · Best score '+best+'/5' : '')+(done?' · Passed':'')+'</span></span>'
+        + '<span class="chev">›</span></button>';
+    });
+  });
+  document.getElementById("view-courses").innerHTML = html;
+  document.querySelectorAll("#view-courses .lesson-row").forEach(function(b){
+    b.addEventListener("click", function(){
+      var c = COURSES.filter(function(x){ return x.id===b.dataset.c; })[0];
+      var l = c.lessons.filter(function(x){ return x.id===b.dataset.l; })[0];
+      openLesson(c, l);
+    });
+  });
+}
+
+/* ===================== LESSON ===================== */
+var quizState = null;
+function openLesson(course, lesson){
+  quizState = { answers:{}, score:0, total:lesson.quiz.length, lessonId:lesson.id };
+  var ci = COURSES.indexOf(course)+1;
+  var li = course.lessons.indexOf(lesson)+1;
+  var html = '<button class="backlink" id="backBtn">‹ Back to courses</button>';
+  html += '<div class="lesson-head"><h2>'+esc(lesson.title)+'</h2>'
+    + '<p class="meta">Course '+ci+' · '+esc(course.title)+' · Lesson '+li+' of '+course.lessons.length+' · '+lesson.mins+' min read</p></div>';
+  lesson.sections.forEach(function(s){
+    html += '<div class="teach"><h3>'+esc(s.h)+'</h3><p>'+esc(s.p)+'</p></div>';
+  });
+  html += '<div class="watch"><h3>⚠ What to watch for</h3><ul>';
+  lesson.watch.forEach(function(w){ html += '<li>'+esc(w)+'</li>'; });
+  html += '</ul></div>';
+  html += '<h3 class="quiz-title">Check your understanding</h3><p class="quiz-sub">5 questions · score 4 or 5 to pass · unlimited retakes</p>';
+  html += '<div id="quizZone">';
+  lesson.quiz.forEach(function(q, qi){
+    html += '<div class="q" data-q="'+qi+'"><p class="qq">'+(qi+1)+'. '+esc(q.q)+'</p>';
+    q.o.forEach(function(o, oi){
+      html += '<button class="opt" data-q="'+qi+'" data-o="'+oi+'">'+esc(o)+'</button>';
+    });
+    html += '<p class="why" id="why-'+qi+'"></p></div>';
+  });
+  html += '</div><div id="lessonResult"></div>';
+  document.getElementById("view-lesson").innerHTML = html;
+  document.getElementById("backBtn").addEventListener("click", function(){ renderCourses(); show("courses"); });
+  document.querySelectorAll("#view-lesson .opt").forEach(function(b){
+    b.addEventListener("click", function(){ answerLesson(lesson, b); });
+  });
+  show("lesson");
+}
+function answerLesson(lesson, btn){
+  var qi = +btn.dataset.q, oi = +btn.dataset.o;
+  if (quizState.answers[qi] != null) return;
+  var q = lesson.quiz[qi];
+  quizState.answers[qi] = oi;
+  var correct = (oi === q.a);
+  if (correct) quizState.score++;
+  var box = btn.closest(".q");
+  box.querySelectorAll(".opt").forEach(function(o){
+    o.disabled = true;
+    var oidx = +o.dataset.o;
+    if (oidx === q.a) o.classList.add("correct");
+    else if (oidx === oi) o.classList.add("wrong");
+    else o.classList.add("dim");
+  });
+  var why = document.getElementById("why-"+qi);
+  why.innerHTML = (correct ? "<b>Correct.</b> " : "<b>Not quite.</b> ") + esc(q.why);
+  why.classList.add("show");
+  if (Object.keys(quizState.answers).length === quizState.total) finishLesson(lesson);
+}
+function finishLesson(lesson){
+  var s = quizState.score, pass = s >= 4;
+  var prevBest = state.best[lesson.id] || 0;
+  if (s > prevBest) state.best[lesson.id] = s;
+  if (pass) state.done[lesson.id] = true;
+  save();
+  var html = '<div class="result '+(pass?"pass":"fail")+'"><h3>'+(pass?"Passed":"Not yet")+' — '+s+' / 5</h3>'
+    + '<p>'+(pass ? "Lesson marked complete. Your best score is saved on this device."
+                   : "You need 4 of 5 to pass. Re-read the sections above and try again — retakes are unlimited.")+'</p>'
+    + '<div class="rowbtns"><button class="btn ghost" id="retakeBtn">Retake quiz</button>'
+    + '<button class="btn" id="toCoursesBtn">Back to courses</button></div></div>';
+  var zone = document.getElementById("lessonResult");
+  zone.innerHTML = html;
+  zone.scrollIntoView({behavior:"smooth", block:"center"});
+  document.getElementById("retakeBtn").addEventListener("click", function(){
+    var c = COURSES.filter(function(x){ return x.lessons.indexOf(lesson) >= 0; })[0];
+    openLesson(c, lesson);
+  });
+  document.getElementById("toCoursesBtn").addEventListener("click", function(){ renderCourses(); show("courses"); });
+}
+
+/* ===================== QUIZ BANK ===================== */
+var bank = null;
+function shuffle(a){
+  for (var i=a.length-1;i>0;i--){ var j = Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; }
+  return a;
+}
+function renderQuizBank(){
+  var pool = [];
+  ALL.forEach(function(x){ x.lesson.quiz.forEach(function(q){ pool.push({q:q, lessonTitle:x.lesson.title, courseTitle:x.course.title}); }); });
+  shuffle(pool);
+  bank = { items: pool.slice(0,20), answers:{}, score:0 };
+  var html = '<div class="lesson-head"><h2>Quiz Bank</h2><p class="meta">20 questions drawn at random from all 140 lesson questions. Quiz Bank scores do not mark lessons as passed.</p></div>';
+  html += '<button class="btn block" id="newBankBtn" style="margin-bottom:14px">↻ New 20 questions</button>';
+  html += '<div id="bankZone">';
+  bank.items.forEach(function(it, qi){
+    html += '<div class="q" data-q="'+qi+'"><p class="qq">'+(qi+1)+'. '+esc(it.q.q)+'</p>';
+    it.q.o.forEach(function(o, oi){ html += '<button class="opt" data-q="'+qi+'" data-o="'+oi+'">'+esc(o)+'</button>'; });
+    html += '<p class="why" id="bwhy-'+qi+'"></p></div>';
+  });
+  html += '</div><div id="bankResult"></div>';
+  document.getElementById("view-quizbank").innerHTML = html;
+  document.getElementById("newBankBtn").addEventListener("click", function(){ renderQuizBank(); show("quizbank"); });
+  document.querySelectorAll("#view-quizbank .opt").forEach(function(b){
+    b.addEventListener("click", function(){ answerBank(b); });
+  });
+}
+function answerBank(btn){
+  var qi = +btn.dataset.q, oi = +btn.dataset.o;
+  if (bank.answers[qi] != null) return;
+  var it = bank.items[qi], q = it.q;
+  bank.answers[qi] = oi;
+  var correct = (oi === q.a);
+  if (correct) bank.score++;
+  var box = btn.closest(".q");
+  box.querySelectorAll(".opt").forEach(function(o){
+    o.disabled = true;
+    var oidx = +o.dataset.o;
+    if (oidx === q.a) o.classList.add("correct");
+    else if (oidx === oi) o.classList.add("wrong");
+    else o.classList.add("dim");
+  });
+  var why = document.getElementById("bwhy-"+qi);
+  why.innerHTML = (correct ? "<b>Correct.</b> " : "<b>Not quite.</b> ") + esc(q.why);
+  why.classList.add("show");
+  if (Object.keys(bank.answers).length === bank.items.length) finishBank();
+}
+function finishBank(){
+  var s = bank.score, total = bank.items.length;
+  var msg;
+  if (s >= 18) msg = "Sharp work. Keep the streak warm with a fresh set now and then.";
+  else if (s >= 14) msg = "Solid. Review the misses below and you'll close the gap fast.";
+  else if (s >= 10) msg = "Getting there. Work through the missed lessons, then draw a new set.";
+  else msg = "Good starting point — the lessons are short. Revisit the topics below and try a fresh 20.";
+  var html = '<div class="result '+(s>=14?"pass":"fail")+'"><h3>Score: '+s+' / '+total+'</h3><p>'+msg+'</p>'
+    + '<div class="rowbtns"><button class="btn" id="againBtn">New 20 questions</button></div></div>';
+  var missed = bank.items.filter(function(it, i){ return bank.answers[i] !== it.q.a; });
+  if (missed.length){
+    html += '<h2 class="sec">Missed questions — review</h2>';
+    missed.forEach(function(it){
+      html += '<div class="missed"><div class="src">From: '+esc(it.lessonTitle)+'</div>'
+        + '<p><b>'+esc(it.q.q)+'</b></p>'
+        + '<p class="ca">Correct answer: '+esc(it.q.o[it.q.a])+'</p>'
+        + '<p>'+esc(it.q.why)+'</p></div>';
+    });
+  } else {
+    html += '<div class="missed"><p><b>Perfect run — no misses to review.</b></p></div>';
+  }
+  var zone = document.getElementById("bankResult");
+  zone.innerHTML = html;
+  zone.scrollIntoView({behavior:"smooth", block:"start"});
+  document.getElementById("againBtn").addEventListener("click", function(){ renderQuizBank(); show("quizbank"); });
+}
+
+/* ===================== TIPS ===================== */
+function renderTips(){
+  var html = '<div class="lesson-head"><h2>RCA Tips</h2><p class="meta">24 weekly field tips — one practical habit at a time.</p></div>';
+  TIPS.forEach(function(t, i){
+    html += '<div class="tip"><span class="wk">Week '+(i+1)+'</span><p>'+esc(t)+'</p></div>';
+  });
+  document.getElementById("view-tips").innerHTML = html;
+}
+
+/* ===================== INIT ===================== */
+renderHome();
+renderCourses();
+renderTips();
+show("home");
+</script>
+</body>
+</html>
