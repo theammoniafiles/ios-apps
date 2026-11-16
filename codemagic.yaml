@@ -7,6 +7,8 @@ workflows:
       app_store_connect: taf-asc
     environment:
       xcode: latest
+      groups:
+        - signing
       vars:
         APP_DIR: "mlt-app"
         BUNDLE_ID: "com.theammoniafiles.mlt"
@@ -25,9 +27,13 @@ workflows:
         script: |
           cd "$APP_DIR/ios/App"
           pod install
-      - name: Fetch signing files
+      - name: Install signing certificate and profiles
         script: |
-          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE
+          keychain initialize
+          echo "$CERT_P12_B64" | base64 --decode > /tmp/dist.p12
+          keychain add-certificates --certificate /tmp/dist.p12 --certificate-password "$CERT_PASSWORD"
+          mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+          cp profiles/*.mobileprovision "$HOME/Library/MobileDevice/Provisioning Profiles/"
       - name: Use profiles
         script: |
           xcode-project use-profiles --workspace "$XCODE_WORKSPACE" --warn-only
@@ -50,6 +56,8 @@ workflows:
       app_store_connect: taf-asc
     environment:
       xcode: latest
+      groups:
+        - signing
       vars:
         APP_DIR: "boilers-app"
         BUNDLE_ID: "com.theammoniafiles.boilers"
@@ -68,9 +76,13 @@ workflows:
         script: |
           cd "$APP_DIR/ios/App"
           pod install
-      - name: Fetch signing files
+      - name: Install signing certificate and profiles
         script: |
-          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE
+          keychain initialize
+          echo "$CERT_P12_B64" | base64 --decode > /tmp/dist.p12
+          keychain add-certificates --certificate /tmp/dist.p12 --certificate-password "$CERT_PASSWORD"
+          mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+          cp profiles/*.mobileprovision "$HOME/Library/MobileDevice/Provisioning Profiles/"
       - name: Use profiles
         script: |
           xcode-project use-profiles --workspace "$XCODE_WORKSPACE" --warn-only
@@ -93,6 +105,8 @@ workflows:
       app_store_connect: taf-asc
     environment:
       xcode: latest
+      groups:
+        - signing
       vars:
         APP_DIR: "rca-app"
         BUNDLE_ID: "com.theammoniafiles.rca"
@@ -111,9 +125,13 @@ workflows:
         script: |
           cd "$APP_DIR/ios/App"
           pod install
-      - name: Fetch signing files
+      - name: Install signing certificate and profiles
         script: |
-          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE
+          keychain initialize
+          echo "$CERT_P12_B64" | base64 --decode > /tmp/dist.p12
+          keychain add-certificates --certificate /tmp/dist.p12 --certificate-password "$CERT_PASSWORD"
+          mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+          cp profiles/*.mobileprovision "$HOME/Library/MobileDevice/Provisioning Profiles/"
       - name: Use profiles
         script: |
           xcode-project use-profiles --workspace "$XCODE_WORKSPACE" --warn-only
