@@ -301,9 +301,9 @@
         </div>
         <div>
           <h1>Gear for the people who run the cold rooms</h1>
-          <p>Tees, hoodies, mugs, hats, crewnecks and more from The Ammonia Files — the channel for industrial ammonia refrigeration operators. All 63 products are live now, printed and shipped by Amaze Commerce. Waves 1 &amp; 2 come in black as a tee, hoodie, or mug, and Wave 3 adds the Skull and Frosty designs on crewnecks, hats, totes, tumblers, bottles, notebooks and stickers — tap Buy on Amaze on any product to open it at the store, where you pick your size and check out.</p>
+          <p>Tees, hoodies, mugs, hats, crewnecks and more from The Ammonia Files — the channel for industrial ammonia refrigeration operators. All 63 products are live now, printed and shipped by Fourthwall. Waves 1 &amp; 2 come in black as a tee, hoodie, or mug, and Wave 3 adds the Skull and Frosty designs on crewnecks, hats, totes, tumblers, bottles, notebooks and stickers — tap Buy on Fourthwall on any product to open the store, where you pick your size and check out.</p>
           <div class="hero-actions">
-            <a class="btn btn-primary" href="https://app.amazecommerce.com/shop/coldchainyt" target="_blank" rel="noopener">Open the full store</a>
+            <a class="btn btn-primary" href="https://theammoniafiles-shop.fourthwall.com/" target="_blank" rel="noopener">Open the full store</a>
             <a class="btn btn-ghost" href="#live">Shop Wave 1</a>
             <a class="btn btn-ghost" href="#wave2">Shop Wave 2</a>
             <a class="btn btn-ghost" href="#extras">Shop Wave 3</a>
@@ -340,7 +340,7 @@
 
       <section id="live" data-section="live">
         <div class="sec-head"><h2>Wave 1 — live now</h2></div>
-        <p class="sec-note">The first drop — 15 products, all live and all black. Frosty, the Emblem, the Wordmark, the Operator Badge, and Don't Be The Math, each as a tee ($24.99), hoodie ($44.99), and mug ($16.99). Tap Buy on Amaze to open that exact product on Amaze — add it to Amaze's cart there, and that's where sizes, payment, and shipping are handled.</p>
+        <p class="sec-note">The first drop — 15 products, all live and all black. Frosty, the Emblem, the Wordmark, the Operator Badge, and Don't Be The Math, each as a tee ($24.99), hoodie ($44.99), and mug ($16.99). Tap Buy on Fourthwall to open the store — find the product there, add it to the cart, and that's where sizes, payment, and shipping are handled.</p>
         <div class="grid" id="liveGrid"></div>
       </section>
 
@@ -352,7 +352,7 @@
 
       <section id="extras" data-section="extras">
         <div class="sec-head"><h2>Wave 3 — more than shirts · live now</h2></div>
-        <p class="sec-note">18 more products, all live — the Skull and Frosty designs on crewnecks, hats, tote bags, tumblers, water bottles, notebooks, and stickers/decals. Apparel is black. Tap Buy on Amaze to open that exact product on Amaze, where you check out.</p>
+        <p class="sec-note">18 more products, all live — the Skull and Frosty designs on crewnecks, hats, tote bags, tumblers, water bottles, notebooks, and stickers/decals. Apparel is black. Tap Buy on Fourthwall to open the store, where you check out.</p>
         <div class="grid" id="extrasGrid"></div>
       </section>
 
@@ -411,16 +411,16 @@
 
       <footer>
         <div class="links">
-          <a href="https://app.amazecommerce.com/shop/coldchainyt" target="_blank" rel="noopener">Amaze store</a>
+          <a href="https://theammoniafiles-shop.fourthwall.com/" target="_blank" rel="noopener">Fourthwall store</a>
           <a href="https://www.youtube.com/@theammoniafiles" target="_blank" rel="noopener">The Ammonia Files on YouTube</a>
           <a href="https://theammoniafiles.com" target="_blank" rel="noopener">theammoniafiles.com</a>
         </div>
-        <p>The Ammonia Files store — merch is print-on-demand via Amaze Commerce, printed, shipped, and paid for on the Amaze store site. Books are sold and shipped by Amazon.</p>
+        <p>The Ammonia Files store — merch is print-on-demand via Fourthwall, printed, shipped, and paid for on the Fourthwall store site. Books are sold and shipped by Amazon.</p>
       </footer>
     </main>
 
     <script>
-      var STORE_URL = "https://app.amazecommerce.com/shop/coldchainyt";
+      var STORE_URL = "https://theammoniafiles-shop.fourthwall.com/";
       var PRICES = { tee: 24.99, hoodie: 44.99, mug: 16.99 };
       var TYPE_LABEL = { tee: "Tee", hoodie: "Hoodie", mug: "Mug" };
       /* Category filter maps: each product's category comes from its type,
@@ -482,7 +482,7 @@
 
       function money(n) { return "$" + n.toFixed(2); }
       function productUrl(designKey, type) {
-        return STORE_URL + "/the-ammonia-files-" + DESIGNS[designKey].slug + "-" + type;
+        return STORE_URL;
       }
 
       function productCard(designKey, type) {
@@ -498,7 +498,7 @@
           '<h3>' + d.name + " " + TYPE_LABEL[type] + '</h3>' +
           '<p class="type">' + d.blurb + ' Black.</p>' +
           '<div class="row"><span class="price">' + money(PRICES[type]) + '</span>' +
-          '<a class="buy-btn" href="' + url + '" target="_blank" rel="noopener">Buy on Amaze</a></div>' +
+          '<a class="buy-btn" href="' + url + '" target="_blank" rel="noopener">Buy on Fourthwall</a></div>' +
           '</div>';
         return card;
       }
@@ -530,7 +530,7 @@
       ];
       function wave3Card(p) {
         var d = DESIGNS[p.design];
-        var url = STORE_URL + "/" + p.slug;
+        var url = STORE_URL;
         var card = document.createElement("article");
         card.className = "card wave3-card";
         card.setAttribute("data-category", CATEGORY_OF_GROUP[p.group]);
@@ -541,7 +541,7 @@
           '<h3>' + p.name + '</h3>' +
           '<p class="type">' + p.type + '. Black.</p>' +
           '<div class="row"><span class="price">' + money(p.price) + '</span>' +
-          '<a class="buy-btn" href="' + url + '" target="_blank" rel="noopener">Buy on Amaze</a></div>' +
+          '<a class="buy-btn" href="' + url + '" target="_blank" rel="noopener">Buy on Fourthwall</a></div>' +
           '</div>';
         return card;
       }
